@@ -1,0 +1,85 @@
+object DtmGrafico: TDtmGrafico
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 261
+  Width = 430
+  object qryProdutoEstoque: TFDQuery
+    Active = True
+    Connection = dtmConexao.fdConexao
+    SQL.Strings = (
+      
+        'SELECT CONVERT (VARCHAR, produtoId) +'#39' - '#39'+nome AS Label, Quanti' +
+        'dade AS Value FROM produtos')
+    Left = 159
+    Top = 49
+    object qryProdutoEstoqueLabel: TStringField
+      FieldName = 'Label'
+      ReadOnly = True
+      Size = 93
+    end
+    object qryProdutoEstoqueValue: TIntegerField
+      FieldName = 'Value'
+    end
+  end
+  object dtsProdutoEstoque: TDataSource
+    DataSet = qryProdutoEstoque
+    Left = 255
+    Top = 54
+  end
+  object qryVendaPorCliente: TFDQuery
+    Active = True
+    Connection = dtmConexao.fdConexao
+    SQL.Strings = (
+      
+        'SELECT CONVERT(VARCHAR, vendas.clienteID) +'#39' - '#39'+clientes.nome A' +
+        'S Label,'
+      '  SUM(vendas.totalVenda) AS Value'
+      '  FROM Vendas'
+      '    INNER JOIN clientes ON clientes.clienteId = vendas.clienteId'
+      
+        '  WHERE vendas.dataVenda BETWEEN CONVERT(DATE, GETDATE()-7) and ' +
+        'CONVERT(DATE, GETDATE())'
+      '  GROUP BY Vendas.clienteId, clientes.Nome')
+    Left = 136
+    Top = 176
+    object qryVendaPorClienteLabel: TStringField
+      FieldName = 'Label'
+      ReadOnly = True
+      Size = 93
+    end
+    object qryVendaPorClienteValue: TFMTBCDField
+      FieldName = 'Value'
+      ReadOnly = True
+      Precision = 38
+      Size = 5
+    end
+  end
+  object qry10ProdutosMaisVendidos: TFDQuery
+    Active = True
+    Connection = dtmConexao.fdConexao
+    SQL.Strings = (
+      
+        'SELECT TOP 10 CONVERT(VARCHAR, vi.produtoId) + '#39'-'#39'+p.nome AS Lab' +
+        'el,'
+      '  SUM(vi.totalProduto) AS Value'
+      'FROM vendasItens AS vi'
+      '  INNER JOIN produtos AS P ON p.produtoId = vi.produtoId'
+      'GROUP BY vi.produtoId, p.nome'
+      'ORDER BY Label DESC')
+    Left = 264
+    Top = 208
+    object qry10ProdutosMaisVendidosLabel: TStringField
+      FieldName = 'Label'
+      Origin = 'Label'
+      ReadOnly = True
+      Size = 91
+    end
+    object qry10ProdutosMaisVendidosValue: TFMTBCDField
+      FieldName = 'Value'
+      Origin = 'Value'
+      ReadOnly = True
+      Precision = 38
+      Size = 5
+    end
+  end
+end

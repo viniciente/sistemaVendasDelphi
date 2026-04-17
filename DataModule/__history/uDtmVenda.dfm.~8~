@@ -1,0 +1,100 @@
+object dtmVenda: TdtmVenda
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
+  Height = 413
+  Width = 709
+  object QryCliente: TFDQuery
+    Active = True
+    Connection = dtmConexao.fdConexao
+    SQL.Strings = (
+      'SELECT clienteId,'
+      '       nome'
+      'FROM clientes')
+    Left = 160
+    Top = 40
+    object QryClienteclienteId: TFDAutoIncField
+      DisplayLabel = 'Codigo'
+      FieldName = 'clienteId'
+      ReadOnly = True
+    end
+    object QryClientenome: TStringField
+      DisplayLabel = 'Nome'
+      FieldName = 'nome'
+      Size = 60
+    end
+  end
+  object QryProdutos: TFDQuery
+    Connection = dtmConexao.fdConexao
+    SQL.Strings = (
+      'SELECT produtoId,'
+      '       nome,'
+      '       valor,'
+      '       quantidade'
+      'FROM produtos')
+    Left = 160
+    Top = 136
+    object QryProdutosprodutoId: TFDAutoIncField
+      DisplayLabel = 'Codigo'
+      FieldName = 'produtoId'
+      ReadOnly = True
+    end
+    object QryProdutosnome: TStringField
+      DisplayLabel = 'Nome'
+      FieldName = 'nome'
+      Size = 60
+    end
+    object QryProdutosvalor: TFMTBCDField
+      DisplayLabel = 'Valor'
+      FieldName = 'valor'
+      Precision = 18
+      Size = 5
+    end
+    object QryProdutosquantidade: TFMTBCDField
+      DisplayLabel = 'Quantidade'
+      FieldName = 'quantidade'
+      Precision = 18
+      Size = 5
+    end
+  end
+  object dtsCliente: TDataSource
+    DataSet = QryCliente
+    Left = 256
+    Top = 40
+  end
+  object dtsProdutos: TDataSource
+    DataSet = QryProdutos
+    Left = 256
+    Top = 136
+  end
+  object dtsItensVendas: TDataSource
+    DataSet = cdsItensVendas
+    Left = 256
+    Top = 232
+  end
+  object cdsItensVendas: TClientDataSet
+    Aggregates = <>
+    Params = <>
+    Left = 160
+    Top = 232
+    object cdsItensVendasprodutosId: TIntegerField
+      DisplayLabel = 'Codigo'
+      FieldName = 'Codigo'#13#10
+    end
+    object cdsItensVendasNomeProduto: TStringField
+      FieldName = 'Nome Produto'
+    end
+    object cdsItensVendasquantidade: TFloatField
+      DisplayLabel = 'Quantidade'
+      FieldName = 'quantidade'
+    end
+    object cdsItensVendasvalorUnitario: TFloatField
+      DisplayLabel = 'Valor Unitario'#13#10
+      FieldName = 'valorUnitario'
+    end
+    object cdsItensVendasvalorTotalProduto: TFloatField
+      DisplayLabel = 'Valor Total Produto'#13#10
+      FieldName = 'valorTotalProduto'
+    end
+  end
+end

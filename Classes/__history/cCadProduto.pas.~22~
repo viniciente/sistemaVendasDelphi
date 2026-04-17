@@ -1,0 +1,205 @@
+﻿unit cCadProduto;
+
+interface
+
+uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      System.SysUtils;
+      // lista de Units
+
+type
+  TProduto = class
+  private
+    FdConexao: TFDConnection;
+    F_produtoId:Integer;  //int
+    F_nome:string; // VarChar
+    F_descricao:string;
+    F_valor:Double;
+    F_quantidade:Double;
+    F_categoriasId: Integer;
+
+  public
+    constructor Create(aConexao:TFDConnection);
+    destructor Destroy; override;
+    function Inserir:Boolean;
+    function Atualizar:Boolean;
+    function Apagar:Boolean;
+    function Selecionar(id:Integer):Boolean;
+
+  published
+    property codigo      :Integer read F_produtoId   write F_produtoId;
+    property nome        :string  read F_nome        write F_nome;
+    property descricao   :string  read F_descricao   write F_descricao;
+    property valor       :Double  read F_valor       write F_valor;
+    property quantidade  :Double  read F_quantidade  write F_quantidade;
+    property categoriasId :Integer read F_categoriasId write F_categoriasId;
+  end;
+
+implementation
+
+{$REGION 'Constructor and Destructor'}
+constructor TProduto.Create(aConexao:TFDConnection);
+begin
+  FdConexao:=aConexao;
+end;
+
+destructor TProduto.Destroy;
+begin
+
+  inherited
+end;
+{$ENDREGION}
+
+{$REGION 'CRUD'}
+function TProduto.Apagar:Boolean;
+var Qry:TFDQuery;
+begin
+  if MessageDlg('Apagar o Regsitro: '+#13+#13+
+                'Codigo: '+IntToStr(F_produtoId)+#13+
+                'Descriçãp: '+F_nome,mtConfirmation, [mbYes, mbNo], 0)=mrNo then begin
+    Result:=False;
+    Abort;
+  end;
+
+  try
+  Result:=False;
+  Qry:=TFDQuery.Create(nil);
+  Qry.Connection:=FdConexao;
+  Qry.SQL.Clear;
+  Qry.SQL.Add('DELETE FROM produtos '+
+              ' WHERE produtoId=:produtoId ');
+  Qry.ParamByName('produtoId').AsInteger :=F_produtoId;
+  try
+    FdConexao.StartTransaction;
+    Qry.ExecSQL;
+    FdConexao.Commit;
+  except
+  on E: Exception do
+    begin
+      MessageDlg('Erro ao excluir produto: ' + E.Message, mtError, [mbOK], 0);
+      FdConexao.Rollback;
+      Result:=False;
+    end;
+  end;
+
+  finally
+    if Assigned(Qry) then
+       FreeAndNil(Qry);
+  end;
+end;
+
+function TProduto.Atualizar:Boolean;
+var Qry:TFDQuery;
+begin
+  try
+    Result:=True;
+    Qry:=TFDQuery.Create(nil);
+    Qry.Connection:=FdConexao;
+    Qry.SQL.Clear;
+    Qry.SQL.Add('UPDATE produtos '+
+                '   SET nome        =:nome '+
+                '      ,descricao   =:descricao '+
+                '      ,valor       =:valor '+
+                '      ,quantidade  =:quantidade '+
+                '      ,categoriasId =:categoriasId '+
+                'WHERE produtoId=:produtoId ');
+    Qry.ParamByName('produtoId').AsInteger   :=Self.F_produtoId;
+    Qry.ParamByName('nome').AsString         :=Self.F_nome;
+    Qry.ParamByName('descricao').AsString    :=Self.F_descricao;
+    Qry.ParamByName('valor').AsFloat         :=Self.F_valor;
+    Qry.ParamByName('quantidade').AsFloat    :=Self.F_quantidade;
+    Qry.ParamByName('categoriasId').AsInteger :=Self.categoriasId;
+
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+    except
+        on E: Exception do
+        begin
+          ShowMessage('Erro técnico: ' + E.Message);
+          FdConexao.Rollback;
+          Result := False;
+        end;
+    end;
+  finally
+    if Assigned(Qry) then
+       FreeAndNil(Qry);
+  end;
+end;
+
+function TProduto.Inserir: Boolean;
+var Qry:TFDQuery;
+begin
+  try
+    Result:=True;
+    Qry:=TFDQuery.Create(nil);
+    Qry.Connection:=FdConexao;
+    Qry.SQL.Clear;
+    Qry.SQL.Add ('INSERT INTO produtos (nome, descricao, valor, quantidade, categoriasId) ' +
+                'VALUES (:nome, :descricao, :valor, :quantidade, :categoriasId)');
+
+    Qry.ParamByName('nome').AsString         :=Self.F_nome;
+    Qry.ParamByName('descricao').AsString    :=Self.F_descricao;
+    Qry.ParamByName('valor').AsFloat         :=Self.F_valor;
+    Qry.ParamByName('quantidade').AsFloat    :=Self.F_quantidade;
+    Qry.ParamByName('categoriasId').AsInteger :=Self.categoriasId;
+
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+    except
+        on E: Exception do
+        begin
+          ShowMessage('Erro técnico: ' + E.Message);
+          FdConexao.Rollback;
+          Result := False;
+        end;
+    end;
+  finally
+  end;
+end;
+
+function TProduto.Selecionar(id: Integer): Boolean;
+var Qry:TFDQuery;
+begin
+  try
+    Result:=True;
+    Qry:=TFDQuery.Create(nil);
+    Qry.Connection:=FdConexao;
+    Qry.SQL.Clear;
+    Qry.SQL.Add('SELECT produtoId, '+
+                '       nome, '+
+                '       descricao, '+
+                '       valor, '+
+                '       quantidade, '+
+                '       categoriasId '+
+                '  FROM produtos '+
+                ' WHERE produtoId=:produtoId');
+    Qry.ParamByName('produtoId').AsInteger:=Id;
+    try
+      Qry.Open;
+
+      Self.F_produtoId        :=Qry.FieldByName('produtoId').AsInteger;
+      Self.F_nome             :=Qry.FieldByName('nome').AsString;
+      Self.F_descricao        :=Qry.FieldByName('descricao').AsString;
+      Self.F_valor            :=Qry.FieldByName('valor').AsFloat;
+      Self.F_quantidade       :=Qry.FieldByName('quantidade').AsFloat;
+      Self.F_categoriasId      :=Qry.FieldByName('categoriasId').AsInteger;
+    except
+      Result:=False;
+    end;
+
+  finally
+    if Assigned(Qry) then
+       FreeAndNil(Qry);
+  end;
+end;
+
+{$ENDREGION}
+end.

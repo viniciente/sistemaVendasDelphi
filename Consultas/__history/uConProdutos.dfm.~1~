@@ -1,0 +1,12 @@
+inherited frmTelaHerancaConsulta1: TfrmTelaHerancaConsulta1
+  Caption = 'frmTelaHerancaConsulta1'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited fdqry1: TFDQuery
+    Top = 8
+  end
+  inherited dsListagem: TDataSource
+    Left = 419
+    Top = 8
+  end
+end

@@ -1,0 +1,234 @@
+unit cFuncao;
+
+interface
+
+uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, cUsuarioLogado,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      RLReport, Vcl.Forms, System.SysUtils, Vcl.Imaging.pngimage, Vcl.Imaging.jpeg, Vcl.Graphics,
+      Vcl.ExtDlgs, UTelaHeranca;
+      // lista de Units
+
+type
+  TFuncao = class
+  private
+  public
+    class procedure CarregarImagem(aImage: TImage); static;
+    class procedure LimparImagem(var aImage: TImage); static;
+    class procedure CriarForm(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado; aConexao:TFDConnection); static;
+    class procedure CriarRelatorio(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado ; aConexao:TFDConnection); static;
+    class function ValidarCPF(aCPF: string): Boolean;
+    class function ValidarCNPJ(aCNPJ: string): Boolean;
+  end;
+
+implementation
+
+{$REGION'CRAIR FORM & RELATORIO'}
+class procedure TFuncao.CriarForm(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado; aConexao:TFDConnection);
+var form: TForm;
+begin
+  try
+    form := aNomeForm.Create(Application);
+    if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, form.Name, aConexao) then
+    begin
+      form.ShowModal;
+    end
+    else begin
+       MessageDlg('Usuário: '+oUsuarioLogado.nome +' Não tem Permissão de Acesso',mtWarning,[mbOK],0);
+    end;
+  finally
+    if Assigned(form) then
+       form.Release;
+  end;
+end;
+
+
+class procedure TFuncao.CriarRelatorio(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado; aConexao:TFDConnection);
+var form: TForm;
+    aRelatorio:TRLReport;
+    i:Integer;
+begin
+  try
+    form := aNomeForm.Create(Application);
+    if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, form.Name, aConexao) then
+    begin
+      for I := 0 to form.ComponentCount-1 do
+      begin
+        if form.Components[i] is TRLReport then
+        begin
+           TRLReport(form.Components[i]).PreviewModal;
+           Break;
+        end;
+      end;
+    end
+    else begin
+       MessageDlg('Usuário: '+oUsuarioLogado.nome +', não tem permissão de acesso',mtWarning,[mbOK],0);
+    end;
+  finally
+    if Assigned(form) then
+       form.Release;
+  end;
+end;
+
+{$ENDREGION}
+
+{$REGION'LIMPAR IMAGEM'}
+
+class procedure TFuncao.LimparImagem(var aImage:TImage);
+begin
+  aImage.Picture.Assign(nil);
+end;
+
+class procedure TFuncao.CarregarImagem(aImage:TImage);
+var
+  Bmp, BmpTrans: TBitmap;
+  Jpg: TJPEGImage;
+  Pic: TPicture;
+  Png: TPngImage;
+  opdSelecionar:TOpenPictureDialog;
+  iWidth:Integer;
+  iHeight:Integer;
+begin
+  Try
+    iWidth:=160;
+    iHeight:=130;
+    opdSelecionar:=TOpenPictureDialog.Create(nil);
+    opdSelecionar.Filter:='All (*.bmp;*.jpg; *.jpeg;*.png)|*.jpg; *.jpeg; *.bmp;*.png|Bitmaps '+
+                          '(*.bmp)|*.bmp|JPEG Image File (*.jpg;*.jpeg)|*.jpg; *.jpeg| '+
+                          'PNG(*.png)|*.png';
+    opdSelecionar.Title:='Selecione a Imagem';
+    opdSelecionar.Execute;
+
+    if opdSelecionar.FileName<>EmptyStr then begin
+      if (Pos('.JPG',UpperCase(opdSelecionar.FileName))>0) or ( Pos('.JPEG',UpperCase(opdSelecionar.FileName))>0) then begin
+        Bmp := TBitmap.Create;
+        Jpg := TJPEGImage.Create;
+        Pic := TPicture.Create;
+        try
+          Pic.LoadFromFile(opdSelecionar.FileName);
+          Jpg.Assign(Pic);
+          Jpg.CompressionQuality :=7;
+          Bmp.Width  :=iWidth;
+          Bmp.Height :=iHeight;
+          Bmp.Canvas.StretchDraw(Rect(0, 0, Bmp.width, Bmp.Height), Jpg);
+          aImage.Picture.Bitmap:=Bmp;
+        finally
+          Pic.Free;
+          Jpg.Free;
+          Bmp.Free;
+        end
+      End
+      else if Pos('.PNG',UpperCase(opdSelecionar.FileName))>0 then begin
+        Bmp := TBitmap.Create;
+        png := TPngImage.Create;
+        Pic := TPicture.Create;
+        try
+          Pic.LoadFromFile(opdSelecionar.FileName);
+          png.Assign(Pic);
+          Bmp.Width  :=iWidth;
+          Bmp.Height :=iHeight;
+          Bmp.Canvas.StretchDraw(Rect(0, 0, Bmp.width, Bmp.Height), png);
+
+          aImage.Picture.Bitmap:=Bmp;
+
+        finally
+          Pic.Free;
+          png.Free;
+          Bmp.Free;
+        end
+      end
+      else begin
+        try
+          Bmp := TBitmap.Create;
+          BmpTrans:= TBitmap.Create;
+          Pic := TPicture.Create;
+
+          Pic.LoadFromFile(opdSelecionar.FileName);
+          BmpTrans.Assign(Pic.Bitmap);
+          Bmp.Width :=iWidth;
+          Bmp.Height:=iHeight;
+          Bmp.Canvas.StretchDraw(Rect(0, 0, Bmp.width, Bmp.Height), BmpTrans);
+          aImage.Picture.Bitmap:=Bmp;
+        finally
+          Pic.Free;
+          BmpTrans.Free;
+          Bmp.Free;
+        end;
+      end;
+    end;
+
+  Finally
+     FreeAndNil(opdSelecionar);
+  End;
+
+end;
+
+{$ENDREGION}
+
+class function TFuncao.ValidarCPF(aCPF: string): Boolean;
+var
+  d1, d2, n: array[1..11] of Integer;
+  i, somatorio: Integer;
+begin
+  Result := False;
+  if Length(aCPF) <> 11 then Exit;
+  if (aCPF = '00000000000') or (aCPF = '11111111111') then Exit;
+
+  try
+    for i := 1 to 11 do n[i] := StrToInt(aCPF[i]);
+
+    // Cálculo do 1º Dígito
+    somatorio := n[1]*10 + n[2]*9 + n[3]*8 + n[4]*7 + n[5]*6 + n[6]*5 + n[7]*4 + n[8]*3 + n[9]*2;
+    d1[1] := 11 - (somatorio mod 11);
+    if d1[1] >= 10 then d1[1] := 0;
+
+    // Cálculo do 2º Dígito
+    somatorio := n[1]*11 + n[2]*10 + n[3]*9 + n[4]*8 + n[5]*7 + n[6]*6 + n[7]*5 + n[8]*4 + n[9]*3 + d1[1]*2;
+    d2[1] := 11 - (somatorio mod 11);
+    if d2[1] >= 10 then d2[1] := 0;
+
+    Result := (n[10] = d1[1]) and (n[11] = d2[1]);
+  except
+    Result := False;
+  end;
+end;
+
+class function TFuncao.ValidarCNPJ(aCNPJ: string): Boolean;
+var
+  v: array[1..2] of Integer;
+  s, i, p, j: Integer; // Adicionamos a variável 'j' aqui
+begin
+  Result := False;
+  if (Length(aCNPJ) <> 14) then Exit;
+
+  try
+    // Usamos 'j' para controlar o loop, em vez de 'v[1]'
+    for j := 1 to 2 do
+    begin
+      s := 0;
+      p := 2;
+
+      // O loop interno percorre os dígitos para o cálculo
+      for i := (11 + j) downto 1 do
+      begin
+        s := s + (StrToInt(aCNPJ[i]) * p);
+        Inc(p);
+        if p > 9 then p := 2;
+      end;
+
+      v[j] := 11 - (s mod 11);
+      if v[j] >= 10 then v[j] := 0;
+    end;
+
+    // Comparamos os dígitos verificadores calculados com os reais (posições 13 e 14)
+    Result := (StrToInt(aCNPJ[13]) = v[1]) and (StrToInt(aCNPJ[14]) = v[2]);
+  except
+    Result := False;
+  end;
+end;
+
+end.
+

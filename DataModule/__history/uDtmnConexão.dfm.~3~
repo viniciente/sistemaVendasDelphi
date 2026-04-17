@@ -1,0 +1,17 @@
+﻿object dtmConexão: TdtmConexão
+  OldCreateOrder = False
+  Height = 484
+  Width = 666
+  object ConexãoDB: TFDConnection
+    Params.Strings = (
+      'DriblerID=MSSQL'#11
+      'Server=DC-TR-06-VM\SERVERCURSO'
+      'Database=Vendas'
+      'OSAuthent=Yes'
+      'DriverID=MSSQL'
+      'User_Name=DOMTEC\devmv'
+      'Connnected=True')
+    Left = 368
+    Top = 200
+  end
+end

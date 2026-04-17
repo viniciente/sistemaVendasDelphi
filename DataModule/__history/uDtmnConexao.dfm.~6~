@@ -1,0 +1,50 @@
+object dtmConexao: TdtmConexao
+  OldCreateOrder = False
+  Height = 484
+  Width = 666
+  object fdConexao: TFDConnection
+    Params.Strings = (
+      'Server=DC-TR-06-VM\SERVERCURSO'
+      'Database=Vendas'
+      'OSAuthent=Yes'
+      'User_Name=DOMTEC\devmv'
+      'DriverID=MSSQL')
+    Connected = True
+    Left = 280
+    Top = 152
+  end
+  object QryScriptCategorias: TFDQuery
+    Connection = fdConexao
+    SQL.Strings = (
+      'IF OBJECT_ID ('#39'categorias'#39') IS NULL'
+      'begin'
+      '  CREATE TABLE categorias ('
+      '    categoriaId int IDENTITY(1,1) NOT NULL,'
+      '    dwescricao varchar(30) NULL,'
+      '    PRIMARY KEY (categoriaID)'
+      ')'
+      'END')
+    Left = 344
+    Top = 88
+  end
+  object QryScriptClientes: TFDQuery
+    Connection = fdConexao
+    Left = 432
+    Top = 152
+  end
+  object QryScriptProdutos: TFDQuery
+    Connection = fdConexao
+    Left = 520
+    Top = 88
+  end
+  object QryScriptVendas: TFDQuery
+    Connection = fdConexao
+    Left = 584
+    Top = 160
+  end
+  object QryScriptItensVendas: TFDQuery
+    Connection = fdConexao
+    Left = 416
+    Top = 256
+  end
+end

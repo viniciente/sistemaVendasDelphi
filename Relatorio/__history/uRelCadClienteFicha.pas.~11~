@@ -1,0 +1,118 @@
+unit uRelCadClienteFicha;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uDtmnConexao, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, RLReport, RLFilters, RLPDFFilter, Vcl.Imaging.pngimage;
+
+type
+  TfrmRelCadClienteFicha = class(TForm)
+    QryCliente: TFDQuery;
+    dtsCliente: TDataSource;
+    Relatorio: TRLReport;
+    Cabecalho: TRLBand;
+    lblLIstagemCategoria: TRLLabel;
+    RLDraw2: TRLDraw;
+    RLPDFFilter1: TRLPDFFilter;
+    RLBand2: TRLBand;
+    Rodape: TRLBand;
+    RLSystemInfo1: TRLSystemInfo;
+    RLDraw1: TRLDraw;
+    RLSystemInfo2: TRLSystemInfo;
+    RLSystemInfo3: TRLSystemInfo;
+    RLLabel1: TRLLabel;
+    lblPaginas: TRLLabel;
+    RLDBText1: TRLDBText;
+    RLDBText2: TRLDBText;
+    RLDBText3: TRLDBText;
+    RLDBText4: TRLDBText;
+    RLLabel6: TRLLabel;
+    RLLabel7: TRLLabel;
+    RLLabel8: TRLLabel;
+    RLLabel9: TRLLabel;
+    RLDBText5: TRLDBText;
+    RLLabel2: TRLLabel;
+    RLLabel3: TRLLabel;
+    RLDBText6: TRLDBText;
+    RLLabel4: TRLLabel;
+    RLDBText7: TRLDBText;
+    RLLabel5: TRLLabel;
+    RLDBText8: TRLDBText;
+    RLLabel10: TRLLabel;
+    RLDBText9: TRLDBText;
+    RLLabel11: TRLLabel;
+    RLDBText10: TRLDBText;
+    RLDraw3: TRLDraw;
+    RLAngleLabel1: TRLAngleLabel;
+    RLImage1: TRLImage;
+    QryClienteclienteId: TFDAutoIncField;
+    QryClientenome: TStringField;
+    QryClientecep: TStringField;
+    QryClienteendereco: TStringField;
+    QryClientecidade: TStringField;
+    QryClientebairro: TStringField;
+    QryClienteestado: TStringField;
+    QryClienteemail: TStringField;
+    QryClientetelefone: TStringField;
+    QryClientedataNascimento: TSQLTimeStampField;
+    QryClientecpf_cnpj: TStringField;
+    QryClientestatusDescricao: TStringField;
+    QryClientetipoPessoa: TStringField;
+    RLLabel12: TRLLabel;
+    RLLabel13: TRLLabel;
+    RLLabel14: TRLLabel;
+    RLDBText11: TRLDBText;
+    RLDBText12: TRLDBText;
+    RLDBText13: TRLDBText;
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure RLBand2BeforePrint(Sender: TObject; var PrintIt: Boolean);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmRelCadClienteFicha: TfrmRelCadClienteFicha;
+
+implementation
+
+
+{$R *.dfm}
+
+procedure TfrmRelCadClienteFicha.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  QryCliente.Close;
+end;
+
+procedure TfrmRelCadClienteFicha.FormCreate(Sender: TObject);
+begin
+  QryCliente.Open;
+end;
+
+procedure TfrmRelCadClienteFicha.RLBand2BeforePrint(Sender: TObject; var PrintIt: Boolean);
+var
+  vTipo: string;
+begin
+  //Verificamos se a Query existe para evitar o Access Violation
+  if Assigned(QryCliente) then
+  begin
+    //Pegamos o valor e limpamos espaços (UpperCase ajuda a não errar maiúsculas)
+    vTipo := UpperCase(Trim(QryCliente.FieldByName('tipoPessoa').AsString));
+
+    //Comparamos usando "Pos" para evitar problemas com o acento do 'Í'
+    if (Pos('FISICA', vTipo) > 0) or (Pos('FÍSICA', vTipo) > 0) then
+      RLLabel14.Caption := 'CPF:'
+    else if (Pos('JURIDICA', vTipo) > 0) or (Pos('JURÍDICA', vTipo) > 0) then
+      RLLabel14.Caption := 'CNPJ:'
+    else
+      //Se cair aqui, é porque o valor no banco é diferente de Física/Jurídica
+      RLLabel14.Caption := 'Documento:';
+  end;
+end;
+
+end.

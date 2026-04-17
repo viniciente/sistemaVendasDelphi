@@ -1,0 +1,22 @@
+﻿object dtmConexão: TdtmConexão
+  OldCreateOrder = False
+  Height = 484
+  Width = 666
+  object ConectionDb: TZConnection
+    ControlsCodePage = cCP_UTF16
+    Catalog = ''
+    Properties.Strings = (
+      'RawStringEncoding=DB_CP')
+    SQLHourGlass = True
+    DisableSavepoints = False
+    HostName = 'DC-TR-06-VM\SERVERCURSO'
+    Port = 0
+    Database = 'Vendas'
+    User = ''
+    Password = 'ynj181011'
+    Protocol = 'mssql'
+    LibraryLocation = 'C:\ProjetoDelphi\ntwdblib.dll'
+    Left = 384
+    Top = 248
+  end
+end

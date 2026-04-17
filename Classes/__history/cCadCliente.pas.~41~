@@ -1,0 +1,386 @@
+unit cCadCliente;
+
+interface
+
+uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      System.SysUtils, System.Variants;
+      // lista de Units
+
+type
+  TCliente = class
+  private
+    FdConexao: TFDConnection;
+    F_clienteId:Integer; //int
+    F_nome:string; //VarChar
+    F_endereco:string;
+    F_cidade:string;
+    F_bairro:string;
+    F_estado:string;
+    F_cep:string;
+    F_telefone:string;
+    F_email:string;
+    F_dataNascimento: TDateTime;
+    F_statusId: Integer;
+    F_pessoaId: Integer;
+    F_cpfCnpf: string;
+    F_numero: string;
+    F_statusNome :string;
+
+  public
+    constructor Create(aConexao:TFDConnection);
+    destructor Destroy; override;
+    function Inserir:Boolean;
+    function Atualizar:Boolean;
+    function Apagar:Boolean;
+    function Selecionar(id:Integer):Boolean;
+    function PodeComprar(out Motivo: string): Boolean;
+    procedure AtualizarStatusParaAtivo;
+  published
+    property codigo         :Integer   read F_clienteId      write F_clienteId;
+    property nome           :string    read F_nome           write F_nome;
+    property endereco       :string    read F_endereco       write F_endereco;
+    property cidade         :string    read F_cidade         write F_cidade;
+    property bairro         :string    read F_bairro         write F_bairro;
+    property estado         :string    read F_estado         write F_estado;
+    property cep            :string    read F_cep            write F_cep;
+    property telefone       :string    read F_telefone       write F_telefone;
+    property email          :string    read F_email          write F_email;
+    property dataNascimento :TDateTime read F_dataNascimento write F_dataNascimento;
+    property statusId       :Integer   read F_statusId       write F_statusId;
+    property pessoaId       :Integer   read F_pessoaId       write F_pessoaId;
+    property cpf_cnpj       :string   read F_cpfcnpf        write F_cpfcnpf;
+    property numero         :string   read F_numero         write F_numero;
+    property statusNome     :string   read F_statusNome     write F_statusNome;
+  end;
+
+implementation
+
+{$REGION 'Constructor and Destructor'}
+constructor TCliente.Create(aConexao:TFDConnection);
+begin
+  FdConexao:=aConexao;
+end;
+
+destructor TCliente.Destroy;
+begin
+
+inherited;
+end;
+{$ENDREGION}
+
+{$REGION 'CRUD'}
+//function TCliente.Apagar: Boolean;
+//var Qry:TFDQuery;
+//begin
+//  if MessageDlg('Apagar o Registro '+#13+#13+
+//                'Codigo: '+IntToStr(F_clienteId)+#13+
+//                'Descrição: '+F_nome,mtConfirmation, [mbYes, mbNo],0)=mrNo then begin
+//    Result:=False;
+//    Abort;
+//  end;
+//
+//  try
+//    Result:=True;
+//    Qry:=TFDQuery.Create(nil);
+//    Qry.Connection:=FdConexao;
+//    Qry.SQL.Clear;
+//    Qry.SQL.Add('DELETE FROM clientes '+
+//                ' WHERE clienteId=:clienteId ');
+//    Qry.ParamByName('clienteId').AsInteger :=F_clienteId;
+//    try
+//      FdConexao.StartTransaction;
+//      Qry.ExecSQL;
+//      FdConexao.Commit;
+//    except
+//      on E: Exception do
+//      begin
+//      ShowMessage('Erro Crítico no Banco: ' + E.Message);
+//      FdConexao.Rollback;
+//      Result := False;
+//      end;
+//    end;
+//
+//  finally
+//    if Assigned(Qry) then
+//       FreeAndNil(Qry);
+//  end;
+//end;
+
+function TCliente.Apagar: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  // Pergunta apenas uma vez para o usuário
+  if MessageDlg('ATENÇÃO!' + #13 + #13 +
+                'Isso apagará o Cliente, suas Vendas e Itens de Venda.' + #13 +
+                'Código: ' + IntToStr(F_clienteId) + ' - ' + F_nome + #13 + #13 +
+                'Deseja continuar?', mtWarning, [mbYes, mbNo], 0) = mrNo then
+    Exit;
+
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    FdConexao.StartTransaction;
+    try
+      // 1. Apaga os ITENS de todas as vendas deste cliente
+      Qry.SQL.Text := 'DELETE FROM dbo.vendasItens WHERE vendaId IN ' +
+                      '(SELECT vendaId FROM vendas WHERE clienteId = :id)';
+      Qry.ParamByName('id').AsInteger := F_clienteId;
+      Qry.ExecSQL;
+
+      // 2. Apaga as VENDAS deste cliente
+      Qry.SQL.Text := 'DELETE FROM vendas WHERE clienteId = :id';
+      Qry.ParamByName('id').AsInteger := F_clienteId;
+      Qry.ExecSQL;
+
+      // 3. Apaga o CLIENTE
+      Qry.SQL.Text := 'DELETE FROM clientes WHERE clienteId = :id';
+      Qry.ParamByName('id').AsInteger := F_clienteId;
+      Qry.ExecSQL;
+
+      FdConexao.Commit;
+      Result := True;
+      ShowMessage('Cliente e todos os registros vinculados foram apagados!');
+    except
+      on E: Exception do
+      begin
+        FdConexao.Rollback;
+        ShowMessage('Erro Crítico ao apagar dados: ' + E.Message);
+        Result := False;
+      end;
+    end;
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TCliente.Atualizar: Boolean;
+var Qry:TFDQuery;
+begin
+  try
+    Result:=True;
+    Qry:=TFDQuery.Create(nil);
+    Qry.Connection:=FdConexao;
+    Qry.SQL.Clear;
+    Qry.SQL.Add('UPDATE clientes '+
+                '   SET nome            =:nome '+
+                '       ,endereco       =:endereco '+
+                '       ,cidade         =:cidade '+
+                '       ,bairro         =:bairro '+
+                '       ,numero         =:numero  '+
+                '       ,estado         =:estado '+
+                '       ,cep            =:cep '+
+                '       ,telefone       =:telefone '+
+                '       ,email          =:email '+
+                '       ,dataNascimento =:dataNascimento '+
+                '       ,statusId       =:statusId '+
+                '       ,pessoaId       =:pessoaId '+
+                '       ,cpf_cnpj       =:cpf_cnpj  '+
+                'WHERE  clienteId=:clienteId ');
+    Qry.ParamByName('clienteId').AsInteger       :=Self.F_clienteId;
+    Qry.ParamByName('nome').AsString             :=Self.F_nome;
+    Qry.ParamByName('endereco').AsString         :=Self.F_endereco;
+    Qry.ParamByName('cidade').AsString           :=Self.F_cidade;
+    Qry.ParamByName('bairro').AsString           :=Self.F_bairro;
+    Qry.ParamByName('numero').AsString          :=Self.F_numero;
+    Qry.ParamByName('estado').AsString           :=Self.F_estado;
+    Qry.ParamByName('cep').AsString              :=Self.F_cep;
+    Qry.ParamByName('telefone').AsString         :=Self.F_telefone;
+    Qry.ParamByName('email').AsString            :=Self.F_email;
+    Qry.ParamByName('dataNascimento').AsDateTime :=Self.F_dataNascimento;
+    Qry.ParamByName('statusId').AsInteger        :=Self.F_statusId;
+    Qry.ParamByName('pessoaId').AsInteger        :=Self.F_pessoaId;
+    Qry.ParamByName('cpf_cnpj').AsString         :=Self.F_cpfcnpf;
+    Qry.ParamByName('numero').DataType := ftString;
+
+    if Trim(Self.F_numero) = '' then
+      Qry.ParamByName('numero').Value := Null
+    else
+      Qry.ParamByName('numero').AsString := Self.F_numero;
+
+    Try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+    except
+    on E: Exception do
+    begin
+      // Isso vai mostrar a mensagem real do SQL
+      ShowMessage('Erro ao excluir: ' + E.Message);
+      FdConexao.Rollback;
+      Result := False;
+    end;
+    end;
+
+  finally
+    if Assigned(Qry) then
+       FreeAndNil(Qry);
+  end;
+end;
+
+function TCliente.Inserir: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := True;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Clear;
+    Qry.SQL.Add('INSERT INTO clientes (nome, endereco, numero, cidade, bairro, estado, cep, ' +
+                '                      telefone, email, dataNascimento, statusId, pessoaId, cpf_cnpj) ' +
+                'VALUES (:nome, :endereco, :numero, :cidade, :bairro, :estado, :cep, ' +
+                '        :telefone, :email, :dataNascimento, :statusId, :pessoaId, :cpf_cnpj)');
+
+    Qry.ParamByName('nome').AsString             := Self.F_nome;
+    Qry.ParamByName('endereco').AsString         := Self.F_endereco;
+    Qry.ParamByName('cidade').AsString           := Self.F_cidade;
+    Qry.ParamByName('bairro').AsString           := Self.F_bairro;
+    Qry.ParamByName('estado').AsString           := Self.F_estado;
+    Qry.ParamByName('cep').AsString              := Self.F_cep;
+    Qry.ParamByName('telefone').AsString         := Self.F_telefone;
+    Qry.ParamByName('email').AsString            := Self.F_email;
+    Qry.ParamByName('dataNascimento').AsDateTime := Self.F_dataNascimento;
+    Qry.ParamByName('statusId').AsInteger        := Self.F_statusId;
+    Qry.ParamByName('pessoaId').AsInteger        := Self.F_pessoaId;
+    Qry.ParamByName('cpf_cnpj').AsString         := Self.F_cpfcnpf;
+    Qry.ParamByName('numero').DataType := ftString;
+
+    // TRATAMENTO DO NÚMERO (Sempre trate strings vazias como NULL para o banco)
+    if Trim(Self.F_numero) = '' then
+      Qry.ParamByName('numero').Value := System.Variants.Null
+    else
+      Qry.ParamByName('numero').AsString := Self.F_numero;
+
+    try
+      // Inicia transação apenas se necessário
+      if not FdConexao.InTransaction then
+        FdConexao.StartTransaction;
+
+      Qry.ExecSQL;
+      FdConexao.Commit;
+    except
+      on E: Exception do
+      begin
+        if FdConexao.InTransaction then
+          FdConexao.Rollback;
+        ShowMessage('Erro ao inserir cliente: ' + E.Message);
+        Result := False;
+      end;
+    end;
+
+  finally
+    // FreeAndNil já verifica se Assigned internamente
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TCliente.Selecionar(id: Integer): Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False; // Começamos como falso, só vira True se achar o registro
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'SELECT clienteId, nome, endereco, cidade, bairro, estado, ' +
+                    '       cep, telefone, email, dataNascimento, pessoaId, ' +
+                    '       statusId, cpf_cnpj, numero ' +
+                    '  FROM clientes ' +
+                    ' WHERE clienteId = :clienteId';
+
+    Qry.ParamByName('clienteId').AsInteger := Id;
+
+    try
+      Qry.Open;
+
+      // Verifica se o registro existe no banco
+      if not Qry.IsEmpty then
+      begin
+        Self.F_clienteId      := Qry.FieldByName('clienteId').AsInteger;
+        Self.F_nome           := Qry.FieldByName('nome').AsString;
+        Self.F_endereco       := Qry.FieldByName('endereco').AsString;
+        Self.F_cidade         := Qry.FieldByName('cidade').AsString;
+        Self.F_bairro         := Qry.FieldByName('bairro').AsString;
+        Self.F_estado         := Qry.FieldByName('estado').AsString;
+        Self.F_cep            := Qry.FieldByName('cep').AsString;
+        Self.F_telefone       := Qry.FieldByName('telefone').AsString;
+        Self.F_email          := Qry.FieldByName('email').AsString;
+        Self.F_dataNascimento := Qry.FieldByName('dataNascimento').AsDateTime;
+        Self.F_pessoaId       := Qry.FieldByName('pessoaId').AsInteger;
+        Self.F_statusId       := Qry.FieldByName('statusId').AsInteger;
+        Self.F_cpfcnpf        := Qry.FieldByName('cpf_cnpj').AsString;
+
+        // No Delphi, .AsString em campo NULL já retorna '',
+        // então essa linha resolve tudo de forma segura:
+        Self.F_numero         := Qry.FieldByName('numero').AsString;
+
+        Result := True;
+      end;
+    except
+      on E: Exception do
+      begin
+        Result := False;
+      end;
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+{$ENDREGION}
+
+{$REGION 'BLOQUEAR CLIENTES'}
+
+function TCliente.PodeComprar(out Motivo: string): Boolean;
+begin
+  Result := True;
+  Motivo := '';
+
+  //1-Ativo 2-Bloqueado 3-Atebção 4-Inativo 5-Prospecto
+  if Self.statusId = 2 then
+  begin
+    Result := False;
+    Motivo := 'O cliente está BLOQUEADO e não poderá efeturar compras.';
+  end
+  else if Self.statusId = 3 then
+  begin
+    Result := False;
+    Motivo := 'Verifique suas pendencias financeiras com a empressa.';
+  end;
+end;
+
+{$ENDREGION}
+
+{$REGION 'INATIVO/PROSPECTOS -> ATIVOS'}
+
+procedure TCliente.AtualizarStatusParaAtivo;
+var
+  Qry: TFDQuery;
+begin
+  // so ativa se o cliente for INATIVO ou PROSPECTO
+  // 4 - Prospecto, 5 - Inativo, 1 - Ativo
+  if (Self.statusId = 4) or (Self.statusId = 5) then
+  begin
+    Qry := TFDQuery.Create(nil);
+    try
+      Qry.Connection := FdConexao;
+      Qry.SQL.Text := 'UPDATE clientes SET statusId = 1 WHERE clienteId = :id';
+      Qry.ParamByName('id').AsInteger := Self.codigo;
+      Qry.ExecSQL;
+
+      // Atualiza a propriedade na memória também
+      Self.statusId := 1;
+      Self.statusNome := 'Ativo';
+    finally
+      Qry.Free;
+    end;
+  end;
+end;
+
+{$ENDREGION}
+
+end.

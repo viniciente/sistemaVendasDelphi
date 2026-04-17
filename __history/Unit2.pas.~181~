@@ -1,0 +1,430 @@
+unit Unit2;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils,System.UITypes,
+  System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.Menus,
+  uDtmnConexao, uFrmAtualizaDB, Enter, FireDAC.Stan.Param, cUsuarioLogado, Vcl.ComCtrls,
+  cAtualizacaoBancoDeDados,
+  RLReport, Vcl.ExtCtrls, VclTee.TeeGDIPlus, Data.DB, VCLTee.TeEngine, VCLTee.Series, VCLTee.TeeProcs, VCLTee.Chart,
+  VCLTee.DBChart, cFuncao, Winapi.ShellAPI, System.ImageList, Vcl.ImgList, Vcl.StdCtrls, Vcl.Imaging.jpeg, Winapi.GDIPAPI,
+  Winapi.GDIPOBJ, System.Math, System.IOUtils;
+
+type
+  TfrmPrincipal = class(TForm)
+    GridPanel1: TGridPanel;
+    Panel2: TPanel;
+    imgAvatar: TImage;
+    mainPrincipal: TMainMenu;
+    CADASTRO1: TMenuItem;
+    CLIENTE1: TMenuItem;
+    N1: TMenuItem;
+    CATEGORIA1: TMenuItem;
+    PRODUTO1: TMenuItem;
+    N2: TMenuItem;
+    USUARIO1: TMenuItem;
+    AOACESSO1: TMenuItem;
+    N3: TMenuItem;
+    USUARIOVSAES1: TMenuItem;
+    N4: TMenuItem;
+    ALTERARSENHA1: TMenuItem;
+    N5: TMenuItem;
+    FECHAR1: TMenuItem;
+    SAIR1: TMenuItem;
+    MOVIMENTAO1: TMenuItem;
+    VENDAS1: TMenuItem;
+    RELATORIOS1: TMenuItem;
+    CATEGORIA2: TMenuItem;
+    CLIENTE2: TMenuItem;
+    FICHACLIENTE1: TMenuItem;
+    N6: TMenuItem;
+    PRODUTO2: TMenuItem;
+    PRODUTOSPORCATEGORIA1: TMenuItem;
+    N7: TMenuItem;
+    VENDAPORDATA1: TMenuItem;
+    Panel1: TPanel;
+    Label1: TLabel;
+    lblNomeUsuario: TLabel;
+    DBChart1: TDBChart;
+    Series1: TBarSeries;
+    Panel4: TPanel;
+    DBChart2: TDBChart;
+    Series2: TPieSeries;
+    Panel3: TPanel;
+    DBChart3: TDBChart;
+    Series3: TFastLineSeries;
+    Panel5: TPanel;
+    DBChart4: TDBChart;
+    PieSeries2: TPieSeries;
+    painel: TPanel;
+    procedure mnuFecharClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure Categorias1Click(Sender: TObject);
+    procedure Cliente1Click(Sender: TObject);
+    procedure Produto1Click(Sender: TObject);
+    procedure Vendas1Click(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure Cliente2Click(Sender: TObject);
+    procedure FichadeCliente1Click(Sender: TObject);
+    procedure Produto2Click(Sender: TObject);
+    procedure ProdutoporCategoria1Click(Sender: TObject);
+    procedure Vendapordata1Click(Sender: TObject);
+    procedure USUARIO1Click(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure ALTERARSENHA1Click(Sender: TObject);
+    procedure AOACESSO1Click(Sender: TObject);
+    procedure Categoria1Click(Sender: TObject);
+    procedure USUARIOVSAES1Click(Sender: TObject);
+    procedure tmrAtualizacaoDashBordTimer(Sender: TObject);
+    procedure LOGOUT1Click(Sender: TObject);
+  private
+    TeclaEnter: TMREnter;
+    procedure AtualizacaoBancoDados(aForm: TfrmAtualizaDB);
+    procedure AtualizarDashBord;
+    procedure DesenharAvatarArredondado(aBitmap: TBitmap);
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPrincipal: TfrmPrincipal;
+  oUsuarioLogado:TUsuarioLogado;
+
+implementation
+
+{$R *.dfm}
+
+uses uCadCategorias, uRelVendaPorData, uCadCliente, uCadProduto, uProVendas, uRelCategoria, uRelCadCliente,
+uRelCadClienteFicha, uRelProduto, uRelCadProdutoComGrupoCategoria, uSelecionarData, uCadUsuario, uLogin, uAlterarSenha,
+cArquivoIni, uCadAcaoAcesso, cAcaoAcesso, uUsuarioVsAcoes, UTelaHeranca, uDtmGrafico, cCadUsuario;
+
+{$REGION'Cadastros'}
+procedure TfrmPrincipal.Categorias1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmCadCategorias, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.Cliente1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmCadCliente, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.ALTERARSENHA1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmAlterarSenha, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.Produto1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmCadProduto, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.USUARIO1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmCadUsuario, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.USUARIOVSAES1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmUsuarioVsAcoes, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.AOACESSO1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmCadAcaoAcesso, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.Vendas1Click(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmProVendas, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+{$ENDREGION}
+
+{$REGION 'Relatorios'}
+procedure TfrmPrincipal.Categoria1Click(Sender: TObject);
+begin
+  TFuncao.CriarRelatorio(TfrmRelCategoria, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.Cliente2Click(Sender: TObject);
+begin
+  TFuncao.CriarRelatorio(TfrmRelCadCliente, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.DesenharAvatarArredondado(aBitmap: TBitmap);
+var
+  gpGrafico  : TGPGraphics;
+  gpImagem   : TGPImage;
+  gpCaneta   : TGPPen;
+  gpCaminho  : TGPGraphicsPath;
+  bmpDestino : TBitmap;
+  sArqTemp   : string;
+  W, H, R    : Integer;
+begin
+  if (aBitmap = nil) or aBitmap.Empty then Exit;
+
+  W := imgAvatar.Width;
+  H := imgAvatar.Height;
+  R := Min(W, H);
+
+  sArqTemp   := TPath.GetTempFileName;
+  bmpDestino := TBitmap.Create;
+  try
+    aBitmap.SaveToFile(sArqTemp);
+    gpImagem := TGPImage.Create(sArqTemp);
+    try
+      bmpDestino.PixelFormat := pf32bit;
+      bmpDestino.SetSize(W, H);
+      bmpDestino.Canvas.Brush.Color := clBtnFace;
+      bmpDestino.Canvas.FillRect(Rect(0, 0, W, H));
+
+      gpGrafico := TGPGraphics.Create(bmpDestino.Canvas.Handle);
+      try
+        gpGrafico.SetSmoothingMode(SmoothingModeAntiAlias);
+        gpGrafico.SetInterpolationMode(InterpolationModeHighQualityBicubic);
+        gpGrafico.SetPixelOffsetMode(PixelOffsetModeHighQuality);
+
+        gpCaminho := TGPGraphicsPath.Create;
+        try
+          gpCaminho.AddEllipse(1, 1, R - 2, R - 2);
+          gpGrafico.SetClip(gpCaminho);
+          gpGrafico.DrawImage(gpImagem, 1, 1, R - 2, R - 2);
+        finally
+          gpCaminho.Free;
+        end;
+
+        gpGrafico.ResetClip;
+
+        gpCaneta := TGPPen.Create(MakeColor(180, 160, 160, 160), 1.5);
+        try
+          gpGrafico.DrawEllipse(gpCaneta, 1, 1, R - 2, R - 2);
+        finally
+          gpCaneta.Free;
+        end;
+
+      finally
+        gpGrafico.Free;
+      end;
+
+    finally
+      gpImagem.Free;
+    end;
+
+    imgAvatar.Picture.Assign(bmpDestino);
+
+  finally
+    bmpDestino.Free;
+    TFile.Delete(sArqTemp);
+  end;
+end;
+
+procedure TfrmPrincipal.FichadeCliente1Click(Sender: TObject);
+begin
+  TFuncao.CriarRelatorio(TfrmRelCadClienteFicha, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.Produto2Click(Sender: TObject);
+begin
+  TFuncao.CriarRelatorio(TfrmRelProduto, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.ProdutoporCategoria1Click(Sender: TObject);
+begin
+  TFuncao.CriarRelatorio(TfrmRelCadProdutoComGrupoCategoria, oUsuarioLogado, dtmConexao.FDConexao);
+end;
+
+procedure TfrmPrincipal.Vendapordata1Click(Sender: TObject);
+begin
+  Try
+    frmSelecionarData:=TfrmSelecionarData.Create(Self);
+    if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, frmSelecionarData.Name, dtmConexao.FDConexao) then
+    begin
+      frmSelecionarData.ShowModal;
+
+      frmRelVendaPorData:=TfrmRelVendaPorData.Create(Self);
+      frmRelVendaPorData.QryVenda.Close;
+      frmRelVendaPorData.QryVenda.ParamByName('DATAINICIO').AsDate:=frmSelecionarData.edtDataInicio.Date;
+      frmRelVendaPorData.QryVenda.ParamByName('DATAFIM').AsDate:=frmSelecionarData.edtDataFinal.Date;
+      frmRelVendaPorData.QryVenda.Open;
+      frmRelVendaPorData.Relatorio.PreviewModal;
+    end
+    else begin
+      MessageDlg('Usuario: '+oUsuarioLogado.nome +', não tem permissão de acesso',mtWarning,[mbOK],0)
+    end;
+  Finally
+    if Assigned(frmSelecionarData) then
+      frmSelecionarData.Release;
+    if Assigned(frmRelVendaPorData) then
+      frmRelVendaPorData.Release;
+  End;
+end;
+
+{$ENDREGION}
+
+{$REGION 'FORMCREATE & FORMCLOSE & FORMSHOW'}
+procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  FreeAndNil(TeclaEnter);
+  FreeAndNil(dtmConexao);
+  FreeAndNil(DtmGrafico);
+
+  if Assigned(oUsuarioLogado) then
+     FreeAndNil(oUsuarioLogado);
+end;
+
+procedure TfrmPrincipal.FormCreate(Sender: TObject);
+begin
+  if not FileExists(TArquivoIni.ArquivoIni) then
+  begin
+    //DC-TR-06-VM\SERVERCURSO
+    TArquivoIni.AtualizarIni('SERVER', 'TipoDataCase', 'MSSQL');
+    TArquivoIni.AtualizarIni('SERVER', 'Password', 'ynj181011');
+    TArquivoIni.AtualizarIni('SERVER', 'DataBase', 'Vendas');
+    //TArquivoIni.AtualizarIni('SERVER', 'Hostame', '.\');
+    //TArquivoIni.AtualizarIni('SERVER', 'Port', '');
+    //TArquivoIni.AtualizarIni('SERVER', 'User', 'sa');
+
+    MessageDlg('Arquivo '+ TArquivoIni.ArquivoIni +' Criado com sucesso' +#13+
+               'Configure o arquivo antes de inicializar aplicação', MtInformation,[mbok],0);
+
+    Application.Terminate;
+  end
+  else
+  begin
+    frmAtualizaDB:=TfrmAtualizaDB.Create(Self);
+    frmAtualizaDB.Show;
+    frmAtualizaDB.Refresh;
+
+    AtualizacaoBancoDados(frmAtualizaDB);
+
+    TAcaoAcesso.CriarAcoes(TfrmCadCategorias, dtmConexao.FDConexao);
+
+    TAcaoAcesso.CriarAcoes(TfrmCadCliente,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmCadProduto,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmCadUsuario,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmCadAcaoAcesso,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmAlterarSenha,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmProVendas,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmRelVendaPorData,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmSelecionarData,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmRelCadClienteFicha,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmRelCadCliente,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmRelCadProdutoComGrupoCategoria,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmRelProduto,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmRelCategoria,dtmConexao.FDConexao);
+    TAcaoAcesso.CriarAcoes(TfrmUsuarioVsAcoes,dtmConexao.FDConexao);
+
+    TAcaoAcesso.PreencherUsuariosVsAcoes(dtmConexao.FDConexao);
+
+    DtmGrafico:=TDtmGrafico.Create(Self);
+    AtualizarDashBord;
+
+    frmAtualizaDB.Free;
+
+    TeclaEnter:= TMREnter.Create(Self);
+    TeclaEnter.FocusEnabled:=True;
+    TeclaEnter.FocusColor:=clInfoBk;
+  end;
+end;
+
+procedure TfrmPrincipal.FormShow(Sender: TObject);
+begin
+  if not Assigned(oUsuarioLogado) then
+   oUsuarioLogado := TUsuarioLogado.Create(dtmConexao.FDConexao);
+
+  try
+    frmLogin := TfrmLogin.Create(Self);
+
+    if frmLogin.ShowModal = mrOk then
+    begin
+      lblNomeUsuario.Caption := '  USUÁRIO: ' + oUsuarioLogado.nome;
+
+      // No seu FormShow ou após o Login
+      if (oUsuarioLogado.foto <> nil) and (not oUsuarioLogado.foto.Empty) then
+        imgAvatar.Picture.Assign(oUsuarioLogado.foto)
+      else
+      begin
+        // Se não houver foto, carrega uma imagem padrão da sua pasta de imagens
+        if FileExists('C:\ProjetoDelphi\Images\usuarioPadrao.jpg') then
+          imgAvatar.Picture.LoadFromFile('C:\ProjetoDelphi\Images\usuarioPadrao.jpg')
+        else
+          imgAvatar.Picture := nil; // Caso o arquivo não exista, limpa o componente
+      end;
+    end
+    else
+      Application.Terminate;
+
+  finally
+    frmLogin.Release;
+  end;
+end;
+
+procedure TfrmPrincipal.AtualizacaoBancoDados(aForm:TfrmAtualizaDB);
+var oAtualizarMSSQL:TAtualizaBancoDeDadosMSSQL;
+begin
+   aForm.Refresh;
+
+   try
+     oAtualizarMSSQL:=TAtualizaBancoDeDadosMSSQL.Create(dtmConexao.FDConexao);
+     oAtualizarMSSQL.AtualizaBancoDeDadosMSSQL;
+   finally
+    if Assigned(oAtualizarMSSQL) then
+       FreeAndNil(oAtualizarMSSQL);
+   end;
+end;
+
+{$ENDREGION}
+
+procedure TfrmPrincipal.mnuFecharClick(Sender: TObject);
+begin
+ //Close
+ Application.Terminate;
+end;
+
+procedure TfrmPrincipal.AtualizarDashBord;
+begin
+  try
+    Screen.Cursor:=crSQLWait;
+
+    if DtmGrafico.qryProdutoEstoque.Active then
+       DtmGrafico.qryProdutoEstoque.Close;
+
+    if DtmGrafico.qryVendaPorCliente.Active then
+       DtmGrafico.qryVendaPorCliente.Close;
+
+    if DtmGrafico.qry10ProdutosMaisVendidos.Active then
+       DtmGrafico.qry10ProdutosMaisVendidos.Close;
+
+    if DtmGrafico.qryVendaUltimaSemana.Active then
+       DtmGrafico.qryVendaUltimaSemana.Close;
+
+    DtmGrafico.qryProdutoEstoque.Open;
+    DtmGrafico.qryVendaPorCliente.Open;
+    DtmGrafico.qry10ProdutosMaisVendidos.Open;
+    DtmGrafico.qryVendaUltimaSemana.Open;
+  finally
+    Screen.Cursor:=crDefault;
+  end;
+end;
+
+procedure TfrmPrincipal.tmrAtualizacaoDashBordTimer(Sender: TObject);
+begin
+  AtualizarDashBord;
+end;
+
+procedure TfrmPrincipal.LOGOUT1Click(Sender: TObject);
+begin
+  if MessageDlg('DESEJA MESMO SAIR DO USUARIO?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+  begin
+    //Comando para o Windows abrir uma nova instância deste mesmo programa
+    ShellExecute(0, 'open', PChar(Application.ExeName), nil, nil, SW_SHOWNORMAL);
+
+    //Fecha a instância atual imediatamente
+    Application.Terminate;
+  end;
+end;
+
+end.

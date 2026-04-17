@@ -1,0 +1,210 @@
+unit cCadCategoria;
+
+interface
+
+uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      System.SysUtils;
+      // lista de Units
+type
+  TCategoria = class //declaração do tipo classe
+  private
+  FdConexao: TFDConnection;
+  FCategoriasId: Integer;
+  FDescricao: String;
+
+  function getCodigo: Integer;
+  function getDescricao: string;
+  procedure setCodigo(const Value: Integer);
+  procedure setDescricao(const Value: string);    //VarChar
+  //variaveeis Privada somente dentro da classe
+  public
+  constructor Create(aConexao: TFDConnection); //Costrutor de classe
+  destructor Destroy; override; // Destroi a Classe usar o override por causa
+                              // de sobescrever
+  function Inserir:Boolean;
+  function Atualizar:Boolean;
+  function Apagar(id:Integer):Boolean;
+  function Selecionar(id:Integer):Boolean;
+  //Variaveis publicas que pode ser trabaçhada fora da classe
+  published
+  property Codigo: Integer read getCodigo write setCodigo;
+  property Descricao: String read getDescricao write setDescricao;
+  end;
+    //variaveis Publicas utilizadas para propriedades da classe
+    //para fornecer informações em runtime
+
+implementation
+
+// TCategoria
+
+{$REGION 'Constructor And Destructor'}
+
+constructor TCategoria.Create(AConexao: TFDConnection);
+begin
+  inherited Create;
+  FdConexao := AConexao;
+end;
+
+destructor TCategoria.Destroy;
+begin
+  inherited;
+end;
+{$ENDREGION}
+
+{$REGION 'Gets'}
+function TCategoria.getCodigo: Integer;
+begin
+  Result := Self.FCategoriasId;
+end;
+
+function TCategoria.getDescricao: string;
+begin
+  Result := Self.FDescricao;
+end;
+{$ENDREGION}
+
+{$REGION 'Set'}
+procedure TCategoria.setCodigo(const Value: Integer);
+begin
+  Self.FCategoriasId := Value;
+end;
+
+procedure TCategoria.setDescricao(const Value: string);
+begin
+  Self.FDescricao := Value;
+end;
+{$ENDREGION}
+
+{$REGION 'CRUD'}
+function TCategoria.Apagar(id: Integer): Boolean;
+var TFD: TFDQuery;
+begin
+  Result := False;
+  TFD := TFDQuery.Create(nil);
+  try
+    TFD.Connection := FdConexao;
+    TFD.SQL.Text := 'DELETE FROM categorias WHERE categoriasId = :id';
+    TFD.ParamByName('id').AsInteger := id;
+
+    try
+      FdConexao.StartTransaction;
+      TFD.ExecSQL;
+      FdConexao.Commit;
+      Result := True;
+    except
+      on E: Exception do
+      begin
+        FdConexao.Rollback;
+        ShowMessage('Erro ao excluir: ' + E.Message);
+        Result := False;
+      end;
+    end;
+  finally
+    TFD.Free;
+  end;
+end;
+
+function TCategoria.Atualizar: Boolean;
+var
+  TFD: TFDQuery;
+begin
+  Result := False;
+  TFD := TFDQuery.Create(nil);
+
+  try
+    TFD.Connection := FdConexao;
+
+    TFD.SQL.Text :=
+      'UPDATE categorias ' +
+      'SET descricao = :descricao ' +
+      'WHERE categoriasId = :categoriasId';
+
+    TFD.ParamByName('descricao').AsString := FDescricao;
+    TFD.ParamByName('categoriasId').AsInteger := FCategoriasId;
+
+    Try
+      FdConexao.StartTransaction;
+      TFD.ExecSQL;
+      FdConexao.Commit;
+    except
+    on E: Exception do
+    begin
+      // Isso vai mostrar a mensagem real do SQL
+      ShowMessage('Erro ao excluir: ' + E.Message);
+      FdConexao.Rollback;
+      Result := False;
+    end;
+    end;
+  except
+    on E: Exception do
+      ShowMessage('Erro ao atualizar: ' + E.Message);
+  end;
+end;
+
+function TCategoria.Inserir: Boolean;
+var TFD: TFDQuery;
+begin
+  Result:=False;
+  TFD:=TFDQuery.Create(nil);
+try
+  TFD.Connection := FdConexao;
+  TFD.SQL.Text := 'INSERT INTO categorias (descricao) VALUES (:descricao)';
+  TFD.ParamByName('descricao').AsString := FDescricao;
+  try
+    FdConexao.StartTransaction;
+    TFD.ExecSQL; // EXEC SQL para INSERT
+    FdConexao.Commit;
+    Result:=True;
+  except
+  on E: Exception do
+  begin
+    ShowMessage('Erro ao inserir categoria: ' + E.Message);
+    FdConexao.Rollback;
+    Result := False;
+  end;
+  end;
+
+finally
+  TFD.Free;
+end;
+end;
+
+function TCategoria.Selecionar(id: Integer): Boolean;
+var
+  TFD: TFDQuery;
+begin
+  Result := False;
+
+  TFD := TFDQuery.Create(nil);
+
+  try
+    TFD.Connection := FdConexao;
+
+    TFD.SQL.Text :=
+      'SELECT categoriasId, descricao '+
+      'FROM categorias '+
+      'WHERE categoriasId = :id';
+
+    TFD.ParamByName('id').AsInteger := id;
+
+    TFD.Open;
+
+    if not TFD.IsEmpty then
+    begin
+      FCategoriasId := TFD.FieldByName('categoriasId').AsInteger;
+      FDescricao := TFD.FieldByName('descricao').AsString;
+
+      Result := True;
+    end;
+
+  finally
+    TFD.Free;
+  end;
+end;
+{$ENDREGION}
+end.

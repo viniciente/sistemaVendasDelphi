@@ -1,0 +1,74 @@
+unit uRelCadCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uDtmnConexao, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, RLReport, RLFilters, RLPDFFilter;
+
+type
+  TfrmRelCadCliente = class(TForm)
+    QryCliente: TFDQuery;
+    dtsCliente: TDataSource;
+    Relatorio: TRLReport;
+    Cabecalho: TRLBand;
+    lblLIstagemCategoria: TRLLabel;
+    RLDraw2: TRLDraw;
+    RLPDFFilter1: TRLPDFFilter;
+    RLBand2: TRLBand;
+    Rodape: TRLBand;
+    RLSystemInfo1: TRLSystemInfo;
+    RLDraw1: TRLDraw;
+    RLSystemInfo2: TRLSystemInfo;
+    RLSystemInfo3: TRLSystemInfo;
+    RLLabel1: TRLLabel;
+    lblPaginas: TRLLabel;
+    RLDBText1: TRLDBText;
+    RLDBText2: TRLDBText;
+    RLBand1: TRLBand;
+    RLPanel1: TRLPanel;
+    RLLabel3: TRLLabel;
+    RLLabel2: TRLLabel;
+    RLDBText3: TRLDBText;
+    RLDBText4: TRLDBText;
+    RLLabel4: TRLLabel;
+    RLLabel5: TRLLabel;
+    QryClienteclienteId: TFDAutoIncField;
+    QryClientenome: TStringField;
+    QryClienteemail: TStringField;
+    QryClientetelefone: TStringField;
+    QryClientestatus_desc: TStringField;
+    QryClientepessoa: TStringField;
+    RLLabel6: TRLLabel;
+    RLLabel7: TRLLabel;
+    RLDBText5: TRLDBText;
+    RLDBText6: TRLDBText;
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmRelCadCliente: TfrmRelCadCliente;
+
+implementation
+
+
+{$R *.dfm}
+
+procedure TfrmRelCadCliente.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  QryCliente.Close;
+end;
+
+procedure TfrmRelCadCliente.FormCreate(Sender: TObject);
+begin
+  QryCliente.Open;
+end;
+
+end.

@@ -1,0 +1,109 @@
+object dtmConexao: TdtmConexao
+  OldCreateOrder = False
+  Height = 484
+  Width = 666
+  object fdConexao: TFDConnection
+    Params.Strings = (
+      'Server=DC-TR-06-VM\SERVERCURSO'
+      'Database=Vendas'
+      'OSAuthent=Yes'
+      'User_Name=DOMTEC\devmv'
+      'DriverID=MSSQL')
+    Connected = True
+    Left = 280
+    Top = 152
+  end
+  object QryScriptCategorias: TFDQuery
+    Connection = fdConexao
+    SQL.Strings = (
+      'IF OBJECT_ID ('#39'categorias'#39') IS NULL'
+      'begin'
+      '  CREATE TABLE categorias ('
+      '    categoriaId int IDENTITY(1,1) NOT NULL,'
+      '    dwescricao varchar(30) NULL,'
+      '    PRIMARY KEY (categoriaID)'
+      ')'
+      'END')
+    Left = 344
+    Top = 88
+  end
+  object QryScriptClientes: TFDQuery
+    Connection = fdConexao
+    SQL.Strings = (
+      'IF OBJECT_ID ('#39'clientes'#39') IS NULL'
+      'BEGIN'
+      '  CREATE TABLE clientes ('
+      '  clienteId int IDENTITY(1,1) NOT NULL,'
+      '  nome varchar(60) NULL,'
+      '  endereco varchar(60) null,'
+      '  cidade varchar(50) null,'
+      '  bairro varchar(40) null,'
+      '  estado varchar(2) null,'
+      '  cep varchar(10) null,'
+      '  telefone varchar(14) null,'
+      '  email varchar(100) null,'
+      '  dataNascimento datetime null'
+      '  PRIMARY KEY (clienteId),'
+      ')'
+      'END')
+    Left = 432
+    Top = 152
+  end
+  object QryScriptProdutos: TFDQuery
+    Connection = fdConexao
+    SQL.Strings = (
+      'IF OBJECT_ID ('#39'produtos'#39') IS NULL'
+      'BEGIN'
+      '  CREATE TABLE produtos ('
+      '    produtoId int IDENTITY(1,1) NOT NULL,'
+      '    nome varchar(60) NULl,'
+      '    descricao varchar(255) null,'
+      '    valor decimal(18,5) default 0.00000 null,'
+      '    categoriaId int null,'
+      '    PRIMARY KEY (produtoId),'
+      '    CONSTRAINT FK_ProdutoCategorias'
+      '    FOREIGN KEY (categoriId) references categorias(categoriaId)'
+      ')'
+      'END')
+    Left = 520
+    Top = 88
+  end
+  object QryScriptVendas: TFDQuery
+    Connection = fdConexao
+    SQL.Strings = (
+      'IF OBJECT_ID ('#39'vendas'#39') IS NULL'
+      'BEGIN'
+      '  Create table vendas ('
+      '    vendaId int identity(1,1) not null,'
+      '    clienteId int not null,'
+      '    fataVenda datetime default getdate(),'
+      '    totslVenda decimal(18,5) default 0.00000,'
+      ''
+      '    PRIMARY KEY (vendaId),'
+      '    CONSTRAINT FK_VendasClientes FOREIGN KEY (clienteID)'
+      '    REFERENCES clientes(clienteId)'
+      '  )'
+      'END')
+    Left = 584
+    Top = 160
+  end
+  object QryScriptItensVendas: TFDQuery
+    Connection = fdConexao
+    SQL.Strings = (
+      'if OBJECT_ID ('#39'vendasItens'#39') is null'
+      'begin'
+      'create table vendasItens ('
+      #9'vendaId int not null,'
+      #9'produtoId int not null,'
+      #9'valorUnitario decimal (18,5) default 0.00000,'
+      #9'quantidade decimal (18,5) default 0.00000,'
+      #9'totalProduto decimal (18,5) default 0.00000,'
+      #9'PRIMARY KEY (vendaId,ProdutoId),'
+      #9'CONSTRAINT FK_VendasItensProdutos FOREIGN KEY (produtoId)'
+      #9#9'REFERENCES produtos(produtoId)'
+      ')'
+      'end')
+    Left = 416
+    Top = 256
+  end
+end

@@ -1,0 +1,78 @@
+unit cAtualizacaoBancoDeDados;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UTelaHeranca, Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.ExtCtrls, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Mask, Vcl.ComCtrls,
+  Vcl.DBCtrls;
+
+type
+  TAtualizacaoBancoDeDados = class
+    private
+    public
+      FdConexao:TFDConnection;
+      constructor Create (aConexao:TFDConnection);
+      procedure ExecutaDiretoBancoDeDados(aScript: string);
+  end;
+
+type
+  TAtualizaBancoDeDadosMSSQL = class
+    private
+      FdConexao:TFDConnection;
+    public
+      function AtualizaBancoDeDadosMSSQL: Boolean;
+      constructor Create (aConexao:TFDConnection);
+  end;
+
+implementation
+
+{ TAtualizaBancoDeDados }
+constructor TAtualizacaoBancoDeDados.Create(aConexao: TFDConnection);
+begin
+  FdConexao:=aConexao;
+end;
+
+procedure TAtualizacaoBancoDeDados.ExecutaDiretoBancoDeDados (aScript:string);
+var Qry:TFDQuery;
+begin
+  try
+    Qry:=TFDQuery.Create(nil);
+    Qry.Connection:=FdConexao;
+    Qry.SQL.Clear;
+    Qry.SQL.Add(aScript);
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+    except
+      FdConexao.Rollback;
+    end;
+  finally
+    Qry.Close;
+    if Assigned(Qry) then
+      FreeAndNil(Qry);
+  end;
+end;
+
+{ TAtualizaBancoDeDadosMSSQL }
+function TAtualizaBancoDeDadosMSSQL.AtualizaBancoDeDadosMSSQL:Boolean;
+var oAtualizarDB:TAtualizacaoBancoDeDados;
+begin
+  try
+    //Calsse Principal de atualização
+    oAtualizarDB := TAtualizacaoBancoDeDados.Create(FdConexao);
+  finally
+    if Assigned (oAtualizarDB) then
+      FreeAndNil(oAtualizarDB)
+  end;
+end;
+
+constructor TAtualizaBancoDeDadosMSSQL.Create (aConexao:TFDConnection);
+begin
+  FdCOnexao:=aConexao;
+end;
+
+end.

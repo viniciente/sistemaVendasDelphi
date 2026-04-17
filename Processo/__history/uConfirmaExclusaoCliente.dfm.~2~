@@ -1,0 +1,102 @@
+object frmConfirmarExclusaoCliente: TfrmConfirmarExclusaoCliente
+  Left = 0
+  Top = 0
+  BorderStyle = bsDialog
+  Caption = 'ATEN'#199#194'O - CLIENTE POSSUI VENDAS'
+  ClientHeight = 471
+  ClientWidth = 714
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poScreenCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pnlTopo: TPanel
+    Left = 0
+    Top = 0
+    Width = 714
+    Height = 60
+    Align = alTop
+    BevelOuter = bvNone
+    Color = clInfoBk
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentBackground = False
+    ParentFont = False
+    TabOrder = 0
+    object lblAviso: TLabel
+      Left = 0
+      Top = 0
+      Width = 714
+      Height = 60
+      Alignment = taCenter
+      Caption = 
+        'Este Cliente Possui Vendas, As Vendas Abaixo Ser'#227'o Excluidas Jun' +
+        'to Com O Cliente'
+    end
+    object lblNomeCliente: TLabel
+      Left = 300
+      Top = 27
+      Width = 44
+      Height = 16
+      Caption = 'Cliente:'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
+  end
+  object pnlBotoes: TPanel
+    Left = 0
+    Top = 431
+    Width = 714
+    Height = 40
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    ExplicitTop = 430
+    object btnExcluirTudo: TBitBtn
+      Left = 12
+      Top = 6
+      Width = 180
+      Height = 28
+      Caption = 'EXCLUIR'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clRed
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 0
+    end
+    object btnCancelar: TBitBtn
+      Left = 608
+      Top = 6
+      Width = 100
+      Height = 28
+      Caption = 'CANCELAR'
+      TabOrder = 1
+    end
+  end
+  object DBGrid1: TDBGrid
+    Left = 200
+    Top = 144
+    Width = 320
+    Height = 120
+    TabOrder = 2
+    TitleFont.Charset = DEFAULT_CHARSET
+    TitleFont.Color = clWindowText
+    TitleFont.Height = -11
+    TitleFont.Name = 'Tahoma'
+    TitleFont.Style = []
+  end
+end

@@ -1,0 +1,21 @@
+inherited frmCadAcaoAcesso: TfrmCadAcaoAcesso
+  Caption = 'Cadastro de Ac'#227'o de Acesso'
+  Position = poScreenCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel1: TPanel
+    inherited pnlRodape: TPanel
+      inherited dbnvgrNavigator: TDBNavigator
+        Hints.Strings = ()
+      end
+    end
+    inherited pgcPrincipal: TPageControl
+      inherited tsListagem: TTabSheet
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
+      end
+    end
+  end
+end

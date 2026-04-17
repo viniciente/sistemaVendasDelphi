@@ -1,0 +1,91 @@
+unit uTelaHerancaConsulta;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Data.DB, Vcl.DBCtrls,
+  Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Mask, Vcl.ComCtrls, Vcl.ExtCtrls, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async,
+  FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client, uEnum, uDtmnConexao, RxToolEdit, RxCurrEdit, Vcl.Buttons,
+  FireDAC.UI.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Phys, FireDAC.VCLUI.Wait;
+
+type
+  TfrmTelaHerancaConsulta = class(TForm)
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    mskPesquisa: TMaskEdit;
+    lblIndice: TLabel;
+    grdPesquisa: TDBGrid;
+    fdqry1: TFDQuery;
+    dsListagem: TDataSource;
+    btnFechar: TBitBtn;
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnFecharClick(Sender: TObject);
+    procedure grdPesquisaKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  private
+    procedure ExibirLabelIndice(Campo: string; aLabel: TLabel);
+    function RetornarCampoTraduzido(Campo: string): string;
+    { Private declarations }
+  public
+    { Public declarations }
+    aRetornarIdSelecionado:Variant;
+    aIniciarPesquisaId:Variant;
+    aCampoId:string;
+    IndiceAtual:string;
+  end;
+
+var
+  frmTelaHerancaConsulta: TfrmTelaHerancaConsulta;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmTelaHerancaConsulta.btnFecharClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmTelaHerancaConsulta.FormClose(Sender: TObject; var Action: TCloseAction);
+var Action: TCloseAction;
+begin
+  if fdqry1.Active then
+  fdqry1.Close
+end;
+
+procedure TfrmTelaHerancaConsulta.FormCreate(Sender: TObject);
+begin
+  if fdqry1.Active then
+  fdqry1.Close;
+
+  fdqry1.Open;
+end;
+
+procedure TfrmTelaHerancaConsulta.grdPesquisaKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var Key: Word; Shift: TShiftState;
+begin
+  //Bloqueia o CTRL + DEL
+  if (Shift = [ssCtrl]) and (Key = 46) then
+  Key := 0;
+end;
+
+procedure TfrmTelaHerancaConsulta.ExibirLabelIndice(Campo: string; aLabel:TLabel);
+begin
+  aLabel.Caption:=RetornarCampoTraduzido(Campo);
+end;
+
+function TfrmTelaHerancaConsulta.RetornarCampoTraduzido(Campo: string):string;
+var i:Integer;
+begin
+  for I := 0 to fdqry1.FieldCount-1 do begin
+    if LowerCase(fdqry1.Fields[i].FieldName) = LowerCase(Campo) then begin
+       Result:=fdqry1.Fields[i].DisplayLabel;
+       Break;
+    end;
+  end;
+end;
+
+end.

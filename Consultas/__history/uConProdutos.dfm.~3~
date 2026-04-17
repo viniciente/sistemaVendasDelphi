@@ -1,0 +1,78 @@
+inherited frmConProdutos: TfrmConProdutos
+  Caption = 'CONSULTE SEU PRODUTOS'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel2: TPanel
+    inherited grdPesquisa: TDBGrid
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'produtoId'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'nome'
+          Visible = True
+        end>
+    end
+  end
+  inherited Panel3: TPanel
+    OnClick = Panel3Click
+  end
+  inherited fdqry1: TFDQuery
+    Active = True
+    SQL.Strings = (
+      'SELECT p.produtoId,'
+      '       p.nome,'
+      '       p.descricao,'
+      '       p.valor,'
+      '       p.quantidade,'
+      '       p.categoriasId,'
+      '       c.descricao As DescricaoCategoria'
+      'FROM produtos as p'
+      '  LEFT JOIN categorias as c on c.categoriasId = p.categoriasId')
+    Top = 8
+    object fdqry1produtoId: TFDAutoIncField
+      DisplayLabel = 'Codigo'
+      FieldName = 'produtoId'
+      Origin = 'produtoId'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object fdqry1nome: TStringField
+      DisplayLabel = 'Nome'
+      FieldName = 'nome'
+      Origin = 'nome'
+      Size = 60
+    end
+    object fdqry1descricao: TStringField
+      FieldName = 'descricao'
+      Origin = 'descricao'
+      Size = 255
+    end
+    object fdqry1valor: TFMTBCDField
+      FieldName = 'valor'
+      Origin = 'valor'
+      Precision = 18
+      Size = 5
+    end
+    object fdqry1quantidade: TIntegerField
+      FieldName = 'quantidade'
+      Origin = 'quantidade'
+    end
+    object fdqry1categoriasId: TIntegerField
+      FieldName = 'categoriasId'
+      Origin = 'categoriasId'
+    end
+    object fdqry1DescricaoCategoria: TStringField
+      FieldName = 'DescricaoCategoria'
+      Origin = 'DescricaoCategoria'
+      Size = 30
+    end
+  end
+  inherited dsListagem: TDataSource
+    Left = 419
+    Top = 8
+  end
+end

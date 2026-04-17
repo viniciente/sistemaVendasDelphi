@@ -1,0 +1,132 @@
+unit uConfirmaExclusaoCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes,
+  Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
+  Vcl.Grids, Vcl.DBGrids, Vcl.ExtCtrls, Vcl.Buttons,
+  Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf,
+  FireDAC.Stan.Async, FireDAC.DApt, FireDAC.Comp.DataSet, FireDAC.Comp.Client;
+
+type
+  TfrmConfirmarExclusaoCliente = class(TForm)
+    pnlTopo: TPanel;
+    lblAviso: TLabel;
+    lblNomeCliente: TLabel;
+    pnlBotoes: TPanel;
+    btnExcluirTudo: TBitBtn;
+    btnCancelar: TBitBtn;
+    dbgrdVendas: TDBGrid;
+    QryVendas: TFDQuery;
+    dtsVendas: TDataSource;
+    QryVendasProduto: TStringField;
+    QryVendasQtd: TFMTBCDField;
+    QryVendasPreçoUnit: TFMTBCDField;
+    QryVendasTotaldoItem: TFMTBCDField;
+    QryVendasDatadaVenda: TSQLTimeStampField;
+    procedure btnExcluirTudoClick(Sender: TObject);
+    procedure btnCancelarClick(Sender: TObject);
+    procedure Configurar(aClienteId: Integer; aNome: string; aConexao: TFDConnection);
+  private
+    { Private declarations }
+    FClienteId: Integer;
+    FNomeCliente: string;
+    FConexao: TFDConnection;
+  public
+    { Public declarations }
+    procedure TfrmConfirmarExclusaoCliente.Configurar(aClienteId: Integer; aNome: string; aConexao: TFDConnection);
+  end;
+
+var
+  frmConfirmarExclusaoCliente: TfrmConfirmarExclusaoCliente;
+
+implementation
+
+{$R *.dfm}
+
+procedure TfrmConfirmarExclusaoCliente.Configurar(aClienteId: Integer;
+  aNome: string; aConexao: TFDConnection);
+begin
+  FClienteId   := aClienteId;
+  FNomeCliente := aNome;
+  FConexao     := aConexao;
+
+  lblNomeCliente.Caption := 'Cliente: ' + aNome;
+
+  QryVendas.Connection := aConexao;
+  QryVendas.Close;
+  QryVendas.SQL.Clear;
+  QryVendas.SQL.Add('SELECT v.vendaId,');
+  QryVendas.SQL.Add('       CONVERT(VARCHAR(10), v.dataVenda, 103) AS dataVenda,');
+  QryVendas.SQL.Add('       p.nome AS nomeProduto,');
+  QryVendas.SQL.Add('       vi.quantidade,');
+  QryVendas.SQL.Add('       vi.valorUnitario,');
+  QryVendas.SQL.Add('       vi.totalProduto,');
+  QryVendas.SQL.Add('       v.totalVenda');
+  QryVendas.SQL.Add('  FROM vendas v');
+  QryVendas.SQL.Add('       INNER JOIN vendasItens vi ON vi.vendaId = v.vendaId');
+  QryVendas.SQL.Add('       INNER JOIN produtos p ON p.produtoId = vi.produtoId');
+  QryVendas.SQL.Add(' WHERE v.clienteId = :clienteId');
+  QryVendas.SQL.Add(' ORDER BY v.dataVenda, v.vendaId');
+  QryVendas.ParamByName('clienteId').AsInteger := aClienteId;
+  QryVendas.Open;
+end;
+
+procedure TfrmConfirmarExclusaoCliente.btnCancelarClick(Sender: TObject);
+begin
+  ModalResult := mrCancel;
+end;
+
+procedure TfrmConfirmarExclusaoCliente.btnExcluirTudoClick(Sender: TObject);
+var
+  Qry: TFDQuery;
+begin
+  if MessageDlg(
+    'Isso ira excluir TODAS as vendas do cliente "' + FNomeCliente + '" e o proprio cliente.' + #13 +
+    'Esta acao nao pode ser desfeita. Confirma?',
+    mtWarning, [mbYes, mbNo], 0) = mrNo then
+    Exit;
+
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FConexao;
+    FConexao.StartTransaction;
+    try
+      // 1. Apagar itens das vendas
+      Qry.SQL.Clear;
+      Qry.SQL.Add('DELETE FROM vendasItens WHERE vendaId IN');
+      Qry.SQL.Add('  (SELECT vendaId FROM vendas WHERE clienteId = :clienteId)');
+      Qry.ParamByName('clienteId').AsInteger := FClienteId;
+      Qry.ExecSQL;
+
+      // 2. Apagar as vendas
+      Qry.SQL.Clear;
+      Qry.SQL.Add('DELETE FROM vendas WHERE clienteId = :clienteId');
+      Qry.ParamByName('clienteId').AsInteger := FClienteId;
+      Qry.ExecSQL;
+
+      // 3. Apagar o cliente
+      Qry.SQL.Clear;
+      Qry.SQL.Add('DELETE FROM clientes WHERE clienteId = :clienteId');
+      Qry.ParamByName('clienteId').AsInteger := FClienteId;
+      Qry.ExecSQL;
+
+      FConexao.Commit;
+      ModalResult := mrOk;
+
+    except
+      on E: Exception do
+      begin
+        FConexao.Rollback;
+        MessageDlg('Erro ao excluir: ' + E.Message, mtError, [mbOK], 0);
+      end;
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+
+end.

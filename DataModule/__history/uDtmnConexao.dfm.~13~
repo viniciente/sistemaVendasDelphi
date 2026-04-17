@@ -1,0 +1,32 @@
+object dtmConexao: TdtmConexao
+  OldCreateOrder = False
+  Height = 484
+  Width = 666
+  object fdConexao: TFDConnection
+    Params.Strings = (
+      'Server=DC-TR-06-VM\SERVERCURSO'
+      'Database=Vendas'
+      'OSAuthent=Yes'
+      'User_Name=DOMTEC\devmv'
+      'DriverID=MSSQL')
+    Connected = True
+    Left = 168
+    Top = 104
+  end
+  object QryScriptUsuarios: TFDQuery
+    Connection = fdConexao
+    SQL.Strings = (
+      'IF OBJECT_ID ('#39'usuarios'#39') is null'
+      'BEGIN'
+      #9'Create table usuarios('
+      #9' usuarioId int identity(1,1) not null,'
+      #9' nome varchar(50) not null,'
+      #9' senha varchar(40) not null,'
+      ''
+      #9' PRIMARY KEY (usuarioId)'
+      #9' )'
+      'END;')
+    Left = 512
+    Top = 136
+  end
+end
