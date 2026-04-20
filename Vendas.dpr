@@ -2,6 +2,8 @@
 
 
 
+{$R *.dres}
+
 uses
   Vcl.Forms,
   Unit2 in 'Unit2.pas' {frmPrincipal},

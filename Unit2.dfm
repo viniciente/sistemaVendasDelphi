@@ -289,19 +289,6 @@ object frmPrincipal: TfrmPrincipal
     Color = clWhite
     ParentBackground = False
     TabOrder = 1
-    ExplicitTop = 397
-    object imgAvatar: TImage
-      Left = 0
-      Top = 0
-      Width = 41
-      Height = 46
-      Align = alLeft
-      Proportional = True
-      Stretch = True
-      ExplicitLeft = 3
-      ExplicitTop = 5
-      ExplicitHeight = 38
-    end
     object lblNomeUsuario: TLabel
       Left = 41
       Top = 0
@@ -318,6 +305,18 @@ object frmPrincipal: TfrmPrincipal
       Layout = tlCenter
       ExplicitHeight = 32
     end
+    object imgAvatar: TImage
+      Left = 0
+      Top = 0
+      Width = 41
+      Height = 46
+      Align = alLeft
+      Proportional = True
+      Stretch = True
+      ExplicitLeft = 3
+      ExplicitTop = 5
+      ExplicitHeight = 38
+    end
   end
   object Panel1: TPanel
     Left = 0
@@ -330,9 +329,9 @@ object frmPrincipal: TfrmPrincipal
     TabOrder = 2
     object Label1: TLabel
       Left = 1
-      Top = 4
+      Top = 7
       Width = 890
-      Height = 22
+      Height = 19
       Align = alBottom
       Alignment = taCenter
       Caption = 'GRAFICOS'
@@ -344,7 +343,8 @@ object frmPrincipal: TfrmPrincipal
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False
-      ExplicitTop = 0
+      ExplicitTop = 4
+      ExplicitWidth = 85
     end
   end
   object mainPrincipal: TMainMenu
