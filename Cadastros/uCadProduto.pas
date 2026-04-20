@@ -180,18 +180,23 @@ procedure TfrmCadProduto.btnPesquisarCategoriaClick(Sender: TObject);
 begin
   inherited;
   try
+    //cria a tela de consulta
     frmConCategorias := TfrmConCategorias.Create(Self);
 
+    //abre a consulta já posocionada no registro
     if lkpCategoria.KeyValue<>null then
        frmConCategorias.aIniciarPesquisaId:=lkpCategoria.KeyValue;
 
+    //executa a tela
     frmConCategorias.ShowModal;
 
+    //verifica se o usuario selecionou algo
     if frmConCategorias.aRetornarIdSelecionado<>Unassigned then //Não Atribuido
        lkpCategoria.KeyValue:=frmConCategorias.aRetornarIdSelecionado;
 
   finally
     frmConCategorias.Release;
+    frmConCategorias := nil;
   end;
 end;
 
@@ -297,6 +302,7 @@ begin
     // Sem foto: esconde o componente e deixa o grid normal
     imgVisualizacao.Visible := False;
 end;
+
 procedure TfrmCadProduto.dsListagemStateChange(Sender: TObject);
 begin
   inherited;
@@ -337,14 +343,14 @@ procedure TfrmCadProduto.FormShow(Sender: TObject);
 begin
   inherited;
 
-  // 1. Primeiro garante que a Query está aberta
+  //garante que a Query está aberta
   if not FDQuery1.Active then
     FDQuery1.Open;
 
-  // 2. DEPOIS liga o evento
+  //liga o evento
   dsListagem.OnDataChange := dsListagemDataChange;
 
-  // 3. Força a execução para o registro que já está selecionado
+  //força a execução para o registro que já está selecionado
   dsListagemDataChange(dsListagem, nil);
 end;
 

@@ -50,6 +50,7 @@ begin
        oUsuarioLogado.nome   := oUsuario.nome;
        oUsuarioLogado.senha  := oUsuario.senha;
        oUsuarioLogado.foto.Assign(oUsuario.foto);
+       oUsuarioLogado.statusId := oUsuario.status;
 
        bFechar := True;
        Self.ModalResult := mrOk;

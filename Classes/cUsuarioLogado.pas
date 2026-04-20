@@ -18,6 +18,7 @@ type
     F_nome:string;
     F_senha: string;
     F_foto: TBitmap;
+    F_statusId :Integer;
     fdConexao: TFDConnection;
 
   public
@@ -29,6 +30,7 @@ type
     property nome          :string     read F_nome           write F_nome;
     property senha         :string     read F_senha          write F_senha;
     property foto          :TBitmap    read F_foto;
+    property statusId      :Integer    read F_statusId       write F_statusId;
   end;
 
 implementation

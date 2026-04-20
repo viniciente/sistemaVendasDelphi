@@ -372,6 +372,16 @@ begin
     Abort;
   end;
 
+  if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo,
+         Self.Name + '_' + TBitBtn(Sender).Name,
+         dtmConexao.FDConexao) then
+    begin
+      MessageDlg('Usuário: ' + oUsuarioLogado.nome +
+                 ', não tem permissão para apagar registros.',
+                 mtWarning, [mbOK], 0);
+      Abort;
+    end;
+
   // 3. Execução da Exclusão
   try
     if (Apagar) then

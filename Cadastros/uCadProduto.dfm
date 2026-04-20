@@ -8,10 +8,10 @@ inherited frmCadProduto: TfrmCadProduto
   TextHeight = 13
   inherited pnlFundo: TPanel
     Width = 864
-    ExplicitWidth = 753
+    ExplicitWidth = 864
     inherited pnlRodape: TPanel
       Width = 864
-      ExplicitWidth = 753
+      ExplicitWidth = 864
       inherited dbnvgrNavigator: TDBNavigator
         Hints.Strings = ()
       end
@@ -27,10 +27,12 @@ inherited frmCadProduto: TfrmCadProduto
     inherited pgcPrincipal: TPageControl
       Width = 864
       ActivePage = tsManutencao
-      ExplicitTop = -4
-      ExplicitWidth = 840
+      ExplicitWidth = 864
       inherited tsListagem: TTabSheet
+        ExplicitLeft = 0
+        ExplicitTop = 0
         ExplicitWidth = 745
+        ExplicitHeight = 0
         object imgVisualizacao: TImage [0]
           Left = 625
           Top = 73
@@ -87,7 +89,7 @@ inherited frmCadProduto: TfrmCadProduto
         end
       end
       inherited tsManutencao: TTabSheet
-        ExplicitWidth = 745
+        ExplicitWidth = 856
         object lblCodigo: TLabel
           Left = 16
           Top = 29

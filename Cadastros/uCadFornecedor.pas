@@ -67,7 +67,7 @@ implementation
 
 function TfrmCadFornecedor.Apagar: Boolean;
 begin
-  if oFornecedor.Selecionar(FDQuery1.FieldByName('clienteId').AsInteger)then begin
+  if oFornecedor.Selecionar(FDQuery1.FieldByName('fornecedorId').AsInteger)then begin
      Result:=oFornecedor.Apagar;
   end;
 end;
@@ -168,7 +168,7 @@ end;
 procedure TfrmCadFornecedor.edtCNPJKeyPress(Sender: TObject; var Key: Char);
 begin
   inherited;
-  if not (Key in ['0'..'9', #8]) then Key := #0;
+  if not (Key in ['0'..'9', #8, #3, #22]) then Key := #0;
 end;
 
 procedure TfrmCadFornecedor.edtTelefoneChange(Sender: TObject);

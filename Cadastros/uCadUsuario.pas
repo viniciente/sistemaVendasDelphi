@@ -129,7 +129,7 @@ end;
 
 procedure TfrmCadUsuario.btnGravarClick(Sender: TObject);
 begin
-  // 1. Validação de duplicidade
+  //verifica se ja n existe esse usuario
   if (EstadoDoCadastro = ecInserir) and oUsuario.UsuarioExiste(edtNome.Text) then
   begin
     MessageDlg('Usuário já cadastrado', mtInformation, [mbok], 0);
@@ -137,13 +137,13 @@ begin
     abort;
   end;
 
-  // 2. Atribuição de ID
+  //atribui o id
   if edtUsuarioId.Text <> EmptyStr then
     oUsuario.codigo := StrToInt(edtUsuarioId.Text)
   else
     oUsuario.codigo := 0;
 
-  // 3. Atribuição de campos simples
+  //pega o campo nome e senha
   oUsuario.nome  := edtNome.Text;
   oUsuario.senha := edtSenha.Text;
 
@@ -152,7 +152,7 @@ begin
   else
     oUsuario.status:= 1;
 
-  // 4. ATRIBUIÇÃO DA FOTO (Tratando o "Existir ou Não")
+  //pega a foto caso tenha
   if (imgImagem.Picture.Graphic <> nil) and (not imgImagem.Picture.Graphic.Empty) then
   begin
     // Se tem imagem no componente, passa para o objeto
@@ -161,11 +161,10 @@ begin
   else
   begin
     // Se a imagem estiver vazia no componente, limpa o objeto oUsuario.foto
-    // Isso garante que se o usuário apagou a foto na tela, ela suma do banco também.
     oUsuario.foto.Assign(nil);
   end;
 
-  inherited; // Chama o Inserir ou Alterar da classe pai
+  inherited;
 end;
 {$ENDREGION}
 

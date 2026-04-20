@@ -78,10 +78,10 @@ begin
     FdConexao.StartTransaction;
     try
       Qry.ExecSQL;
-      FdConexao.Commit;
+      FdConexao.Commit; //grava definitvamente
       Result := True;
     except
-      FdConexao.Rollback;
+      FdConexao.Rollback; //em caso de erro desfaz a tentativa
       Result := False;
     end;
   finally
@@ -180,12 +180,16 @@ begin
   try
     oAcaoAcesso:=TAcaoAcesso.Create(aConexao);
     oAcaoAcesso.descricao := aForm.Caption;
+    //usa o nome como chave tecnica
     oAcaoAcesso.Chave := aForm.Name;
+    //verifica se a tela esta cadastrada no banco
     if not oAcaoAcesso.ChaveExiste(oAcaoAcesso.Chave) then
        oAcaoAcesso.Inserir;
 
+    //percorre a lista de todos os componentess que pertecem a esse formulario
     for I := 0 to aForm.ComponentCount -1 do
     begin
+      //filtra somente os botões (bitbtn)
       if (aForm.Components[i] is TBitBtn) then
       begin
         if TBitBtn(aForm.Components[i]).Tag=99 then
@@ -361,16 +365,14 @@ begin
     QryAcaoAcesso.Open;
 
     while not Qry.Eof do  //usuarios
-    // Dentro do while not Qry.Eof do (na sua classe TAcaoAcesso)
     begin
       QryAcaoAcesso.First;
       while not QryAcaoAcesso.Eof do
       begin
-        // Agora passamos tamb m o statusId que vem da tabela de usu rios
         VerificarUsuarioAcao(
           Qry.FieldByName('usuarioId').AsInteger,
           QryAcaoAcesso.FieldByName('acaoAcessoId').AsInteger,
-          Qry.FieldByName('statusId').AsInteger, // <--- Novo par metro
+          Qry.FieldByName('statusId').AsInteger,
           aConexao
         );
         QryAcaoAcesso.Next;

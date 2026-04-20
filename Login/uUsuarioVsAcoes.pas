@@ -85,19 +85,50 @@ end;
 procedure TfrmUsuarioVsAcoes.grdAcoesDblClick(Sender: TObject);
 var Qry:TFDQuery;
     bmRegistroAtual:TBookmark;
+    vNovoAtivo: Boolean;
+    vChave: string;
+    vStatusUsuario: Integer;
+    QryStatus: TFDQuery;
 begin
   try
     bmRegistroAtual := QryAcoes.GetBookmark;
+
+    // Busca o status do usuario selecionado para proteger acoes restritas
+    QryStatus := TFDQuery.Create(nil);
+    try
+      QryStatus.Connection := dtmConexao.FDConexao;
+      QryStatus.SQL.Text := 'SELECT statusId FROM usuarios WHERE usuarioId = :id';
+      QryStatus.ParamByName('id').AsInteger := QryUsuario.FieldByName('usuarioID').AsInteger;
+      QryStatus.Open;
+      vStatusUsuario := QryStatus.FieldByName('statusId').AsInteger;
+    finally
+      QryStatus.Free;
+    end;
+
+    vNovoAtivo := not QryAcoes.FieldByName('ativo').AsBoolean;
+    vChave := QryAcoes.FieldByName('descricao').AsString;
+
+    // Colaborador (statusId=3): nao permite reativar acoes bloqueadas automaticamente
+    if (vStatusUsuario = 3) and vNovoAtivo then
+    begin
+      if (Pos('APAGAR', UpperCase(vChave)) > 0) or (Pos('USUARIOVSAOES', UpperCase(vChave)) > 0) then
+      begin
+        MessageDlg('Esta acao é restrita para o perfil Colaborador e nao pode ser liberada.',
+          mtWarning, [mbOK], 0);
+        Exit;
+      end;
+    end;
+
     Qry:=TFDQuery.Create(nil);
     Qry.Connection:=dtmConexao.FDConexao;
     Qry.SQL.Clear;
-    Qry.SQL.Add('UPDATE usuariosAcaoAcesso '+
-                '   SET ativo=:ativo '+
-                ' WHERE usuarioId=:usuarioId '+
-                '   AND acaoAcessoId=:acaoAcessoId ');
+    Qry.SQL.Add('UPDATE usuariosAcaoAcesso ');
+    Qry.SQL.Add('   SET ativo=:ativo ');
+    Qry.SQL.Add(' WHERE usuarioId=:usuarioId ');
+    Qry.SQL.Add('   AND acaoAcessoId=:acaoAcessoId ');
     Qry.ParamByName('usuarioId').AsInteger    :=QryAcoes.FieldByName('usuarioId').AsInteger;
     Qry.ParamByName('acaoAcessoId').AsInteger :=QryAcoes.FieldByName('acaoAcessoId').AsInteger;
-    Qry.ParamByName('ativo').AsBoolean        :=not QryAcoes.FieldByName('ativo').AsBoolean;
+    Qry.ParamByName('ativo').AsBoolean        := vNovoAtivo;
     try
       dtmConexao.FDConexao.StartTransaction;
       Qry.ExecSQL;

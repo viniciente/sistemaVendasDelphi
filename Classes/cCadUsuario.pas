@@ -278,7 +278,7 @@ begin
   try
     Qry := TFDQuery.Create(nil);
     Qry.Connection := FdConexao;
-    Qry.SQL.Add('SELECT usuarioId, nome, senha, foto');
+    Qry.SQL.Add('SELECT usuarioId, nome, senha, foto, statusId');
     Qry.SQL.Add('  FROM usuarios');
     Qry.SQL.Add(' WHERE nome = :nome');
     Qry.SQL.Add('   AND senha = :Senha');
@@ -292,6 +292,7 @@ begin
         F_usuarioId  := Qry.FieldByName('usuarioId').AsInteger;
         F_nome       := Qry.FieldByName('nome').AsString;
         F_senha      := Qry.FieldByName('senha').AsString;
+        F_statusId   := Qry.FieldByName('statusId').AsInteger;
 
         // Carrega a foto
         if not Qry.FieldByName('foto').IsNull then

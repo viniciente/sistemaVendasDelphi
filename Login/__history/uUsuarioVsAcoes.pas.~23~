@@ -1,0 +1,206 @@
+unit uUsuarioVsAcoes;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.Grids, Vcl.DBGrids, uDtmnConexao, Vcl.StdCtrls, Vcl.Buttons;
+
+type
+  TfrmUsuarioVsAcoes = class(TForm)
+    Panel1: TPanel;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    Splitter1: TSplitter;
+    grdUsuarios: TDBGrid;
+    grdAcoes: TDBGrid;
+    QryAcoes: TFDQuery;
+    QryUsuario: TFDQuery;
+    dtsAcoes: TDataSource;
+    dtsUsuario: TDataSource;
+    QryUsuariousuarioID: TFDAutoIncField;
+    QryUsuarioNome: TStringField;
+    QryAcoesusuarioId: TIntegerField;
+    QryAcoesacaoAcessoId: TIntegerField;
+    QryAcoesdescricao: TStringField;
+    QryAcoesativo: TBooleanField;
+    btnFechar: TBitBtn;
+    procedure btnFecharClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure grdAcoesDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+      State: TGridDrawState);
+    procedure grdAcoesDblClick(Sender: TObject);
+    procedure QryUsuarioAfterScroll(DataSet: TDataSet);
+    procedure grdUsuariosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+      State: TGridDrawState);
+    procedure FormCreate(Sender: TObject);
+  private
+    procedure SelecionarAcoesAcessoPorUsuario;
+    procedure CentralizarColunas;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmUsuarioVsAcoes: TfrmUsuarioVsAcoes;
+
+implementation
+
+uses
+  UTelaHeranca;
+
+{$R *.dfm}
+
+procedure TfrmUsuarioVsAcoes.btnFecharClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfrmUsuarioVsAcoes.SelecionarAcoesAcessoPorUsuario;
+begin
+  QryAcoes.Close;
+  QryAcoes.ParamByName('usuarioId').AsInteger := QryUsuario.FieldByName('usuarioID').AsInteger;
+  QryAcoes.Open;
+end;
+
+procedure TfrmUsuarioVsAcoes.FormCreate(Sender: TObject);
+begin
+  CentralizarColunas;
+end;
+
+procedure TfrmUsuarioVsAcoes.FormShow(Sender: TObject);
+begin
+  Try
+    QryUsuario.DisableControls;
+    QryUsuario.Open;
+    SelecionarAcoesAcessoPorUsuario;
+  Finally
+    QryUsuario.EnableControls;
+  End;
+end;
+
+procedure TfrmUsuarioVsAcoes.grdAcoesDblClick(Sender: TObject);
+var Qry:TFDQuery;
+    bmRegistroAtual:TBookmark;
+    vNovoAtivo: Boolean;
+    vChave: string;
+    vStatusUsuario: Integer;
+    QryStatus: TFDQuery;
+begin
+  try
+    bmRegistroAtual := QryAcoes.GetBookmark;
+
+    // Busca o status do usuario selecionado para proteger acoes restritas
+    QryStatus := TFDQuery.Create(nil);
+    try
+      QryStatus.Connection := dtmConexao.FDConexao;
+      QryStatus.SQL.Text := 'SELECT statusId FROM usuarios WHERE usuarioId = :id';
+      QryStatus.ParamByName('id').AsInteger := QryUsuario.FieldByName('usuarioID').AsInteger;
+      QryStatus.Open;
+      vStatusUsuario := QryStatus.FieldByName('statusId').AsInteger;
+    finally
+      QryStatus.Free;
+    end;
+
+    vNovoAtivo := not QryAcoes.FieldByName('ativo').AsBoolean;
+    vChave := QryAcoes.FieldByName('descricao').AsString;
+
+    // Colaborador (statusId=3): nao permite reativar acoes bloqueadas automaticamente
+    if (vStatusUsuario = 3) and vNovoAtivo then
+    begin
+      if (Pos('APAGAR', UpperCase(vChave)) > 0) or (Pos('USUARIOVSAOES', UpperCase(vChave)) > 0) then
+      begin
+        MessageDlg('Esta acao eh restrita para o perfil Colaborador e nao pode ser liberada.',
+          mtWarning, [mbOK], 0);
+        Exit;
+      end;
+    end;
+
+    Qry:=TFDQuery.Create(nil);
+    Qry.Connection:=dtmConexao.FDConexao;
+    Qry.SQL.Clear;
+    Qry.SQL.Add('UPDATE usuariosAcaoAcesso ');
+    Qry.SQL.Add('   SET ativo=:ativo ');
+    Qry.SQL.Add(' WHERE usuarioId=:usuarioId ');
+    Qry.SQL.Add('   AND acaoAcessoId=:acaoAcessoId ');
+    Qry.ParamByName('usuarioId').AsInteger    :=QryAcoes.FieldByName('usuarioId').AsInteger;
+    Qry.ParamByName('acaoAcessoId').AsInteger :=QryAcoes.FieldByName('acaoAcessoId').AsInteger;
+    Qry.ParamByName('ativo').AsBoolean        := vNovoAtivo;
+    try
+      dtmConexao.FDConexao.StartTransaction;
+      Qry.ExecSQL;
+      dtmConexao.FDConexao.Commit;
+    except
+      dtmConexao.FDConexao.Rollback;
+    end;
+  finally
+    SelecionarAcoesAcessoPorUsuario;
+    QryAcoes.GotoBookMark(bmRegistroAtual);
+    if Assigned(Qry) then FreeAndNil(Qry);
+  end;
+end;
+
+procedure TfrmUsuarioVsAcoes.grdAcoesDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+begin
+  If not QryAcoes.FieldByName('ativo').AsBoolean  then
+  begin
+    TDBGrid(Sender).Canvas.Font.Color:= clWhite;
+    TDBGrid(Sender).Canvas.Brush.Color:=clRed
+  end;
+  TDBGrid(Sender).DefaultDrawDataCell(Rect, TDBGrid(Sender).columns[datacol].field, State);
+end;
+
+procedure TfrmUsuarioVsAcoes.grdUsuariosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
+  Column: TColumn; State: TGridDrawState);
+begin
+  // 1. Define as cores de fundo (Zebrado)
+  if not (gdSelected in State) then
+  begin
+    if Odd(TDBGrid(Sender).DataSource.DataSet.RecNo) then
+      TDBGrid(Sender).Canvas.Brush.Color := $00F2F2F2 // Cinza quase branco
+    else
+      TDBGrid(Sender).Canvas.Brush.Color := $00E1E1E1; // Cinza um pouco mais escuro
+
+    // FORÇA A COR DA FONTE para preto nas linhas normais
+    TDBGrid(Sender).Canvas.Font.Color := clBlack;
+  end
+  else
+  begin
+    // 2. Cores para a linha SELECIONADA (Fundo azul com letra branca, por exemplo)
+    TDBGrid(Sender).Canvas.Brush.Color := clHighlight; // Cor padrão de seleção do Windows
+    TDBGrid(Sender).Canvas.Font.Color := clHighlightText; // Branco padrão de seleção
+  end;
+
+  // Aplica a cor definida no fundo
+  TDBGrid(Sender).Canvas.FillRect(Rect);
+
+  // 3. Pinta o texto.
+  // O DefaultDrawColumnCell agora usará as cores de Canvas que definimos acima.
+  TDBGrid(Sender).DefaultDrawColumnCell(Rect, DataCol, Column, State);
+end;
+
+procedure TfrmUsuarioVsAcoes.QryUsuarioAfterScroll(DataSet: TDataSet);
+begin
+  SelecionarAcoesAcessoPorUsuario;
+end;
+
+procedure TfrmUsuarioVsAcoes.CentralizarColunas;
+var
+  I: Integer;
+begin
+  for I := 0 to grdUsuarios.Columns.Count - 1 do
+  begin
+    // Centraliza o texto das linhas
+    grdUsuarios.Columns[I].Alignment := taCenter;
+
+    // Centraliza o texto do título
+    grdUsuarios.Columns[I].Title.Alignment := taCenter;
+  end;
+end;
+
+end.
+
