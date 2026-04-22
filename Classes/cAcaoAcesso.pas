@@ -282,7 +282,6 @@ begin
 
     if Qry.IsEmpty then
     begin
-      // Padr o: acesso liberado
       vAtivo := True;
 
       // Restri  es autom ticas para Colaborador (statusId = 3)
@@ -294,6 +293,15 @@ begin
 
         // Bloqueia todos os bot es APAGAR de qualquer tela
         if Pos('_btnApagar', vChave) > 0 then
+          vAtivo := False;
+
+        if Pos('_btnAlterar', vChave) > 0 then
+          vAtivo := False;
+      end;
+
+      if aStatusId = 2 then
+      begin
+        if Pos('_btnAlterar', vChave) > 0 then
           vAtivo := False;
       end;
 
