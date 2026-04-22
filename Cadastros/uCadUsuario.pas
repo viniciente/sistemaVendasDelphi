@@ -101,6 +101,10 @@ begin
   inherited;
   pgcPrincipal.ActivePage := tsManutencao;
 
+  edtSenha.Enabled := True;
+  edtSenha.Visible := True;
+  lblSenha.Visible := True;
+
   if edtNome.CanFocus then
     edtNome.SetFocus;
 end;
@@ -110,7 +114,6 @@ begin
   if oUsuario.Selecionar(FDQuery1.FieldByName('usuarioID').AsInteger) then begin
     edtUsuarioId.Text   :=IntToStr(oUsuario.codigo);
     edtNome.Text        :=oUsuario.nome;
-    edtSenha.Text       :=oUsuario.senha;
     imgImagem.Picture.Assign(oUsuario.foto);
     lkpStatusUsuario.KeyValue :=oUsuario.status;
 

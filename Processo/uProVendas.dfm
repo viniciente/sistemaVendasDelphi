@@ -250,19 +250,16 @@ inherited frmProVendas: TfrmProVendas
                 item
                   Expanded = False
                   FieldName = 'quantidade'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'valorUnitario'
-                  Width = 64
                   Visible = True
                 end
                 item
                   Expanded = False
                   FieldName = 'valorTotalProduto'
-                  Width = 64
                   Visible = True
                 end>
             end
