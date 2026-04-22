@@ -55,6 +55,8 @@ type
     pnlFotoProduto: TPanel;
     imgProduto: TImage;
     imgVisualizacao: TImage;
+    btnIncluirClientes: TSpeedButton;
+    btnPesquisarClientes: TSpeedButton;
     procedure btnAlterarClick(Sender: TObject);
     procedure btnNovoClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -67,11 +69,12 @@ type
     procedure dsListagemDataChange(Sender: TObject; Field: TField);
     procedure FormShow(Sender: TObject);
     procedure dsListagemStateChange(Sender: TObject);
-    procedure lkpCategoriaExit(Sender: TObject);
     procedure FDQuery1AfterScroll(DataSet: TDataSet);
     procedure btnAlterarExit(Sender: TObject);
     procedure dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
+    procedure btnIncluirClientesClick(Sender: TObject);
+    procedure btnPesquisarClientesClick(Sender: TObject);
   private
     { Private declarations }
     FCarregando: Boolean;
@@ -200,12 +203,38 @@ begin
   end;
 end;
 
+procedure TfrmCadProduto.btnPesquisarClientesClick(Sender: TObject);
+begin
+  inherited;
+  try
+    frmConCategorias := TfrmConCategorias.Create(Self);
+
+    if lkpCategoria.KeyValue<>null then
+       frmConCategorias.aIniciarPesquisaId:=lkpCategoria.KeyValue;
+
+    frmConCategorias.ShowModal;
+
+    if frmConCategorias.aRetornarIdSelecionado<>Unassigned then //N o Atribuido
+       lkpCategoria.KeyValue:=frmConCategorias.aRetornarIdSelecionado;
+
+  finally
+    frmConCategorias.Release;
+  end;
+  AjustarInterfacePorCategoria;
+end;
+
 procedure TfrmCadProduto.btnIncluirCategoriaClick(Sender: TObject);
 begin
   inherited;
   TFuncao.CriarForm(TfrmCadCategorias, oUsuarioLogado, dtmConexao.FDConexao);
   FDQuery1.Refresh;
 end;
+procedure TfrmCadProduto.btnIncluirClientesClick(Sender: TObject);
+begin
+  TFuncao.CriarForm(TfrmCadCategorias, oUsuarioLogado, dtmConexao.FDConexao);
+  FDQuery1.Refresh;
+end;
+
 {$ENDREGION}
 
 {$REGION 'CARREGAR/LIMPAR IMAGEM'}
@@ -219,10 +248,6 @@ procedure TfrmCadProduto.LimparImagem1Click(Sender: TObject);
 begin
   inherited;
   TFuncao.LimparImagem(imgProduto);
-end;
-procedure TfrmCadProduto.lkpCategoriaExit(Sender: TObject);
-begin
-  AjustarInterfacePorCategoria;
 end;
 
 {$ENDREGION}

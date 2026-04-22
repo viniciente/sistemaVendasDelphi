@@ -193,6 +193,7 @@ inherited frmProVendas: TfrmProVendas
               Top = 6
               Width = 121
               Height = 21
+              Enabled = False
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
@@ -414,7 +415,7 @@ inherited frmProVendas: TfrmProVendas
             end
             object lkpProduto: TDBLookupComboBox
               Left = -1
-              Top = 14
+              Top = 15
               Width = 177
               Height = 21
               KeyField = 'produtoId'

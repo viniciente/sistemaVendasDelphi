@@ -5,7 +5,6 @@ inherited frmConCategorias: TfrmConCategorias
   inherited Panel2: TPanel
     inherited grdPesquisa: TDBGrid
       Font.Color = clBlack
-      ParentFont = False
       Columns = <
         item
           Expanded = False

@@ -143,7 +143,7 @@ object frmRelCadProdutoComGrupoCategoria: TfrmRelCadProdutoComGrupoCategoria
         end
         object RLDraw3: TRLDraw
           Left = 336
-          Top = 1
+          Top = -2
           Width = 383
           Height = 20
           DrawKind = dkLine
@@ -183,6 +183,7 @@ object frmRelCadProdutoComGrupoCategoria: TfrmRelCadProdutoComGrupoCategoria
           Alignment = taRightJustify
           DataField = 'Quantidade'
           DataSource = dtsProduto
+          DisplayMask = 'R$##,##0.00'
           Info = riAverage
           Text = ''
         end
@@ -396,7 +397,7 @@ object frmRelCadProdutoComGrupoCategoria: TfrmRelCadProdutoComGrupoCategoria
       FieldName = 'Valor'
       Origin = 'Valor'
       ReadOnly = True
-      DisplayFormat = '##,##0.00'
+      DisplayFormat = 'R$##,##0.00'
       Precision = 18
       Size = 3
     end

@@ -1,4 +1,4 @@
-unit uCadCliente;
+Ôªøunit uCadCliente;
 
 interface
 
@@ -80,6 +80,8 @@ type
     lblStatusAtencao: TLabel;
     lblStatusInativo: TLabel;
     lblStatusProspecto: TLabel;
+    pnlImage: TPanel;
+    imgStatus: TImage;
     procedure FormCreate(Sender: TObject);
     procedure btnNovoClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -111,6 +113,9 @@ type
     procedure FDQuery1cepGetText(Sender: TField; var Text: string; DisplayText: Boolean);
     procedure FDQuery1cpf_cnpjGetText(Sender: TField; var Text: string; DisplayText: Boolean);
     procedure FDQuery1telefoneGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+    procedure edtCEPChange(Sender: TObject);
+    procedure dsListagemDataChange(Sender: TObject; Field: TField);
+    procedure lpkStatusClick(Sender: TObject);
   private
     { Private declarations }
     oCliente:TCliente;
@@ -145,26 +150,26 @@ function TfrmCadCliente.Gravar(EstadoDoCadastro: TEstadoDoCadastro): Boolean;
 var
   vDocLimpo: string;
 begin
-  //remove a formataÁ„o do texto, (ponto, traÁo, barra)
+  //remove a formata√ß√£o do texto, (ponto, tra√ßo, barra)
   vDocLimpo := SomenteNumeros(edtCPFCNPJ.Text);
 
-  //ValidaÁ„o do cpf
-  if lkpPessoa.KeyValue = 1 then // Pessoa FÌsica
+  //Valida√ß√£o do cpf
+  if lkpPessoa.KeyValue = 1 then // Pessoa F√≠sica
   begin
     if not TFuncao.ValidarCPF(vDocLimpo) then
     begin
-      MessageDlg('CPF Inv·lido! Por favor, verifique os n˙meros.', mtError, [mbOK], 0);
+      MessageDlg('CPF Inv√°lido! Por favor, verifique os n√∫meros.', mtError, [mbOK], 0);
       edtCPFCNPJ.SetFocus;
       Result := False;
       Exit;
     end;
   end
-  //validaÁ„o do CNPJ
-  else if lkpPessoa.KeyValue = 2 then // Pessoa JurÌdica
+  //valida√ß√£o do CNPJ
+  else if lkpPessoa.KeyValue = 2 then // Pessoa Jur√≠dica
   begin
     if not TFuncao.ValidarCNPJ(vDocLimpo) then
     begin
-      MessageDlg('CNPJ Inv·lido! Por favor, verifique os n˙meros.', mtError, [mbOK], 0);
+      MessageDlg('CNPJ Inv√°lido! Por favor, verifique os n√∫meros.', mtError, [mbOK], 0);
       edtCPFCNPJ.SetFocus;
       Result := False;
       Exit;
@@ -174,13 +179,13 @@ begin
   //verifica se o campos do email esta vazio ou n
   if (edtEmail.Text <> '') and (not EmailValido(edtEmail.Text)) then
   begin
-    MessageDlg('Por favor, insira um e-mail v·lido!' + #13 +
+    MessageDlg('Por favor, insira um e-mail v√°lido!' + #13 +
                'Exemplo: usuario@gmail.com', mtWarning, [mbOK], 0);
     edtEmail.SetFocus;
-    Abort; // Para a execuÁ„o e n„o grava
+    Abort; // Para a execu√ß√£o e n√£o grava
   end;
 
-  // Se o cÛdigo chegou aqui, significa que o CPF/CNPJ È v·lido.
+  // Se o c√≥digo chegou aqui, significa que o CPF/CNPJ √© v√°lido.
 
   // Tratamento do ID
   if edtClienteId.Text <> EmptyStr then
@@ -188,7 +193,7 @@ begin
   else
     oCliente.codigo := 0;
 
-  // AtribuiÁ„o de campos de texto
+  // Atribui√ß√£o de campos de texto
   oCliente.nome           := edtNome.Text;
   oCliente.endereco       := edtEndereco.Text;
   oCliente.estado         := edtEstado.Text;
@@ -198,10 +203,10 @@ begin
   oCliente.dataNascimento := edtDataNascimento.Date;
   oCliente.numero         := edtNumero.Text;
 
-  // Uso do mÈtodo "SomenteNumeros" salva somente os numeros no banco
+  // Uso do m√©todo "SomenteNumeros" salva somente os numeros no banco
   oCliente.cep      := SomenteNumeros(edtCEP.Text);
   oCliente.telefone := SomenteNumeros(edtTelefone.Text);
-  oCliente.cpf_cnpj := vDocLimpo; // J· usamos a vari·vel que limpamos l· no topo
+  oCliente.cpf_cnpj := vDocLimpo; // J√° usamos a vari√°vel que limpamos l√° no topo
 
   // Uso do tipo pessoa
   if lkpPessoa.KeyValue <> null then
@@ -215,7 +220,7 @@ begin
   else
     oCliente.statusId := 1;
 
-  // ExecuÁ„o da gravaÁ„o
+  // Execu√ß√£o da grava√ß√£o
   if (EstadoDoCadastro = ecInserir) then
     Result := oCliente.Inserir
   else if (EstadoDoCadastro = ecAlterar) then
@@ -267,7 +272,7 @@ var
   SQLBase, SQLFinal: string;
   PosOrder: Integer;
 begin
-  // Pega o SelectOriginal da heranÁa (j· preenchido no FormShow)
+  // Pega o SelectOriginal da heran√ßa (j√° preenchido no FormShow)
   SQLBase := SelectOriginal;
 
   // Remove o ORDER BY para poder adicionar WHERE antes
@@ -316,6 +321,8 @@ begin
     lpkStatus.KeyValue := oCliente.statusId;
     lkpPessoa.KeyValue := oCliente.pessoaId;
 
+    lpkStatusClick(lpkStatus);
+
   end
   else begin
     btnCancelar.Click;
@@ -330,6 +337,7 @@ begin
   inherited;
   edtDataNascimento.Date:=Date;
   pgcPrincipal.ActivePage := tsManutencao;
+  imgStatus.Picture := nil;
   if edtNome.CanFocus then
     edtNome.SetFocus;
 end;
@@ -348,7 +356,7 @@ var
   vStatusID: Integer;
 begin
   inherited;
-  //verifica se a coluna È do Id
+  //verifica se a coluna √© do Id
   if Column.FieldName = 'statusId' then
   begin
     //Limpeza
@@ -369,6 +377,11 @@ begin
   end;
 end;
 
+procedure TfrmCadCliente.dsListagemDataChange(Sender: TObject; Field: TField);
+begin
+  lpkStatusClick(lpkStatus);
+end;
+
 procedure TfrmCadCliente.dsListagemStateChange(Sender: TObject);
 begin
   inherited;
@@ -378,6 +391,28 @@ end;
 {$ENDREGION}
 
 {$REGION'EDT E LKP'}
+
+procedure TfrmCadCliente.edtCEPChange(Sender: TObject);
+var
+  TextoLimpo: string;
+begin
+  //trabalha apenas com numeros
+  TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
+  TEdit(Sender).OnChange := nil;
+  try
+    TEdit(Sender).MaxLength := 9; // Limite de caracteres do CEP
+
+    if Length(TextoLimpo) <= 4 then
+        TEdit(Sender).Text := TextoLimpo
+    else if Length(TextoLimpo) <= 6 then           // se tiver + 6 numeros
+        TEdit(Sender).Text := Copy(TextoLimpo, 1, 5) + '-' + Copy(TextoLimpo, 6, 3);
+
+    TEdit(Sender).SelStart := Length(TEdit(Sender).Text);
+  finally
+    TEdit(Sender).OnChange := edtCEPChange;
+  end;
+end;
+
 procedure TfrmCadCliente.edtCEPExit(Sender: TObject);
 var
   HTTP: THTTPClient;
@@ -386,7 +421,7 @@ var
   CEP, URL: string;
 begin
   CEP := Trim(edtCEP.Text);
-  // Limpa m·scara (deixa sÛ n˙meros)
+  // Limpa m√°scara (deixa s√≥ n√∫meros)
   CEP := StringReplace(CEP, '-', '', [rfReplaceAll]);
   CEP := StringReplace(CEP, '.', '', [rfReplaceAll]);
 
@@ -404,10 +439,10 @@ begin
         try
           if Assigned(JSONObj) then
           begin
-            // A API do ViaCEP retorna "erro: true" se o CEP for v·lido mas n„o existir
+            // A API do ViaCEP retorna "erro: true" se o CEP for v√°lido mas n√£o existir
             if JSONObj.GetValue('erro') <> nil then
             begin
-              ShowMessage('CEP n„o encontrado!');
+              ShowMessage('CEP n√£o encontrado!');
               Exit;
             end;
 
@@ -436,18 +471,18 @@ end;
 procedure TfrmCadCliente.edtCEPKeyPress(Sender: TObject; var Key: Char);
 begin
   inherited;
-  if not (Key in ['0'..'9', #8, #3, #22]) then Key := #0;
+  // if not (Key in ['0'..'9', #8, #3, #22]) then Key := #0;
 end;
 
 procedure TfrmCadCliente.edtCEPKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
 var
   TextoFormatado: string;
 begin
-  // Ignora teclas de controle (setas, backspace, etc) para n„o atrapalhar a navegaÁ„o
+  // Ignora teclas de controle (setas, backspace, etc) para n√£o atrapalhar a navega√ß√£o
   if Key in [VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN, VK_BACK, VK_DELETE, VK_TAB, VK_RETURN] then
     Exit;
 
-  // Aplica a formataÁ„o
+  // Aplica a formata√ß√£o
   TextoFormatado := FormatarCEP(TEdit(Sender).Text);
 
   // Atualiza o texto do campo
@@ -520,7 +555,7 @@ begin
   begin
     Key := #0;
   end;
-  // se n„o for uma letra entre a ... z ou backspace (#8) n„o digita nada
+  // se n√£o for uma letra entre a ... z ou backspace (#8) n√£o digita nada
 end;
 
 procedure TfrmCadCliente.edtNumeroChange(Sender: TObject);
@@ -559,13 +594,13 @@ begin
         TEdit(Sender).Text := Copy(TextoLimpo, 1, 4) + ' ' + Copy(TextoLimpo, 5, 3) + ' ' + Copy(TextoLimpo, 8, 4);
     end
 
-    //CELULAR (11 dÌgitos)
+    //CELULAR (11 d√≠gitos)
     else if (Tam = 11) then
     begin
       TEdit(Sender).Text := '(' + Copy(TextoLimpo, 1, 2) + ')' + Copy(TextoLimpo, 3, 5) + '-' + Copy(TextoLimpo, 8, 4);
     end
 
-    //FIXO (AtÈ 10 dÌgitos)
+    //FIXO (At√© 10 d√≠gitos)
     else
     begin
       if Tam <= 2 then
@@ -617,25 +652,25 @@ begin
 
   V := Trim(Sender.AsString);
 
-  //Formato 0800: 0800 000 0000 (11 dÌgitos comeÁando com 0)
+  //Formato 0800: 0800 000 0000 (11 d√≠gitos come√ßando com 0)
   if (Length(V) = 11) and (V[1] = '0') then
     Text := Copy(V, 1, 4) + ' ' + Copy(V, 5, 3) + ' ' + Copy(V, 8, 4)
 
-  //Celular comum com 9∫ dÌgito: (11) 98888-7777 (11 dÌgitos)
+  //Celular comum com 9¬∫ d√≠gito: (11) 98888-7777 (11 d√≠gitos)
   else if (Length(V) = 11) then
     Text := '(' + Copy(V, 1, 2) + ') ' + Copy(V, 3, 5) + '-' + Copy(V, 8, 4)
 
-  //Telefone Fixo: (11) 3333-4444 (10 dÌgitos)
+  //Telefone Fixo: (11) 3333-4444 (10 d√≠gitos)
   else if (Length(V) = 10) then
     Text := '(' + Copy(V, 1, 2) + ') ' + Copy(V, 3, 4) + '-' + Copy(V, 7, 4)
 
   else
-    Text := V; // Caso n„o se encaixe em nenhum, mostra o n˙mero puro
+    Text := V; // Caso n√£o se encaixe em nenhum, mostra o n√∫mero puro
 end;
 
 procedure TfrmCadCliente.lkpPessoaClick(Sender: TObject);
 begin
-  edtCPFCNPJ.Clear; //limpa o campo para n„o ficar com numero caso mude de pessoa
+  edtCPFCNPJ.Clear; //limpa o campo para n√£o ficar com numero caso mude de pessoa
 
   if lkpPessoa.KeyValue <> null then
   begin
@@ -649,7 +684,41 @@ begin
     end;
   end;
 
-  edtCPFCNPJ.SetFocus; //foco fica no edit pra comeÁar a digitar
+  edtCPFCNPJ.SetFocus; //foco fica no edit pra come√ßar a digitar
+end;
+
+procedure TfrmCadCliente.lpkStatusClick(Sender: TObject);
+var
+  iStatusID: Integer;
+  R: TRect;
+begin
+  if VarIsNull(lpkStatus.KeyValue) then
+  begin
+    imgStatus.Picture := nil;
+    Exit;
+  end;
+
+  iStatusID := lpkStatus.KeyValue;
+
+  if (iStatusID >= 1) and (iStatusID <= imglStatus.Count) then
+  begin
+    // Prepara o Bitmap
+    imgStatus.Picture.Bitmap.SetSize(imgStatus.Width, imgStatus.Height);
+
+    // Se o imgStatus estiver dentro de um Panel1, ele usar√° a cor do Panel1
+    imgStatus.Picture.Bitmap.Canvas.Brush.Color := Self.Color;
+
+    R := Rect(0, 0, imgStatus.Width, imgStatus.Height);
+    imgStatus.Picture.Bitmap.Canvas.FillRect(R);
+
+    //Desenha a bolinha centralizada
+    imglStatus.Draw(imgStatus.Picture.Bitmap.Canvas,
+                    (imgStatus.Width  div 2) - (imglStatus.Width  div 2),
+                    (imgStatus.Height div 2) - (imglStatus.Height div 2),
+                    iStatusID - 1);
+  end
+  else
+    imgStatus.Picture := nil;
 end;
 
 {$ENDREGION}
@@ -660,7 +729,7 @@ var
   S: string;
   i: Integer;
 begin
-  // Remove tudo que n„o for n˙mero
+  // Remove tudo que n√£o for n√∫mero
   S := '';
   for i := 1 to Length(Value) do
     if Value[i] in ['0'..'9'] then
@@ -683,7 +752,7 @@ end;
 var
   RegEx: TRegEx;
 begin
-  // Esse padr„o verifica se tem letras, @, ponto e se termina com um domÌnio
+  // Esse padr√£o verifica se tem letras, @, ponto e se termina com um dom√≠nio
   Result := TRegEx.IsMatch(Email, '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 end;
 
@@ -707,7 +776,7 @@ procedure TfrmCadCliente.FormShow(Sender: TObject);
 begin
   inherited;
 
-  //forÁa a abertura das qry
+  //for√ßa a abertura das qry
   qryStatus.Close;
   qryStatus.Open;
 

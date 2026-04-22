@@ -65,6 +65,7 @@ type
       State: TGridDrawState);
     procedure lkpProdutoClick(Sender: TObject);
     procedure lkpClienteClick(Sender: TObject);
+
   private
     { Private declarations }
     dtmVendas:TdtmVendas;
@@ -281,7 +282,6 @@ end;
 
 procedure TfrmProVendas.btnIncluirProdutosClick(Sender: TObject);
 begin
-  inherited;
   TFuncao.CriarForm(TfrmCadProduto, oUsuarioLogado, dtmConexao.FDConexao);
   FDQuery1.Refresh;
 end;
@@ -299,18 +299,18 @@ procedure TfrmProVendas.btnPesquisarClientesClick(Sender: TObject);
 begin
   inherited;
   try
-    frmConCLientes := TfrmConCLientes.Create(Self);
+    frmConClientes := TfrmConCLientes.Create(Self);
 
     if lkpCliente.KeyValue<>null then
-       frmConCLientes.aIniciarPesquisaId:=lkpCliente.KeyValue;
+       frmConClientes.aIniciarPesquisaId:=lkpCliente.KeyValue;
 
-    frmConCLientes.ShowModal;
+    frmConClientes.ShowModal;
 
-    if frmConCLientes.aRetornarIdSelecionado<>Unassigned then //N o Atribuido
-       lkpProduto.KeyValue:=frmConCLientes.aRetornarIdSelecionado;
+    if frmConClientes.aRetornarIdSelecionado<>Unassigned then //N o Atribuido
+       lkpCliente.KeyValue:=frmConClientes.aRetornarIdSelecionado;
 
   finally
-    frmConCLientes.Release;
+    frmConClientes.Release;
   end;
 end;
 
@@ -337,25 +337,25 @@ procedure TfrmProVendas.btnAdicionarItemClick(Sender: TObject);
 begin
   inherited;
   if lkpProduto.KeyValue=Null then begin
-    MessageDlg('Produto   um campo obrigatorio' ,mtInformation,[mbOK], 0);
+    MessageDlg('Produto é um campo obrigatorio' ,mtInformation,[mbOK], 0);
     lkpProduto.SetFocus;
     Abort;
   end;
 
   if edtValorUnitario.Value<=0 then begin
-    MessageDlg('Valor Unitario n o pode ser zero' ,mtInformation,[mbOK], 0);
+    MessageDlg('Valor Unitario não pode ser zero' ,mtInformation,[mbOK], 0);
     lkpProduto.SetFocus;
     Abort;
   end;
 
   if edtQuantidade.Value<=0 then begin
-    MessageDlg('Quantidade n o pode ser zero' ,mtInformation,[mbOK], 0);
+    MessageDlg('Quantidade não pode ser zero' ,mtInformation,[mbOK], 0);
     lkpProduto.SetFocus;
     Abort;
   end;
 
   if dtmVendas.cdsItensVendas.Locate('produtoId', lkpProduto.KeyValue, []) then begin
-    MessageDlg('Esta Produto j  foi selecionado' ,mtInformation, [mbOK],0);
+    MessageDlg('Esta Produto já foi selecionado' ,mtInformation, [mbOK],0);
     lkpProduto.SetFocus;
     Abort;
   end;

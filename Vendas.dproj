@@ -211,6 +211,26 @@
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>AVATAR_PADARAO</ResourceId>
         </RcItem>
+        <RcItem Include="Images\amarela.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>status_atencao</ResourceId>
+        </RcItem>
+        <RcItem Include="Images\azul.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>status_prospecto</ResourceId>
+        </RcItem>
+        <RcItem Include="Images\preta.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>status_inativo</ResourceId>
+        </RcItem>
+        <RcItem Include="Images\verde.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>status_ativo</ResourceId>
+        </RcItem>
+        <RcItem Include="Images\vermelha.bmp">
+            <ResourceType>BITMAP</ResourceType>
+            <ResourceId>status_bloqueado</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -237,6 +257,24 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
+                <DeployFile LocalName="Images\preta.bmp" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Images\amarela.bmp" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Images\azul.bmp" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="Win32\Debug\Vendas.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Vendas.exe</RemoteName>
@@ -244,6 +282,18 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="Images\usuarioPadrao.jpg" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Images\vermelha.bmp" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Images\verde.bmp" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

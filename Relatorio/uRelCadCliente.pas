@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uDtmnConexao, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt, Data.DB,
-  FireDAC.Comp.DataSet, FireDAC.Comp.Client, RLReport, RLFilters, RLPDFFilter;
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, RLReport, RLFilters, RLPDFFilter, UTelaHeranca;
 
 type
   TfrmRelCadCliente = class(TForm)
@@ -32,7 +32,7 @@ type
     RLLabel3: TRLLabel;
     RLLabel2: TRLLabel;
     RLDBText3: TRLDBText;
-    RLDBText4: TRLDBText;
+    lblTelefoneValor: TRLDBText;
     RLLabel4: TRLLabel;
     RLLabel5: TRLLabel;
     QryClienteclienteId: TFDAutoIncField;
@@ -47,6 +47,8 @@ type
     RLDBText6: TRLDBText;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure lblTelefoneValorBeforePrint(Sender: TObject; var PrintIt: Boolean);
+
   private
     { Private declarations }
   public
@@ -69,6 +71,42 @@ end;
 procedure TfrmRelCadCliente.FormCreate(Sender: TObject);
 begin
   QryCliente.Open;
+end;
+
+
+procedure TfrmRelCadCliente.lblTelefoneValorBeforePrint(Sender: TObject; var PrintIt: Boolean);
+var
+  vTel, vTelFormatado: string;
+begin
+  vTel := Trim(QryCliente.FieldByName('telefone').AsString);
+  vTelFormatado := vTel; // Valor padrão caso não caia em nenhuma regra
+
+  // 2. Lógica para identificar o tipo de telefone pelo tamanho ou prefixo
+
+  // Verificação para 0800 (Geralmente 10 ou 11 dígitos começando com 0800)
+  if Pos('0', vTel) = 1 then
+  begin
+    // Mascara 0800: 0800 000 0000
+    if Length(vTel) >= 10 then
+       vTelFormatado := Copy(vTel, 1, 4) + ' ' + Copy(vTel, 5, 3) + ' ' + Copy(vTel, 8, 4);
+  end
+
+  // Verificação para Celular (11 dígitos: DDD + 9 dígitos)
+  else if Length(vTel) = 11 then
+  begin
+    // Mascara Celular: (00) 00000-0000
+    vTelFormatado := '(' + Copy(vTel, 1, 2) + ') ' + Copy(vTel, 3, 5) + '-' + Copy(vTel, 8, 4);
+  end
+
+  // Verificação para Telefone Fixo (10 dígitos: DDD + 8 dígitos)
+  else if Length(vTel) = 10 then
+  begin
+    // Mascara Fixo: (00) 0000-0000
+    vTelFormatado := '(' + Copy(vTel, 1, 2) + ') ' + Copy(vTel, 3, 4) + '-' + Copy(vTel, 7, 4);
+  end;
+
+  lblTelefoneValor.Caption := vTelFormatado;
+
 end;
 
 end.

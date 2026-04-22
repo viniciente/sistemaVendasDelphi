@@ -37,6 +37,7 @@ type
     procedure grdPesquisaDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure FormCreate(Sender: TObject);
+    procedure grdPesquisaDblClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -55,6 +56,12 @@ begin
   aCampoId := 'clienteId';
   IndiceAtual := 'nome';
   inherited;
+end;
+
+procedure TfrmConClientes.grdPesquisaDblClick(Sender: TObject);
+begin
+  inherited;
+  aRetornarIdSelecionado:=fdqry1.FieldByName(aCampoId).AsVariant;
 end;
 
 procedure TfrmConClientes.grdPesquisaDrawColumnCell(Sender: TObject;

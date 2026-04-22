@@ -1,1 +1,6 @@
 AVATAR_PADARAO RCDATA "Images\\usuarioPadrao.jpg"
+status_atencao BITMAP "Images\\amarela.bmp"
+status_prospecto BITMAP "Images\\azul.bmp"
+status_inativo BITMAP "Images\\preta.bmp"
+status_ativo BITMAP "Images\\verde.bmp"
+status_bloqueado BITMAP "Images\\vermelha.bmp"

@@ -82,19 +82,18 @@ object frmRelProduto: TfrmRelProduto
         Top = 6
         Width = 70
         Height = 16
-        Alignment = taRightJustify
         DataField = 'Quantidade'
         DataSource = dtsProduto
         Text = ''
       end
       object RLDBText4: TRLDBText
-        Left = 652
+        Left = 625
         Top = 6
         Width = 30
         Height = 16
-        Alignment = taRightJustify
         DataField = 'valor'
         DataSource = dtsProduto
+        DisplayMask = 'R$#,##0.00'
         Text = ''
       end
     end
@@ -214,7 +213,7 @@ object frmRelProduto: TfrmRelProduto
           Transparent = False
         end
         object RLLabel5: TRLLabel
-          Left = 644
+          Left = 625
           Top = 12
           Width = 38
           Height = 16
@@ -255,6 +254,7 @@ object frmRelProduto: TfrmRelProduto
     object QryProdutosvalor: TFMTBCDField
       FieldName = 'valor'
       Origin = 'valor'
+      DisplayFormat = 'R$##,##0.00'
       Precision = 18
       Size = 5
     end

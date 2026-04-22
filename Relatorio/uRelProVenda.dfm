@@ -260,6 +260,7 @@ object frmRelProVenda: TfrmRelProVenda
             Alignment = taRightJustify
             DataField = 'valorUnitario'
             DataSource = dtsVendasItens
+            DisplayMask = 'R$#,##0.00'
             Text = ''
           end
           object RLDBText9: TRLDBText
@@ -270,6 +271,7 @@ object frmRelProVenda: TfrmRelProVenda
             Alignment = taRightJustify
             DataField = 'totalProduto'
             DataSource = dtsVendasItens
+            DisplayMask = 'R$#,##0.00'
             Text = ''
           end
           object RLLabel10: TRLLabel
@@ -523,7 +525,7 @@ object frmRelProVenda: TfrmRelProVenda
     object QryVendasItenstotalProduto: TFMTBCDField
       FieldName = 'totalProduto'
       Origin = 'totalProduto'
-      DisplayFormat = '##,##0.00'
+      DisplayFormat = 'R$##,##0.00'
       Precision = 18
       Size = 5
     end
