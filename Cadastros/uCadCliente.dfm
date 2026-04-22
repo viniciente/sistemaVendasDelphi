@@ -10,7 +10,6 @@ inherited frmCadCliente: TfrmCadCliente
       end
     end
     inherited pgcPrincipal: TPageControl
-      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited pnlListagemTopo: TPanel
           inherited maskPesquisar: TMaskEdit

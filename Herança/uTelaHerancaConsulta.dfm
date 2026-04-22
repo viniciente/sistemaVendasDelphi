@@ -25,8 +25,6 @@ object frmTelaHerancaConsulta: TfrmTelaHerancaConsulta
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitLeft = -1
-    ExplicitTop = -5
     object lblIndice: TLabel
       Left = 1
       Top = 2
@@ -72,7 +70,7 @@ object frmTelaHerancaConsulta: TfrmTelaHerancaConsulta
       Font.Color = clWindowText
       Font.Height = -11
       Font.Name = 'Tahoma'
-      Font.Style = []
+      Font.Style = [fsBold]
       Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
       ParentFont = False
       TabOrder = 0

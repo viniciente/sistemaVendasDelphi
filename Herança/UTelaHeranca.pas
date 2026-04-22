@@ -77,6 +77,7 @@ type
 
 var
   frmTelaHeranca: TfrmTelaHeranca;
+  HoveredRow: Integer = -1;
 
 implementation
 

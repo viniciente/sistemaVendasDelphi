@@ -20,6 +20,7 @@ inherited frmProVendas: TfrmProVendas
       end
     end
     inherited pgcPrincipal: TPageControl
+      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited dbgrdListagem: TDBGrid
           DataSource = dsListagem
@@ -445,6 +446,7 @@ inherited frmProVendas: TfrmProVendas
           ListField = 'nome'
           ListSource = dtmVendas.dtsCliente
           TabOrder = 0
+          OnClick = lkpClienteClick
         end
       end
     end

@@ -1,0 +1,126 @@
+inherited frmConClientes: TfrmConClientes
+  Caption = 'CONSULTE SEUS CLIENTES'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited Panel1: TPanel
+    ExplicitLeft = 0
+    ExplicitTop = 0
+    ExplicitWidth = 508
+    inherited mskPesquisa: TMaskEdit
+      ExplicitLeft = 1
+      ExplicitTop = 19
+    end
+  end
+  inherited Panel2: TPanel
+    ExplicitTop = 41
+    inherited grdPesquisa: TDBGrid
+      OnDrawColumnCell = grdPesquisaDrawColumnCell
+      Columns = <
+        item
+          Expanded = False
+          FieldName = 'clienteId'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'nome'
+          Visible = True
+        end
+        item
+          Expanded = False
+          FieldName = 'statusId'
+          Title.Caption = 'Status'
+          Width = 50
+          Visible = True
+        end>
+    end
+  end
+  inherited Panel3: TPanel
+    ExplicitLeft = 0
+    ExplicitTop = 227
+    ExplicitWidth = 508
+  end
+  inherited fdqry1: TFDQuery
+    Active = True
+    SQL.Strings = (
+      'select c.clienteId,'
+      '       c.nome,'
+      '       c.endereco,'
+      '       c.cidade,'
+      '       c.bairro,'
+      '       c.cep,'
+      '       c.telefone,'
+      '       c.email,'
+      '       c.datanascimento,'
+      '       c.statusId,'
+      '       s.descricao AS statusNome'
+      'FROM clientes c'
+      'LEFT JOIN statusUsuario s ON s.statusId = c.statusId')
+    Left = 399
+    Top = 8
+    object fdqry1clienteId: TFDAutoIncField
+      DisplayLabel = 'Codigo'
+      FieldName = 'clienteId'
+      Origin = 'clienteId'
+      ProviderFlags = [pfInWhere, pfInKey]
+      ReadOnly = True
+    end
+    object fdqry1nome: TStringField
+      DisplayLabel = 'Nome'
+      FieldName = 'nome'
+      Origin = 'nome'
+      Size = 60
+    end
+    object fdqry1endereco: TStringField
+      FieldName = 'endereco'
+      Origin = 'endereco'
+      Size = 60
+    end
+    object fdqry1cidade: TStringField
+      FieldName = 'cidade'
+      Origin = 'cidade'
+      Size = 50
+    end
+    object fdqry1bairro: TStringField
+      FieldName = 'bairro'
+      Origin = 'bairro'
+      Size = 40
+    end
+    object fdqry1cep: TStringField
+      FieldName = 'cep'
+      Origin = 'cep'
+      Size = 10
+    end
+    object fdqry1telefone: TStringField
+      FieldName = 'telefone'
+      Origin = 'telefone'
+      Size = 14
+    end
+    object fdqry1email: TStringField
+      FieldName = 'email'
+      Origin = 'email'
+      Size = 100
+    end
+    object fdqry1datanascimento: TSQLTimeStampField
+      FieldName = 'datanascimento'
+      Origin = 'datanascimento'
+    end
+    object fdqry1statusId: TIntegerField
+      FieldName = 'statusId'
+      Origin = 'statusId'
+    end
+    object fdqry1statusNome: TStringField
+      FieldName = 'statusNome'
+      Origin = 'descricao'
+      Size = 30
+    end
+  end
+  inherited dsListagem: TDataSource
+    Top = 8
+  end
+  object imglStatus: TImageList
+    Left = 420
+    Top = 8
+  end
+end
+

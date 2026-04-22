@@ -64,6 +64,7 @@ type
     procedure dbGridItensVendasDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
     procedure lkpProdutoClick(Sender: TObject);
+    procedure lkpClienteClick(Sender: TObject);
   private
     { Private declarations }
     dtmVendas:TdtmVendas;
@@ -105,13 +106,23 @@ var
   vMotivo: string;
   vClienteCheck: TCliente;
 begin
+  // Verifica se ha itens na venda antes de qualquer coisa
+  if dtmVendas.cdsItensVendas.IsEmpty then
+  begin
+    MessageDlg('Nao e possivel gravar uma venda sem itens.' + #13 +
+               'Adicione ao menos um produto antes de gravar.',
+               mtWarning, [mbOK], 0);
+    Result := False;
+    Exit;
+  end;
+
   vClienteCheck := TCliente.Create(dtmConexao.FDConexao);
   try
     if vClienteCheck.Selecionar(lkpCliente.KeyValue) then
     begin
       if not vClienteCheck.PodeComprar(vMotivo) then
       begin
-        Application.MessageBox(PChar('Este cliente possui restrições:' + #13#10 + vMotivo),
+        Application.MessageBox(PChar('Este cliente possui restri  es:' + #13#10 + vMotivo),
           'Venda Bloqueada', MB_OK + MB_ICONSTOP);
         Result := False;
         Exit;
@@ -129,7 +140,7 @@ begin
   oVenda.ClienteId  := lkpCliente.KeyValue;
   oVenda.DataVenda  := edtDataVenda.Date;
 
-  // O edtValorTotal já deve ter a soma calculada na Grid
+  // O edtValorTotal j  deve ter a soma calculada na Grid
   oVenda.TotalVenda := edtValorTotal.Value;
 
   if (EstadoDoCadastro = ecInserir) then
@@ -139,7 +150,7 @@ begin
   else if (EstadoDoCadastro = ecAlterar) then
      oVenda.Atualizar(dtmVendas.cdsItensVendas);
 
-  // relatório também aceite quantidade 1 para serviços
+  // relat rio tamb m aceite quantidade 1 para servi os
   frmRelProVenda := TfrmRelProVenda.Create(self);
   try
     frmRelProVenda.QryVenda.Close;
@@ -159,6 +170,31 @@ begin
 end;
 
 
+procedure TfrmProVendas.lkpClienteClick(Sender: TObject);
+begin
+  // S  limpa se estiver em modo de inser  o   n o interfere no Alterar
+  if EstadoDoCadastro <> ecInserir then
+    Exit;
+
+  // S  age se realmente houver itens na grid
+  if dtmVendas.cdsItensVendas.IsEmpty then
+    Exit;
+
+  // Confirma antes de limpar, pra n o surpreender o operador
+  if MessageDlg('Trocar o cliente vai limpar os itens da venda.' + #13 +
+                'Deseja continuar?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+  begin
+    // Desfaz a sele  o voltando para nulo
+    lkpCliente.KeyValue := Null;
+    Exit;
+  end;
+
+  // Limpa tudo
+  LimparCds;
+  LimparComponenteItem;
+  edtValorTotal.Value := 0;
+end;
+
 procedure TfrmProVendas.lkpProdutoClick(Sender: TObject);
 var
   FieldCategoria: TField;
@@ -168,9 +204,9 @@ begin
 
   if (FieldCategoria <> nil) and (lkpProduto.KeyValue <> Null) then
   begin
-    if FieldCategoria.AsInteger = 46 then // 46 = Serviços
+    if FieldCategoria.AsInteger = 46 then // 46 = Servi os
     begin
-      // Modo Serviço
+      // Modo Servi o
       lblQuantidade.Visible := False;
       edtQuantidade.Visible := False;
       lblTotalProduto.Visible := False;
@@ -186,7 +222,7 @@ begin
       edtQuantidade.Visible := True;
       lblTotalProduto.Visible := True;
       edtTotalProduto.Visible := True;
-      lblValorUnitario.Caption := 'Valor Unitário';
+      lblValorUnitario.Caption := 'Valor Unit rio';
     end;
   end;
 end;
@@ -270,7 +306,7 @@ begin
 
     frmConCLientes.ShowModal;
 
-    if frmConCLientes.aRetornarIdSelecionado<>Unassigned then //Não Atribuido
+    if frmConCLientes.aRetornarIdSelecionado<>Unassigned then //N o Atribuido
        lkpProduto.KeyValue:=frmConCLientes.aRetornarIdSelecionado;
 
   finally
@@ -289,7 +325,7 @@ begin
 
     frmConProdutos.ShowModal;
 
-    if frmConProdutos.aRetornarIdSelecionado<>Unassigned then //Não Atribuido
+    if frmConProdutos.aRetornarIdSelecionado<>Unassigned then //N o Atribuido
        lkpProduto.KeyValue:=frmConProdutos.aRetornarIdSelecionado;
 
   finally
@@ -447,11 +483,11 @@ begin
   CarregarRegistroSelecionado;
 end;
 
-{$REGION 'CONFIGURAÇãES DO GRID'}
+{$REGION 'CONFIGURA  ES DO GRID'}
 procedure TfrmProVendas.dbGridItensVendasDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
   Column: TColumn; State: TGridDrawState);
 begin
-  // Se a linha não estiver selecionada, faz o constraste
+  // Se a linha n o estiver selecionada, faz o constraste
   if not (gdSelected in State) then
   begin
     if Odd(TDBGrid(Sender).DataSource.DataSet.RecNo) then
@@ -463,7 +499,7 @@ begin
   // Aplica a cor no fundo
   TDBGrid(Sender).Canvas.FillRect(Rect);
 
-  //mostra o texto padrão
+  //mostra o texto padr o
   TDBGrid(Sender).DefaultDrawColumnCell(Rect, DataCol, Column, State);
 
 end;
@@ -477,7 +513,7 @@ begin
     // Centraliza o texto das linhas
     dbGridItensVendas.Columns[I].Alignment := taCenter;
 
-    // Centraliza o texto do título
+    // Centraliza o texto do t tulo
     dbGridItensVendas.Columns[I].Title.Alignment := taCenter;
   end;
 end;
@@ -491,4 +527,5 @@ begin
 end;
 
 end.
+
 
