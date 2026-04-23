@@ -87,15 +87,6 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
         DataSource = dtsCliente
         Text = ''
       end
-      object RLDBText4: TRLDBText
-        Left = 67
-        Top = 54
-        Width = 51
-        Height = 16
-        DataField = 'telefone'
-        DataSource = dtsCliente
-        Text = ''
-      end
       object RLLabel6: TRLLabel
         Left = 3
         Top = 54
@@ -141,28 +132,6 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
         Width = 53
         Height = 16
         Caption = 'Codigo:'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlack
-        Font.Height = -13
-        Font.Name = 'Arial'
-        Font.Style = [fsBold]
-        ParentFont = False
-      end
-      object RLDBText5: TRLDBText
-        Left = 52
-        Top = 20
-        Width = 25
-        Height = 16
-        DataField = 'cep'
-        DataSource = dtsCliente
-        Text = ''
-      end
-      object RLLabel2: TRLLabel
-        Left = 3
-        Top = 20
-        Width = 34
-        Height = 16
-        Caption = 'CEP:'
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -13
@@ -228,7 +197,7 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
         ParentFont = False
       end
       object RLDBText8: TRLDBText
-        Left = 307
+        Left = 309
         Top = 38
         Width = 44
         Height = 16
@@ -238,7 +207,7 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
       end
       object RLLabel10: TRLLabel
         Left = 604
-        Top = 38
+        Top = 1
         Width = 25
         Height = 16
         Caption = 'UF:'
@@ -251,7 +220,7 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
       end
       object RLDBText9: TRLDBText
         Left = 630
-        Top = 38
+        Top = 1
         Width = 43
         Height = 16
         DataField = 'estado'
@@ -398,8 +367,8 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
         Scaled = True
       end
       object RLLabel12: TRLLabel
-        Left = 561
-        Top = 16
+        Left = 2
+        Top = 20
         Width = 34
         Height = 16
         Caption = 'CEP:'
@@ -412,7 +381,7 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
       end
       object RLLabel13: TRLLabel
         Left = 513
-        Top = 57
+        Top = 20
         Width = 85
         Height = 13
         Caption = 'Tipo Pessoa:'
@@ -425,7 +394,7 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
       end
       object RLLabel14: TRLLabel
         Left = 495
-        Top = 74
+        Top = 37
         Width = 80
         Height = 19
         Alignment = taRightJustify
@@ -438,8 +407,8 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
         ParentFont = False
       end
       object RLDBText11: TRLDBText
-        Left = 604
-        Top = 59
+        Left = 601
+        Top = 22
         Width = 69
         Height = 16
         DataField = 'tipoPessoa'
@@ -447,15 +416,21 @@ object frmRelCadClienteFicha: TfrmRelCadClienteFicha
         Text = ''
       end
       object lblCEPValor: TRLLabel
-        Left = 593
-        Top = 16
+        Left = 33
+        Top = 20
         Width = 74
         Height = 16
       end
       object RLLabelDocValor: TRLLabel
         Left = 577
-        Top = 76
+        Top = 39
         Width = 104
+        Height = 16
+      end
+      object RLLabelTelValor: TRLLabel
+        Left = 71
+        Top = 54
+        Width = 98
         Height = 16
       end
     end

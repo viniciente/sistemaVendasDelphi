@@ -34,8 +34,20 @@ implementation
 
 procedure TfrmConProdutos.FormCreate(Sender: TObject);
 begin
-  aCampoId := 'produtosId';
+  aCampoId := 'produtoId';
   IndiceAtual := 'nome';
+
+    fdqry1.SQL.Clear;
+  fdqry1.SQL.Add('SELECT p.produtoId,');
+  fdqry1.SQL.Add('       p.nome,');
+  fdqry1.SQL.Add('       p.descricao,');
+  fdqry1.SQL.Add('       p.valor,');
+  fdqry1.SQL.Add('       p.quantidade,');
+  fdqry1.SQL.Add('       p.categoriasId,');
+  fdqry1.SQL.Add('       c.descricao AS DescricaoCategoria');
+  fdqry1.SQL.Add('FROM produtos AS p');
+  fdqry1.SQL.Add('LEFT JOIN categorias AS c ON c.categoriasId = p.categoriasId');
+  fdqry1.SQL.Add('ORDER BY p.nome');
 
   inherited;
 end;

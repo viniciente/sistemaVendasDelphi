@@ -426,13 +426,41 @@ end;
 
 procedure TfrmPrincipal.LOGOUT1Click(Sender: TObject);
 begin
-  if MessageDlg('DESEJA MESMO SAIR DO USUARIO?', mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-  begin
-    //Comando para o Windows abrir uma nova instância deste mesmo programa
-    ShellExecute(0, 'open', PChar(Application.ExeName), nil, nil, SW_SHOWNORMAL);
+if MessageDlg('Deseja trocar de usuário?', mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
+    Exit;
 
-    //Fecha a instância atual imediatamente
-    Application.Terminate;
+  // Limpa os dados do usuário atual
+  oUsuarioLogado.codigo := 0;
+  oUsuarioLogado.nome   := '';
+  oUsuarioLogado.senha  := '';
+  oUsuarioLogado.foto.Assign(nil);
+
+  // Reabre o login — mesmo fluxo do FormShow
+  try
+    frmLogin := TfrmLogin.Create(Self);
+
+    if frmLogin.ShowModal = mrOk then
+    begin
+      // Atualiza o nome na barra inferior
+      lblNomeUsuario.Caption := '  USUÁRIO: ' + oUsuarioLogado.nome;
+
+      // Atualiza o avatar
+      if (oUsuarioLogado.foto <> nil) and (not oUsuarioLogado.foto.Empty) then
+        DesenharAvatarArredondado(oUsuarioLogado.foto)
+      else
+        DesenharAvatarArredondado(imgAvatar.Picture.Bitmap);
+
+      // Atualiza o dashboard com os dados do novo usuário
+      AtualizarDashBord;
+    end
+    else
+    begin
+      // Usuário fechou o login sem entrar — encerra o sistema
+      Application.Terminate;
+    end;
+
+  finally
+    frmLogin.Release;
   end;
 end;
 

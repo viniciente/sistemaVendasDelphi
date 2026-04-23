@@ -343,7 +343,6 @@ object frmPrincipal: TfrmPrincipal
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False
-      ExplicitTop = 4
       ExplicitWidth = 85
     end
   end

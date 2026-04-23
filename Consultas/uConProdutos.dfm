@@ -18,7 +18,6 @@ inherited frmConProdutos: TfrmConProdutos
     end
   end
   inherited fdqry1: TFDQuery
-    Active = True
     SQL.Strings = (
       'SELECT p.produtoId,'
       '       p.nome,'

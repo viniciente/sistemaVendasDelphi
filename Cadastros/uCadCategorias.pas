@@ -12,11 +12,9 @@ uses
 type
   TfrmCadCategorias = class(TfrmTelaHeranca)
     edtCategoriasId: TEdit;
-    edtNome: TEdit;
     lblCodigo: TLabel;
-    lblNome: TLabel;
     edtDescricao: TEdit;
-    lblDescricao: TLabel;
+    lblNome: TLabel;
     FDQuery1categoriasId: TFDAutoIncField;
     FDQuery1descricao: TStringField;
     procedure FormCreate(Sender: TObject);
@@ -96,7 +94,7 @@ begin
     edtDescricao.Text := oCategoria.descricao;
   end
   else begin
-    //se n achou "cancela" a ação
+    //se não achou, "cancela" a ação
     btnCancelar.Click;
     Abort
   end;

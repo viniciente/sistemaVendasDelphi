@@ -90,7 +90,12 @@ end;
 
 procedure TfrmLogin.FormShow(Sender: TObject);
 begin
-  bfechar:=False;
+  bFechar := False;
+  edtUsuario.Clear;
+  edtSenha.Clear;
+  if edtUsuario.CanFocus then
+    edtUsuario.SetFocus;
 end;
+
 end.
 

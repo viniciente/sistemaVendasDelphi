@@ -63,8 +63,8 @@ type
     procedure dsListagemStateChange(Sender: TObject);
     procedure dbGridItensVendasDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
-    procedure lkpProdutoClick(Sender: TObject);
     procedure lkpClienteClick(Sender: TObject);
+    procedure lkpProdutoClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -78,6 +78,7 @@ type
     function TotalizarVenda: Double;
     procedure CarregarRegistroSelecionado;
     procedure CentralizarColunas;
+    procedure AjustarDesign;
 
   public
     { Public declarations }
@@ -197,35 +198,9 @@ begin
 end;
 
 procedure TfrmProVendas.lkpProdutoClick(Sender: TObject);
-var
-  FieldCategoria: TField;
 begin
-  // Busca o campo de forma segura
-  FieldCategoria := dtmVendas.QryProdutos.FindField('categoriasId');
-
-  if (FieldCategoria <> nil) and (lkpProduto.KeyValue <> Null) then
-  begin
-    if FieldCategoria.AsInteger = 46 then // 46 = Servi os
-    begin
-      // Modo Servi o
-      lblQuantidade.Visible := False;
-      edtQuantidade.Visible := False;
-      lblTotalProduto.Visible := False;
-      edtTotalProduto.Visible := False;
-      lblValorUnitario.Caption := 'Valor';
-
-      edtQuantidade.Value := 1;
-    end
-    else
-    begin
-      // Modo Produto
-      lblQuantidade.Visible := True;
-      edtQuantidade.Visible := True;
-      lblTotalProduto.Visible := True;
-      edtTotalProduto.Visible := True;
-      lblValorUnitario.Caption := 'Valor Unit rio';
-    end;
-  end;
+  inherited;
+  AjustarDesign;
 end;
 
 procedure TfrmProVendas.lkpProdutoExit(Sender: TObject);
@@ -314,6 +289,38 @@ begin
   end;
 end;
 
+procedure TfrmProVendas.AjustarDesign;
+  var
+  FieldCategoria: TField;
+begin
+  // Busca o campo de forma segura
+  FieldCategoria := dtmVendas.QryProdutos.FindField('categoriasId');
+
+  if (FieldCategoria <> nil) and (lkpProduto.KeyValue <> Null) then
+  begin
+    if FieldCategoria.AsInteger = 46 then // 46 = Servi os
+    begin
+      // Modo Serviço
+      lblQuantidade.Visible := False;
+      edtQuantidade.Visible := False;
+      lblTotalProduto.Visible := False;
+      edtTotalProduto.Visible := False;
+      lblValorUnitario.Caption := 'Valor';
+
+      edtQuantidade.Value := 1;
+    end
+    else
+    begin
+      // Modo Produto
+      lblQuantidade.Visible := True;
+      edtQuantidade.Visible := True;
+      lblTotalProduto.Visible := True;
+      edtTotalProduto.Visible := True;
+      lblValorUnitario.Caption := 'Valor Unit rio';
+    end;
+  end;
+end;
+
 procedure TfrmProVendas.btnPesquisarProdutoClick(Sender: TObject);
 begin
   inherited;
@@ -331,6 +338,7 @@ begin
   finally
     frmConProdutos.Release;
   end;
+  AjustarDesign;
 end;
 
 procedure TfrmProVendas.btnAdicionarItemClick(Sender: TObject);

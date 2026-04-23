@@ -28,13 +28,10 @@ type
     RLDBText1: TRLDBText;
     RLDBText2: TRLDBText;
     RLDBText3: TRLDBText;
-    RLDBText4: TRLDBText;
     RLLabel6: TRLLabel;
     RLLabel7: TRLLabel;
     RLLabel8: TRLLabel;
     RLLabel9: TRLLabel;
-    RLDBText5: TRLDBText;
-    RLLabel2: TRLLabel;
     RLLabel3: TRLLabel;
     RLDBText6: TRLDBText;
     RLLabel4: TRLLabel;
@@ -67,6 +64,7 @@ type
     RLDBText11: TRLDBText;
     lblCEPValor: TRLLabel;
     RLLabelDocValor: TRLLabel;
+    RLLabelTelValor: TRLLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure RLBand2BeforePrint(Sender: TObject; var PrintIt: Boolean);
@@ -96,36 +94,52 @@ end;
 
 procedure TfrmRelCadClienteFicha.RLBand2BeforePrint(Sender: TObject; var PrintIt: Boolean);
 var
-  vTipo, vDoc, vFormatado, vCEP: string;
+  vTipo, vDoc, vFormatado, vCEP, vTel, vTelFormatado: string;
 begin
+  //mascara cnpj/cpf
   vTipo := UpperCase(Trim(QryCliente.FieldByName('tipoPessoa').AsString));
   vDoc  := Trim(QryCliente.FieldByName('cpf_cnpj').AsString);
-  vFormatado := vDoc; //valor padrão caso não tanha o tamanho correto
+  vFormatado := vDoc;
 
-  //identifica o tipoPessoa e aplica a mascara
-  if (Pos('FISICA', vTipo) > 0) or (Pos('FISICA', vTipo) > 0) then
+  if (Pos('FISICA', vTipo) > 0) then
   begin
     RLLabel14.Caption := 'CPF:';
-    //mascara do cpf: 000.000.000-00
     if Length(vDoc) = 11 then
-      vFormatado := Copy(vDoc, 1, 3) + '.' + Copy(vDoc, 4, 3) + '.' +
-                    Copy(vDoc, 7, 3) + '-' + Copy(vDoc, 10, 2);
+      vFormatado := Copy(vDoc,1,3)+'.'+Copy(vDoc,4,3)+'.'+
+                    Copy(vDoc,7,3)+'-'+Copy(vDoc,10,2);
   end
-  else begin
+  else
+  begin
     RLLabel14.Caption := 'CNPJ:';
-    //mascara cnpj
     if Length(vDoc) = 14 then
-      vFormatado := Copy(vDoc, 1, 2) + '.' + Copy(vDoc, 3, 3) + '.' +
-                    Copy(vDoc, 6, 3) + '/' + Copy(vDoc, 9, 4) + '-' + Copy(vDoc, 13, 2);
+      vFormatado := Copy(vDoc,1,2)+'.'+Copy(vDoc,3,3)+'.'+
+                    Copy(vDoc,6,3)+'/'+Copy(vDoc,9,4)+'-'+Copy(vDoc,13,2);
   end;
-
   RLLabelDocValor.Caption := vFormatado;
 
-  //mascara CEP
+  //mascara cep
   vCEP := Trim(QryCliente.FieldByName('cep').AsString);
   if Length(vCEP) = 8 then
-      lblCEPValor.Caption := Copy(vCEP, 1, 5) + '-' + Copy(vCEP, 6, 3)
+    lblCEPValor.Caption := Copy(vCEP,1,5)+'-'+Copy(vCEP,6,3)
   else
     lblCEPValor.Caption := vCEP;
+
+  //mascara telefone
+  vTel := Trim(QryCliente.FieldByName('telefone').AsString);
+  vTelFormatado := vTel;
+
+  if (Length(vTel) > 0) and (vTel[1] = '0') then
+    // 0800 000 0000
+    vTelFormatado := Copy(vTel,1,4)+' '+Copy(vTel,5,3)+' '+Copy(vTel,8,4)
+  else if Length(vTel) = 11 then
+    // (11) 98888-7777
+    vTelFormatado := '('+Copy(vTel,1,2)+') '+Copy(vTel,3,5)+'-'+Copy(vTel,8,4)
+  else if Length(vTel) = 10 then
+    // (11) 3333-4444
+    vTelFormatado := '('+Copy(vTel,1,2)+') '+Copy(vTel,3,4)+'-'+Copy(vTel,7,4);
+
+  // Aponta pro RLLabel que você vai criar no lugar do RLDBText4
+  // (veja instrução abaixo)
+  RLLabelTelValor.Caption := vTelFormatado;
 end;
 end.
