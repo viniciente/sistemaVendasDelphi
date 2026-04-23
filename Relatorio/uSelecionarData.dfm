@@ -53,7 +53,7 @@ object frmSelecionarData: TfrmSelecionarData
     TabOrder = 1
   end
   object BitBtn1: TBitBtn
-    Left = 3
+    Left = 4
     Top = 63
     Width = 333
     Height = 25

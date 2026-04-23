@@ -44,18 +44,27 @@ procedure TfrmLogin.btnAcessarClick(Sender: TObject);
 var oUsuario:TUsuario;
 begin
   Try
+    //cria conexão com o banco
     oUsuario:=TUsuario.Create(dtmConexao.FDConexao);
+    //se o usuario digitar senha e usuario
     if oUsuario.Logar(edtUsuario.Text,edtSenha.Text) then begin
+      //confere o id
        oUsuarioLogado.codigo := oUsuario.codigo;
+       //confere usuario
        oUsuarioLogado.nome   := oUsuario.nome;
+       //confere senha
        oUsuarioLogado.senha  := oUsuario.senha;
+       //puxa a foto
        oUsuarioLogado.foto.Assign(oUsuario.foto);
+       //puxa status
        oUsuarioLogado.statusId := oUsuario.status;
 
+       //fecha o login
        bFechar := True;
        Self.ModalResult := mrOk;
     end
     else begin
+      //caso alguma de erro, notifica o usuario
       MessageDlg('Usuario Invalido',mtInformation,[mbok],0);
       edtUsuario.SetFocus;
     end;

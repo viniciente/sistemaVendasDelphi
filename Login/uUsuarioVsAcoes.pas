@@ -109,7 +109,7 @@ begin
     vNovoAtivo := not QryAcoes.FieldByName('ativo').AsBoolean;
     vChave := QryAcoes.FieldByName('descricao').AsString;
 
-    // Colaborador (statusId=3): nao permite reativar acoes bloqueadas automaticamente
+    // Colaborador (statusId=3): nao pode reativar acoes bloqueadas automaticamente
     if (vStatusUsuario = 3) and vNovoAtivo then
     begin
       if (Pos('APAGAR', UpperCase(vChave)) > 0) or (Pos('USUARIOVSAOES', UpperCase(vChave)) > 0) then
@@ -154,12 +154,12 @@ begin
     else
       TDBGrid(Sender).Canvas.Brush.Color := $00E1E1E1; // Cinza um pouco mais escuro
 
-    // FORÇA A COR DA FONTE para preto nas linhas normais
+    // oloca cor nas letras
     TDBGrid(Sender).Canvas.Font.Color := clBlack;
   end
   else
   begin
-    // 2. Cores para a linha SELECIONADA (Fundo azul com letra branca, por exemplo)
+    // cor na linha selecionada
     TDBGrid(Sender).Canvas.Brush.Color := clHighlight; // Cor padrão de seleção do Windows
     TDBGrid(Sender).Canvas.Font.Color := clHighlightText; // Branco padrão de seleção
   end;
@@ -167,7 +167,6 @@ begin
   // Aplica a cor definida no fundo
   TDBGrid(Sender).Canvas.FillRect(Rect);
 
-  // 3. Pinta o texto.
   // O DefaultDrawColumnCell agora usará as cores de Canvas que definimos acima.
   TDBGrid(Sender).DefaultDrawColumnCell(Rect, DataCol, Column, State);
 
@@ -182,7 +181,7 @@ end;
 procedure TfrmUsuarioVsAcoes.grdUsuariosDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
   Column: TColumn; State: TGridDrawState);
 begin
-  // 1. Define as cores de fundo (Zebrado)
+  //Define as cores de fundo (Zebrado)
   if not (gdSelected in State) then
   begin
     if Odd(TDBGrid(Sender).DataSource.DataSet.RecNo) then
@@ -190,12 +189,10 @@ begin
     else
       TDBGrid(Sender).Canvas.Brush.Color := $00E1E1E1; // Cinza um pouco mais escuro
 
-    // FORÇA A COR DA FONTE para preto nas linhas normais
     TDBGrid(Sender).Canvas.Font.Color := clBlack;
   end
   else
   begin
-    // 2. Cores para a linha SELECIONADA (Fundo azul com letra branca, por exemplo)
     TDBGrid(Sender).Canvas.Brush.Color := clHighlight; // Cor padrão de seleção do Windows
     TDBGrid(Sender).Canvas.Font.Color := clHighlightText; // Branco padrão de seleção
   end;
@@ -203,8 +200,6 @@ begin
   // Aplica a cor definida no fundo
   TDBGrid(Sender).Canvas.FillRect(Rect);
 
-  // 3. Pinta o texto.
-  // O DefaultDrawColumnCell agora usará as cores de Canvas que definimos acima.
   TDBGrid(Sender).DefaultDrawColumnCell(Rect, DataCol, Column, State);
 end;
 

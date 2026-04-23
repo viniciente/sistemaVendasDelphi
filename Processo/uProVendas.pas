@@ -124,7 +124,7 @@ begin
     begin
       if not vClienteCheck.PodeComprar(vMotivo) then
       begin
-        Application.MessageBox(PChar('Este cliente possui restri  es:' + #13#10 + vMotivo),
+        Application.MessageBox(PChar('Este cliente possui restrições:' + #13#10 + vMotivo),
           'Venda Bloqueada', MB_OK + MB_ICONSTOP);
         Result := False;
         Exit;
@@ -142,7 +142,7 @@ begin
   oVenda.ClienteId  := lkpCliente.KeyValue;
   oVenda.DataVenda  := edtDataVenda.Date;
 
-  // O edtValorTotal j  deve ter a soma calculada na Grid
+  // O edtValorTotal ja  deve ter a soma calculada na Grid
   oVenda.TotalVenda := edtValorTotal.Value;
 
   if (EstadoDoCadastro = ecInserir) then
@@ -152,7 +152,7 @@ begin
   else if (EstadoDoCadastro = ecAlterar) then
      oVenda.Atualizar(dtmVendas.cdsItensVendas);
 
-  // relat rio tamb m aceite quantidade 1 para servi os
+  // relatorio tambem aceite quantidade 1 para servi os
   frmRelProVenda := TfrmRelProVenda.Create(self);
   try
     frmRelProVenda.QryVenda.Close;
@@ -174,19 +174,16 @@ end;
 
 procedure TfrmProVendas.lkpClienteClick(Sender: TObject);
 begin
-  // S  limpa se estiver em modo de inser  o   n o interfere no Alterar
   if EstadoDoCadastro <> ecInserir then
     Exit;
 
-  // S  age se realmente houver itens na grid
   if dtmVendas.cdsItensVendas.IsEmpty then
     Exit;
 
-  // Confirma antes de limpar, pra n o surpreender o operador
+  // Confirma antes de limpar, pra n surpreender o operador
   if MessageDlg('Trocar o cliente vai limpar os itens da venda.' + #13 +
                 'Deseja continuar?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
   begin
-    // Desfaz a sele  o voltando para nulo
     lkpCliente.KeyValue := Null;
     Exit;
   end;

@@ -12,7 +12,6 @@ type
   TfrmRelVendaPorData = class(TForm)
     QryVenda: TFDQuery;
     dtsVenda: TDataSource;
-    Relatorio: TRLReport;
     Cabecalho: TRLBand;
     lblLIstagemProduto: TRLLabel;
     RLDraw2: TRLDraw;
@@ -50,6 +49,7 @@ type
     RLDraw4: TRLDraw;
     RLDBResult1: TRLDBResult;
     QryVendatotalVenda: TBCDField;
+    Relatorio: TRLReport;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }

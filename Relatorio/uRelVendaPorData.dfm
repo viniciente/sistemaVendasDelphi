@@ -159,7 +159,7 @@ object frmRelVendaPorData: TfrmRelVendaPorData
           Width = 66
           Height = 16
           Alignment = taRightJustify
-          DataField = 'dataVenda'
+          DataField = 'totalVenda'
           DataSource = dtsVenda
           Text = ''
         end
@@ -326,7 +326,6 @@ object frmRelVendaPorData: TfrmRelVendaPorData
     end
   end
   object QryVenda: TFDQuery
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'SELECT vendas.vendaId,'

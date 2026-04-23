@@ -405,7 +405,7 @@ object frmPrincipal: TfrmPrincipal
         OnClick = mnuFecharClick
       end
       object SAIR1: TMenuItem
-        Caption = 'SAIR'
+        Caption = 'TROCAR USUARIO'
         OnClick = LOGOUT1Click
       end
     end
