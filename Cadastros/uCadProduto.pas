@@ -73,7 +73,6 @@ type
     procedure btnAlterarExit(Sender: TObject);
     procedure dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
-    procedure btnIncluirClientesClick(Sender: TObject);
     procedure btnPesquisarClientesClick(Sender: TObject);
     procedure lkpCategoriaClick(Sender: TObject);
     procedure imgProdutoClick(Sender: TObject);
@@ -244,11 +243,6 @@ end;
 procedure TfrmCadProduto.btnIncluirCategoriaClick(Sender: TObject);
 begin
   inherited;
-  TFuncao.CriarForm(TfrmCadCategorias, oUsuarioLogado, dtmConexao.FDConexao);
-  FDQuery1.Refresh;
-end;
-procedure TfrmCadProduto.btnIncluirClientesClick(Sender: TObject);
-begin
   TFuncao.CriarForm(TfrmCadCategorias, oUsuarioLogado, dtmConexao.FDConexao);
   FDQuery1.Refresh;
 end;

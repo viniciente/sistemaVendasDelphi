@@ -26,13 +26,9 @@ inherited frmCadProduto: TfrmCadProduto
     end
     inherited pgcPrincipal: TPageControl
       Width = 864
-      ActivePage = tsManutencao
       ExplicitWidth = 864
       inherited tsListagem: TTabSheet
-        ExplicitLeft = 4
-        ExplicitTop = 24
         ExplicitWidth = 856
-        ExplicitHeight = 373
         object imgVisualizacao: TImage [0]
           Left = 625
           Top = 73
@@ -89,10 +85,7 @@ inherited frmCadProduto: TfrmCadProduto
         end
       end
       inherited tsManutencao: TTabSheet
-        ExplicitLeft = 4
-        ExplicitTop = 24
         ExplicitWidth = 856
-        ExplicitHeight = 373
         object lblCodigo: TLabel
           Left = 16
           Top = 29
@@ -174,7 +167,7 @@ inherited frmCadProduto: TfrmCadProduto
             CF871DCF871DCE861DCC831CCC821CCA801BC87D1BC67A1AC47719C37419C172
             17BF6F17FF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
             00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FF}
-          OnClick = btnIncluirClientesClick
+          OnClick = btnIncluirCategoriaClick
         end
         object btnPesquisarClientes: TSpeedButton
           Left = 396
@@ -232,7 +225,7 @@ inherited frmCadProduto: TfrmCadProduto
           Height = 143
           AutoSelect = False
           AutoSize = False
-          TabOrder = 2
+          TabOrder = 4
         end
         object lkpCategoria: TDBLookupComboBox
           Left = 215
@@ -242,7 +235,7 @@ inherited frmCadProduto: TfrmCadProduto
           KeyField = 'categoriasId'
           ListField = 'descricao'
           ListSource = dtsCategoria
-          TabOrder = 3
+          TabOrder = 2
           OnClick = lkpCategoriaClick
         end
         object edtValor: TCurrencyEdit
@@ -250,7 +243,7 @@ inherited frmCadProduto: TfrmCadProduto
           Top = 304
           Width = 121
           Height = 21
-          TabOrder = 4
+          TabOrder = 5
         end
         object edtQuantidade: TCurrencyEdit
           Left = 187
@@ -258,7 +251,7 @@ inherited frmCadProduto: TfrmCadProduto
           Width = 121
           Height = 21
           DisplayFormat = '##00'
-          TabOrder = 5
+          TabOrder = 6
         end
         object lkpFornecedor: TDBLookupComboBox
           Left = 215
@@ -268,7 +261,7 @@ inherited frmCadProduto: TfrmCadProduto
           KeyField = 'fornecedorId'
           ListField = 'nomeFantasia'
           ListSource = dsFornecedor
-          TabOrder = 6
+          TabOrder = 3
         end
         object pnlFotoProduto: TPanel
           Left = 542

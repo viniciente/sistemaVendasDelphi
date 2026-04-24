@@ -116,6 +116,7 @@ type
     procedure edtCEPChange(Sender: TObject);
     procedure dsListagemDataChange(Sender: TObject; Field: TField);
     procedure lpkStatusClick(Sender: TObject);
+    procedure btnFecharClick(Sender: TObject);
   private
     { Private declarations }
     oCliente:TCliente;
@@ -332,6 +333,11 @@ begin
   inherited
 end;
 
+procedure TfrmCadCliente.btnFecharClick(Sender: TObject);
+begin
+Self.ModalResult := mrCancel;
+end;
+
 procedure TfrmCadCliente.btnNovoClick(Sender: TObject);
 begin
   inherited;
@@ -450,7 +456,7 @@ begin
             edtEndereco.Text := JSONObj.GetValue('logradouro').Value;
             edtBairro.Text   := JSONObj.GetValue('bairro').Value;
             edtCidade.Text   := JSONObj.GetValue('localidade').Value;
-            edtEstado.Text   := JSONObj.GetValue('uf').Value;
+            edtEstado.Text  := JSONObj.GetValue('uf').Value;
 
             //edtNumero.SetFocus;
 

@@ -40,7 +40,6 @@ type
     fdqry1nome: TStringField;
     fdqry1dataVenda: TSQLTimeStampField;
     fdqry1totalVenda: TFMTBCDField;
-    btnIncluirCliente: TSpeedButton;
     btnPesquisarProduto: TSpeedButton;
     btnIncluirClientes: TSpeedButton;
     btnPesquisarClientes: TSpeedButton;
@@ -55,16 +54,15 @@ type
     procedure btnApagarItemClick(Sender: TObject);
     procedure dbGridItensVendasDblClick(Sender: TObject);
     procedure btnAlterarClick(Sender: TObject);
-    procedure btnIncluirClienteClick(Sender: TObject);
-    procedure btnIncluirProdutosClick(Sender: TObject);
     procedure btnPesquisarProdutoClick(Sender: TObject);
     procedure btnPesquisarClientesClick(Sender: TObject);
-    procedure btnIncluirClientesClick(Sender: TObject);
     procedure dsListagemStateChange(Sender: TObject);
     procedure dbGridItensVendasDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
     procedure lkpClienteClick(Sender: TObject);
     procedure lkpProdutoClick(Sender: TObject);
+
+    procedure btnIncluirClientesClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -237,25 +235,13 @@ begin
   LimparCds;
 end;
 
-
-procedure TfrmProVendas.btnIncluirClienteClick(Sender: TObject);
-begin
-  inherited;
-  TFuncao.CriarForm(TfrmCadCliente, oUsuarioLogado, dtmConexao.FDConexao);
-  FDQuery1.Refresh;
-end;
-
 procedure TfrmProVendas.btnIncluirClientesClick(Sender: TObject);
 begin
   inherited;
   TFuncao.CriarForm(TfrmCadCliente, oUsuarioLogado, dtmConexao.FDConexao);
   FDQuery1.Refresh;
-end;
 
-procedure TfrmProVendas.btnIncluirProdutosClick(Sender: TObject);
-begin
-  TFuncao.CriarForm(TfrmCadProduto, oUsuarioLogado, dtmConexao.FDConexao);
-  FDQuery1.Refresh;
+  pgcPrincipal.ActivePage := tsManutencao;
 end;
 
 procedure TfrmProVendas.btnNovoClick(Sender: TObject);

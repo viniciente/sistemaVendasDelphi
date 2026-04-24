@@ -35,7 +35,7 @@ class procedure TFuncao.CriarForm(aNomeForm: TFormClass; oUsuarioLogado: TUsuari
 var form: TForm;
 begin
   try
-    form := aNomeForm.Create(Application);
+    form := aNomeForm.Create(nil);
     if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, form.Name, aConexao) then
     begin
       form.ShowModal;
@@ -291,4 +291,4 @@ begin
 end;
 
 end.
-
+

@@ -10,7 +10,6 @@ inherited frmCadCliente: TfrmCadCliente
       end
     end
     inherited pgcPrincipal: TPageControl
-      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited pnlListagemTopo: TPanel
           inherited maskPesquisar: TMaskEdit
@@ -315,10 +314,6 @@ inherited frmCadCliente: TfrmCadCliente
         end
       end
       inherited tsManutencao: TTabSheet
-        ExplicitLeft = 4
-        ExplicitTop = 24
-        ExplicitWidth = 740
-        ExplicitHeight = 373
         object lblCPFCNPJ: TLabel
           Left = 280
           Top = 139
