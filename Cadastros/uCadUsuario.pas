@@ -42,6 +42,7 @@ type
     procedure btnAlterarClick(Sender: TObject);
     procedure CarregaImagem(Sender: TObject);
     procedure LimparImagem(Sender: TObject);
+    procedure imgImagemClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -75,6 +76,21 @@ begin
     Result:=oUsuario.Atualizar;
 
   TAcaoAcesso.PreencherUsuariosVsAcoes(dtmConexao.FDConexao);
+end;
+
+procedure TfrmCadUsuario.imgImagemClick(Sender: TObject);
+var
+  P: TPoint;
+begin
+  // 1. Captura a posição do mouse na tela
+  GetCursorPos(P);
+
+  // 2. Verificamos se o menu não é nulo por segurança
+    if Assigned(popMenu) then
+    begin
+      // 3. Forçamos a abertura do menu na posição do mouse
+      popMenu.Popup(P.X, P.Y);
+    end;
 end;
 
 {$ENDREGION}

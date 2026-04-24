@@ -76,48 +76,56 @@ end;
 
 {$REGION 'CRUD'}
 function TCliente.Apagar: Boolean;
-var Qry: TFDQuery;
+var
+  Qry: TFDQuery;
+  TotalVendas: Integer;
 begin
   Result := False;
-  // Pergunta apenas uma vez para o usuário
-  if MessageDlg('ATENÇÃO!' + #13 + #13 +
-                'Isso apagará o Cliente, suas Vendas e Itens de Venda.' + #13 +
-                'Código: ' + IntToStr(F_clienteId) + ' - ' + F_nome + #13 + #13 +
-                'Deseja continuar?', mtWarning, [mbYes, mbNo], 0) = mrNo then
-    Exit;
-
   Qry := TFDQuery.Create(nil);
   try
     Qry.Connection := FdConexao;
-    FdConexao.StartTransaction;
+
+    Qry.SQL.Text := 'SELECT COUNT(*) FROM vendas WHERE clienteId = :id';
+    Qry.ParamByName('id').AsInteger := F_clienteId;
+    Qry.Open;
+    TotalVendas := Qry.Fields[0].AsInteger;
+    Qry.Close;
+
+    // Se o total de vendas for maior que zero, bloqueia a exclusão
+    if TotalVendas > 0 then
+    begin
+      MessageDlg('BLOQUEADO!' + #13 + #13 +
+                 'Não é possível excluir o cliente "' + F_nome + '" porque ele possui ' +
+                 IntToStr(TotalVendas) + ' venda(s) vinculada(s).' + #13 + #13 +
+                 'Para manter o histórico financeiro, o cliente não pode ser removido.',
+                 mtError, [mbOK], 0);
+      Exit;
+    end;
+
+    if MessageDlg('Deseja realmente apagar o Cliente?' + #13 + #13 +
+                  'Código: ' + IntToStr(F_clienteId) + ' - ' + F_nome,
+                  mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+      Exit;
+
     try
-      // 1. Apaga os ITENS de todas as vendas deste cliente
-      Qry.SQL.Text := 'DELETE FROM dbo.vendasItens WHERE vendaId IN ' +
-                      '(SELECT vendaId FROM vendas WHERE clienteId = :id)';
-      Qry.ParamByName('id').AsInteger := F_clienteId;
-      Qry.ExecSQL;
+      FdConexao.StartTransaction;
 
-      // 2. Apaga as VENDAS deste cliente
-      Qry.SQL.Text := 'DELETE FROM vendas WHERE clienteId = :id';
-      Qry.ParamByName('id').AsInteger := F_clienteId;
-      Qry.ExecSQL;
-
-      // 3. Apaga o CLIENTE
       Qry.SQL.Text := 'DELETE FROM clientes WHERE clienteId = :id';
       Qry.ParamByName('id').AsInteger := F_clienteId;
       Qry.ExecSQL;
 
       FdConexao.Commit;
       Result := True;
-      ShowMessage('Cliente e todos os registros vinculados foram apagados!');
+      ShowMessage('Cliente removido com sucesso!');
     except
       on E: Exception do
       begin
         FdConexao.Rollback;
-        ShowMessage('Erro Crítico ao apagar dados: ' + E.Message);
+        ShowMessage('Erro ao apagar cliente: ' + E.Message);
         Result := False;
       end;
     end;
+
   finally
     Qry.Free;
   end;

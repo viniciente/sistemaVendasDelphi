@@ -75,6 +75,8 @@ type
       State: TGridDrawState);
     procedure btnIncluirClientesClick(Sender: TObject);
     procedure btnPesquisarClientesClick(Sender: TObject);
+    procedure lkpCategoriaClick(Sender: TObject);
+    procedure imgProdutoClick(Sender: TObject);
   private
     { Private declarations }
     FCarregando: Boolean;
@@ -138,6 +140,21 @@ begin
     Result := oProduto.Atualizar;
 end;
 
+procedure TfrmCadProduto.imgProdutoClick(Sender: TObject);
+var
+  P: TPoint;
+begin
+  // 1. Captura a posição do mouse na tela
+  GetCursorPos(P);
+
+  // 2. Verificamos se o menu não é nulo por segurança
+    if Assigned(popMenu) then
+    begin
+      // 3. Forçamos a abertura do menu na posição do mouse
+      popMenu.Popup(P.X, P.Y);
+    end;
+end;
+
 {$ENDREGION}
 
 {$REGION 'BTNS'}
@@ -172,6 +189,7 @@ begin
   inherited;
   pgcPrincipal.ActivePage := tsManutencao;
   LimparImagem1.Click;
+  pnlFotoProduto.Caption := '📷  Clique para carregar foto';
 
   if edtNome.CanFocus then
     edtNome.SetFocus;
@@ -248,6 +266,11 @@ procedure TfrmCadProduto.LimparImagem1Click(Sender: TObject);
 begin
   inherited;
   TFuncao.LimparImagem(imgProduto);
+end;
+
+procedure TfrmCadProduto.lkpCategoriaClick(Sender: TObject);
+begin
+  AjustarInterfacePorCategoria;
 end;
 
 {$ENDREGION}
@@ -367,7 +390,6 @@ end;
 procedure TfrmCadProduto.FormShow(Sender: TObject);
 begin
   inherited;
-
   //garante que a Query está aberta
   if not FDQuery1.Active then
     FDQuery1.Open;
@@ -399,6 +421,7 @@ begin
     // Volta ao padrão para Itens/Produtos
     edtQuantidade.Visible := True;
     lblQuantidade.Visible := True;
+    pnlFotoProduto.Visible := True;
     lblFornecedor.Caption := 'Fornecedor';
     pnlFundo.Color := clBtnFace;
   end;

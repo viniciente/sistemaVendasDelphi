@@ -350,9 +350,14 @@ begin
     begin
       lblNomeUsuario.Caption := '  USUÁRIO: ' + oUsuarioLogado.nome;
 
+      imgAvatar.Picture := nil;
+
       // No seu FormShow ou após o Login
       if (oUsuarioLogado.foto <> nil) and (not oUsuarioLogado.foto.Empty) then
-        imgAvatar.Picture.Assign(oUsuarioLogado.foto)
+      begin
+        imgAvatar.Picture.Assign(oUsuarioLogado.foto);
+        DesenharAvatarArredondado(imgAvatar.Picture.Bitmap);
+      end
       else
       begin
         // Se não houver foto, carrega uma imagem padrão da sua pasta de imagens

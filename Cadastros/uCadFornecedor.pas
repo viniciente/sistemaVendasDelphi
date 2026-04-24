@@ -145,24 +145,34 @@ end;
 procedure TfrmCadFornecedor.edtCNPJChange(Sender: TObject);
 var
   TextoLimpo: string;
+  PosicaoCursor: Integer;
 begin
+  PosicaoCursor := TEdit(Sender).SelStart;
+
   TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
 
   TEdit(Sender).OnChange := nil;
-  TEdit(Sender).MaxLength := 18; // Limite de caracteres do CNPJ
 
-  if Length(TextoLimpo) <= 2 then
-    TEdit(Sender).Text := TextoLimpo
-  else if Length(TextoLimpo) <= 5 then
-    TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3)
-  else if Length(TextoLimpo) <= 8 then
-    TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' + Copy(TextoLimpo, 6, 3)
-  else if Length(TextoLimpo) <= 12 then
-    TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
-    Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4)
-  else
-    TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
-    Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4) + '-' + Copy(TextoLimpo, 13, 2);
+  try
+    TEdit(Sender).MaxLength := 18;
+
+    if Length(TextoLimpo) <= 2 then
+      TEdit(Sender).Text := TextoLimpo
+    else if Length(TextoLimpo) <= 5 then
+      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3)
+    else if Length(TextoLimpo) <= 8 then
+      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' + Copy(TextoLimpo, 6, 3)
+    else if Length(TextoLimpo) <= 12 then
+      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
+                            Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4)
+    else
+      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
+                            Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4) + '-' + Copy(TextoLimpo, 13, 2);
+    TEdit(Sender).SelStart := PosicaoCursor + (Length(TEdit(Sender).Text) - Length(TextoLimpo));
+
+  finally
+    TEdit(Sender).OnChange := edtCNPJChange;
+  end;
 end;
 
 procedure TfrmCadFornecedor.edtCNPJKeyPress(Sender: TObject; var Key: Char);

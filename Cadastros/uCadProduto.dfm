@@ -29,7 +29,10 @@ inherited frmCadProduto: TfrmCadProduto
       ActivePage = tsManutencao
       ExplicitWidth = 864
       inherited tsListagem: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
         ExplicitWidth = 856
+        ExplicitHeight = 373
         object imgVisualizacao: TImage [0]
           Left = 625
           Top = 73
@@ -86,7 +89,10 @@ inherited frmCadProduto: TfrmCadProduto
         end
       end
       inherited tsManutencao: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
         ExplicitWidth = 856
+        ExplicitHeight = 373
         object lblCodigo: TLabel
           Left = 16
           Top = 29
@@ -237,6 +243,7 @@ inherited frmCadProduto: TfrmCadProduto
           ListField = 'descricao'
           ListSource = dtsCategoria
           TabOrder = 3
+          OnClick = lkpCategoriaClick
         end
         object edtValor: TCurrencyEdit
           Left = 16
@@ -268,18 +275,22 @@ inherited frmCadProduto: TfrmCadProduto
           Top = 3
           Width = 185
           Height = 127
+          BorderStyle = bsSingle
           TabOrder = 7
           object imgProduto: TImage
             Left = 1
             Top = 1
-            Width = 183
-            Height = 125
+            Width = 179
+            Height = 121
             Align = alClient
+            Center = True
             ParentShowHint = False
-            PopupMenu = popMenu
             Proportional = True
             ShowHint = False
+            OnClick = imgProdutoClick
             ExplicitTop = 2
+            ExplicitWidth = 183
+            ExplicitHeight = 125
           end
         end
       end
@@ -312,6 +323,7 @@ inherited frmCadProduto: TfrmCadProduto
     Top = 8
   end
   object popMenu: TPopupMenu [3]
+    TrackButton = tbLeftButton
     Left = 460
     Top = 16
     object CarregarImagem1: TMenuItem
