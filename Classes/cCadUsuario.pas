@@ -79,11 +79,8 @@ begin
       FdConexao.Commit;
       Result := True;
     except
-      on E: Exception do
-      begin
         FdConexao.Rollback;
-        ShowMessage('Erro ao apagar usuário: ' + E.Message);
-      end;
+        ShowMessage('Erro ao apagar usuário');
     end;
   finally
     Qry.Free;
@@ -95,30 +92,24 @@ var
   Qry: TFDQuery;
   ms: TMemoryStream;
 begin
-  Result := True; // Assume sucesso por padrão
+  Result := True;
   Qry := TFDQuery.Create(nil);
   ms := TMemoryStream.Create;
   try
     Qry.Connection := FdConexao;
 
-    // Montagem da instrução SQL de atualização.
-    // O uso de SQL.Add ajuda a organizar a leitura do comando.
     Qry.SQL.Add('UPDATE usuarios ');
     Qry.SQL.Add('   SET nome    = :nome, ');
     Qry.SQL.Add('       senha   = :senha, ');
     Qry.SQL.Add('       foto    = :foto,  ' );
     Qry.SQL.Add('       statusId = :statusId' );
-    Qry.SQL.Add(' WHERE usuarioId = :usuarioId'); // CRÍTICO: Filtra apenas o usuário atual
+    Qry.SQL.Add(' WHERE usuarioId = :usuarioId');
 
-    // Mapeamento dos parâmetros.
-    // O usuarioId é usado no WHERE para localizar o registro correto no SQL Server.
     Qry.ParamByName('usuarioId').AsInteger := Self.F_usuarioId;
     Qry.ParamByName('nome').AsString        := Self.F_nome;
     Qry.ParamByName('senha').AsString       := Self.F_senha;
     Qry.ParamByName('statusId').AsInteger   := Self.F_statusId;
 
-    // --- MANIPULAÇÃO DE IMAGEM (BLOB) ---
-// --- MANIPULAÇÃO DE IMAGEM (BLOB) ---
     if (Self.F_foto <> nil) and (not Self.F_foto.Empty) then
     begin
       Self.F_foto.SaveToStream(ms);
@@ -128,24 +119,18 @@ begin
     else
     begin
       // SE NÃO TIVER FOTO, PRECISA DECLARAR COMO NULL
-      // Sem isso, o FireDAC dá erro de "Field not found"
       Qry.ParamByName('foto').DataType := ftBlob;
       Qry.ParamByName('foto').Value    := Null;
     end;
 
-    // --- PROCESSO DE GRAVAÇÃO COM TRANSAÇÃO ---
     try
       FdConexao.StartTransaction;
       Qry.ExecSQL;      // Executa a alteração no banco
       FdConexao.Commit;  // Confirma as alterações
     except
-      on E: Exception do
-      begin
-        // Em caso de falha (ex: erro de Foreign Key "FK_status"), desfaz tudo
         FdConexao.Rollback;
-        ShowMessage('Erro técnico ao atualizar: ' + E.Message);
+        ShowMessage('Erro técnico ao atualizar');
         Result := False;
-      end;
     end;
   finally
     // Limpeza de memória
@@ -174,10 +159,8 @@ begin
     Qry.ParamByName('nome').AsString  := Self.F_nome;
     Qry.ParamByName('senha').AsString := Self.F_senha;
 
-    // IMPORTANTE: Este valor deve existir na tabela statusUsuario (1, 2 ou 3)
     Qry.ParamByName('statusId').AsInteger := Self.F_statusId;
 
-    // --- TRATAMENTO DA FOTO ---
     // Se houver uma imagem carregada no objeto F_foto, converte para Stream e envia como Blob
     if (F_foto <> nil) and (not F_foto.Empty) then
     begin
@@ -192,21 +175,17 @@ begin
       Qry.ParamByName('foto').Value    := Null;
     end;
 
-    // --- CONTROLE DE TRANSAÇÃO ---
     try
-      FdConexao.StartTransaction; // Inicia a operação atômica
-      Qry.ExecSQL;                // Tenta executar o comando no banco
-      FdConexao.Commit;           // Confirma a gravação permanentemente
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
       Result := True;
     except
-      on E: Exception do
-      begin
-        FdConexao.Rollback;       // Em caso de erro (ex: FK Violada), desfaz qualquer alteração
-        ShowMessage('Erro: ' + E.Message);
-      end;
+        FdConexao.Rollback;
+        ShowMessage('Erro');
     end;
   finally
-    // Libera os objetos da memória para evitar vazamentos (Memory Leaks)
+
     ms.Free;
     Qry.Free;
   end;
@@ -255,11 +234,8 @@ begin
       end;
 
     except
-      on E: Exception do
-      begin
-        ShowMessage('Erro técnico ao selecionar: ' + E.Message);
+        ShowMessage('Erro técnico ao selecionar');
         Result := False;
-      end;
     end;
   finally
     FreeAndNil(Qry);
@@ -308,11 +284,8 @@ begin
         end;
       end;
     except
-      on E: Exception do
-      begin
-        ShowMessage('Erro técnico: ' + E.Message);
+        ShowMessage('Erro técnico');
         Result := False;
-      end;
     end;
   finally
     FreeAndNil(Qry);
@@ -341,11 +314,8 @@ begin
          result := false;
 
     except
-        on E: Exception do
-        begin
-          ShowMessage('Erro técnico: ' + E.Message);
+          ShowMessage('Erro técnico');
           Result := False;
-        end;
     end;
 
   finally
@@ -389,12 +359,9 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-      on E: Exception do
-      begin
-        ShowMessage('Erro técnico: ' + E.Message);
+        ShowMessage('Erro técnico');
         FdConexao.Rollback;
         Result := False;
-      end;
     end;
   finally
     if Assigned(Qry) then

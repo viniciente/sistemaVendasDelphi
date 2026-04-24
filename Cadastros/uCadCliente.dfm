@@ -10,6 +10,7 @@ inherited frmCadCliente: TfrmCadCliente
       end
     end
     inherited pgcPrincipal: TPageControl
+      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited pnlListagemTopo: TPanel
           inherited maskPesquisar: TMaskEdit
@@ -981,12 +982,12 @@ inherited frmCadCliente: TfrmCadCliente
     object FDQuery1statusId: TIntegerField
       DisplayLabel = 'Status'
       FieldName = 'statusId'
-      Origin = 'statusId'
+      Origin = 'cl.statusId'
     end
     object FDQuery1pessoaId: TIntegerField
       DisplayLabel = 'Tipo Pessoa'
       FieldName = 'pessoaId'
-      Origin = 'pessoaId'
+      Origin = 'cl.pessoaId'
     end
     object FDQuery1cpf_cnpj: TStringField
       DisplayLabel = 'Documento'
@@ -1003,13 +1004,13 @@ inherited frmCadCliente: TfrmCadCliente
     object FDQuery1status: TStringField
       DisplayLabel = 'Status'
       FieldName = 'status'
-      Origin = 'status'
+      Origin = 's.descricao'
       Required = True
     end
     object FDQuery1tipoPessoa: TStringField
       DisplayLabel = 'Tipo Pessoa'
       FieldName = 'tipoPessoa'
-      Origin = 'tipoPessoa'
+      Origin = 't.descricao'
       Required = True
       Size = 15
     end

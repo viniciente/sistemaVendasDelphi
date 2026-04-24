@@ -10,7 +10,6 @@ inherited frmCadFornecedor: TfrmCadFornecedor
       end
     end
     inherited pgcPrincipal: TPageControl
-      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited dbgrdListagem: TDBGrid
           DataSource = dsListagem
@@ -48,10 +47,6 @@ inherited frmCadFornecedor: TfrmCadFornecedor
         end
       end
       inherited tsManutencao: TTabSheet
-        ExplicitLeft = 4
-        ExplicitTop = 24
-        ExplicitWidth = 740
-        ExplicitHeight = 373
         object lblCodigo: TLabel
           Left = 16
           Top = 37

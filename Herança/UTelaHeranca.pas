@@ -52,7 +52,6 @@ type
     procedure maskPesquisarChange(Sender: TObject);
     procedure dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
-  private
     { Private declarations }
     procedure ControlarIndiceTab(pgcPrincipal: TPageControl; Indice: Integer);
     function RetomarCampoTraduzido(Campo: string): string;
@@ -273,23 +272,23 @@ if maskPesquisar.Text='' then
     if I > 0 then
       SQLBase := Copy(SQLBase, 1, I - 1);
 
-  // Localiza o campo selecionado
-  TipoCampo := ftUnknown;
-  for I := 0 to FDQuery1.FieldCount-1 do
-  begin
-    if FDQuery1.Fields[i].FieldName = IndiceAtual then
+    TipoCampo := ftUnknown;
+    NomeCampo := '';
+
+    for I := 0 to FDQuery1.FieldCount - 1 do
     begin
-      TipoCampo := FDQuery1.Fields[i].DataType;
+      if (FDQuery1.Fields[I].FieldName = IndiceAtual) then
+      begin
+        TipoCampo := FDQuery1.Fields[I].DataType;
 
-      // Usa Origin para evitar erro de coluna ambígua em SQL com JOIN
-      if FDQuery1.Fields[i].Origin <> '' then
-        NomeCampo := FDQuery1.Fields[i].Origin
-      else
-        NomeCampo := FDQuery1.Fields[i].FieldName;
+        if (FDQuery1.Fields[I].Origin <> '') and (UpperCase(FDQuery1.Fields[I].Origin) <> 'VENDAS') then
+          NomeCampo := FDQuery1.Fields[I].Origin
+        else
+          NomeCampo := 'vendas.' + FDQuery1.Fields[I].FieldName;
 
-      Break;
+        Break;
+      end;
     end;
-  end;
 
   // Verifica se já existe WHERE no SQL original
   if Pos('where', LowerCase(SQLBase)) > 0 then
@@ -333,7 +332,6 @@ if maskPesquisar.Text='' then
   except
     on E: Exception do
     begin
-      // Se der erro, mostra o SQL que foi gerado para você debugar
       ShowMessage('Erro no SQL: ' + E.Message + #13 + FDQuery1.SQL.Text);
     end;
   end;
@@ -479,8 +477,7 @@ begin
       else
         MessageDlg('A gravação não pôde ser concluída.', mtWarning, [mbOK], 0);
     except
-      on E: Exception do
-        MessageDlg('Erro ao gravar: ' + E.Message, mtError, [mbOK], 0);
+        MessageDlg('Erro ao gravar', mtError, [mbOK], 0);
     end;
   finally
   end;

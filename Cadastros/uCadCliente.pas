@@ -202,7 +202,7 @@ begin
   oCliente.cidade         := edtCidade.Text;
   oCliente.email          := edtEmail.Text;
   oCliente.dataNascimento := edtDataNascimento.Date;
-  oCliente.numero         := edtNumero.Text;
+  oCliente.numero         := SomenteNumeros(edtNumero.Text);
 
   // Uso do método "SomenteNumeros" salva somente os numeros no banco
   oCliente.cep      := SomenteNumeros(edtCEP.Text);
@@ -305,32 +305,37 @@ end;
 {$REGION'BTNS"}
 procedure TfrmCadCliente.btnAlterarClick(Sender: TObject);
 begin
-  if oCliente.Selecionar(FDQuery1.FieldByName('clienteId').AsInteger)then begin
-    edtClienteId.Text:=IntToStr(oCliente.codigo);
-    edtNome.Text     :=oCliente.nome;
-    edtCEP.Text      :=oCliente.cep;
-    edtEstado.Text   :=oCliente.estado;
-    edtEndereco.Text :=oCliente.endereco;
-    edtBairro.Text   :=oCliente.bairro;
-    edtCidade.Text   :=oCliente.cidade;
-    edtTelefone.Text :=oCliente.telefone;
-    edtEmail.Text    :=oCliente.email;
-    edtDataNascimento.Date :=oCliente.dataNascimento;
-    edtCPFCNPJ.Text  :=oCliente.cpf_cnpj;
-    edtNumero.Text   :=oCliente.numero;
+  if oCliente.Selecionar(FDQuery1.FieldByName('clienteId').AsInteger) then
+  begin
+    edtClienteId.Text          := IntToStr(oCliente.codigo);
+    edtNome.Text               := oCliente.nome;
+    edtEstado.Text             := oCliente.estado;
+    edtEndereco.Text           := oCliente.endereco;
+    edtBairro.Text             := oCliente.bairro;
+    edtCidade.Text             := oCliente.cidade;
+    edtEmail.Text              := oCliente.email;
+    edtDataNascimento.Date     := oCliente.dataNascimento;
+    edtNumero.Text             := oCliente.numero;
+
+    edtCEP.Text      := oCliente.cep;
+    edtCEPChange(edtCEP);
+
+    edtTelefone.Text := oCliente.telefone;
+    edtTelefoneChange(edtTelefone);
+
+    lkpPessoa.KeyValue := oCliente.pessoaId;
+    edtCPFCNPJ.Text  := oCliente.cpf_cnpj;
+    edtCPFCNPJChange(edtCPFCNPJ);
 
     lpkStatus.KeyValue := oCliente.statusId;
-    lkpPessoa.KeyValue := oCliente.pessoaId;
-
     lpkStatusClick(lpkStatus);
-
   end
-  else begin
+  else
+  begin
     btnCancelar.Click;
     Abort;
   end;
-
-  inherited
+  inherited;
 end;
 
 procedure TfrmCadCliente.btnFecharClick(Sender: TObject);
@@ -408,9 +413,9 @@ begin
   try
     TEdit(Sender).MaxLength := 9; // Limite de caracteres do CEP
 
-    if Length(TextoLimpo) <= 4 then
+    if Length(TextoLimpo) <= 5 then
         TEdit(Sender).Text := TextoLimpo
-    else if Length(TextoLimpo) <= 6 then           // se tiver + 6 numeros
+    else
         TEdit(Sender).Text := Copy(TextoLimpo, 1, 5) + '-' + Copy(TextoLimpo, 6, 3);
 
     TEdit(Sender).SelStart := Length(TEdit(Sender).Text);

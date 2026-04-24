@@ -97,12 +97,8 @@ begin
       FdConexao.Commit;
       Result := True;
     except
-      on E: Exception do
-      begin
-        FdConexao.Rollback;
-        ShowMessage('Erro ao excluir: ' + E.Message);
+        ShowMessage('Erro ao excluir');
         Result := False;
-      end;
     end;
   finally
     TFD.Free;
@@ -133,17 +129,12 @@ begin
       FdConexao.Commit;
       Result:=True;
     except
-    on E: Exception do
-    begin
-      // Isso vai mostrar a mensagem real do SQL
-      ShowMessage('Erro ao excluir: ' + E.Message);
+      ShowMessage('Erro ao excluir');
       FdConexao.Rollback;
       Result := False;
     end;
-    end;
   except
-    on E: Exception do
-      ShowMessage('Erro ao atualizar: ' + E.Message);
+      ShowMessage('Erro ao atualizar');
   end;
 end;
 
@@ -162,12 +153,9 @@ try
     FdConexao.Commit;
     Result:=True;
   except
-  on E: Exception do
-  begin
-    ShowMessage('Erro ao inserir categoria: ' + E.Message);
+    ShowMessage('Erro ao inserir categoria');
     FdConexao.Rollback;
     Result := False;
-  end;
   end;
 
 finally

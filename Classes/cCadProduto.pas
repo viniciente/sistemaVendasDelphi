@@ -89,12 +89,9 @@ begin
     Qry.ExecSQL;
     FdConexao.Commit;
   except
-  on E: Exception do
-    begin
-      MessageDlg('Erro ao excluir produto: ' + E.Message, mtError, [mbOK], 0);
+      MessageDlg('Erro ao excluir produto', mtError, [mbOK], 0);
       FdConexao.Rollback;
       Result:=True;
-    end;
   end;
 
   finally
@@ -146,12 +143,9 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-        on E: Exception do
-        begin
-          ShowMessage('Erro técnico: ' + E.Message);
+          ShowMessage('Erro técnico');
           FdConexao.Rollback;
           Result := False;
-        end;
     end;
   finally
     if Assigned(Qry) then
@@ -195,12 +189,9 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-        on E: Exception do
-        begin
-          ShowMessage('Erro técnico: ' + E.Message);
+          ShowMessage('Erro técnico');
           FdConexao.Rollback;
           Result := False;
-        end;
     end;
   finally
   end;

@@ -118,12 +118,9 @@ begin
       Result := True;
       ShowMessage('Cliente removido com sucesso!');
     except
-      on E: Exception do
-      begin
         FdConexao.Rollback;
-        ShowMessage('Erro ao apagar cliente: ' + E.Message);
+        ShowMessage('Erro ao apagar cliente');
         Result := False;
-      end;
     end;
 
   finally
@@ -180,13 +177,9 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-    on E: Exception do
-    begin
-      // Isso vai mostrar a mensagem real do SQL
-      ShowMessage('Erro ao excluir: ' + E.Message);
+      ShowMessage('Erro ao excluir');
       FdConexao.Rollback;
       Result := False;
-    end;
     end;
 
   finally
@@ -236,13 +229,10 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-      on E: Exception do
-      begin
         if FdConexao.InTransaction then
           FdConexao.Rollback;
-        ShowMessage('Erro ao inserir cliente: ' + E.Message);
+        ShowMessage('Erro ao inserir cliente');
         Result := False;
-      end;
     end;
 
   finally

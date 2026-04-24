@@ -89,12 +89,9 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-    on E: Exception do
-    begin
-      ShowMessage('Erro ao inserir categoria: ' + E.Message);
+      ShowMessage('Erro ao inserir categoria:');
       FdConexao.Rollback;
       Result := False;
-    end;
     end;
 
   finally
@@ -208,10 +205,8 @@ begin
       end;
 
     except
-      on E: Exception do begin
-        ShowMessage('Erro no Selecionar: ' + E.Message);
+        ShowMessage('Erro no Selecionar');
         Result := False;
-      end;
     end;
 
   finally
@@ -275,11 +270,9 @@ begin
         oCliente.Free;
       end;
     Except
-      on E: Exception do begin
         FdConexao.Rollback;
-        ShowMessage('Erro ao inserir venda: ' + E.Message);
+        ShowMessage('Erro ao inserir venda');
         Result := -1;
-      end;
     End;
 
   finally
@@ -449,14 +442,10 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-      on E: Exception do
-      begin
-      // Isso vai mostrar a mensagem real do SQL Server
-      ShowMessage('Erro Crítico no Banco: ' + E.Message);
+      ShowMessage('Erro Crítico no Banco');
       FdConexao.Rollback;
       Result := False;
-      end;
-    end;;
+    end;
 
   finally
     if Assigned(Qry) then

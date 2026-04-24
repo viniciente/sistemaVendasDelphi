@@ -119,20 +119,24 @@ end;
 
 procedure TfrmCadFornecedor.btnAlterarClick(Sender: TObject);
 begin
-  if oFornecedor.Selecionar(FDQuery1.FieldByName('fornecedorId').AsInteger)then begin
-    edtFornecedorId.Text:=IntToStr(oFornecedor.codigo);
-    edtNomeFantasia.Text     :=oFornecedor.nomeFantasia;
-    edtRazaoSocial.Text      :=oFornecedor.razaoSocial;
-    edtTelefone.Text         :=oFornecedor.telefone;
-    edtEmail.Text            :=oFornecedor.email;
-    edtCNPJ.Text             :=oFornecedor.cnpj;
+  if oFornecedor.Selecionar(FDQuery1.FieldByName('fornecedorId').AsInteger) then
+  begin
+    edtFornecedorId.Text := IntToStr(oFornecedor.codigo);
+    edtNomeFantasia.Text := oFornecedor.nomeFantasia;
+    edtRazaoSocial.Text  := oFornecedor.razaoSocial;
+    edtEmail.Text        := oFornecedor.email;
 
+    edtTelefone.Text := oFornecedor.telefone;
+    edtTelefoneChange(edtTelefone); // aplica máscara telefone
+
+    edtCNPJ.Text := oFornecedor.cnpj;
+    edtCNPJChange(edtCNPJ);         //aplica máscara
   end
-  else begin
+  else
+  begin
     btnCancelar.Click;
     Abort;
   end;
-
   inherited;
 end;
 

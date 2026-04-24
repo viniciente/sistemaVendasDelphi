@@ -20,7 +20,6 @@ inherited frmProVendas: TfrmProVendas
       end
     end
     inherited pgcPrincipal: TPageControl
-      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited dbgrdListagem: TDBGrid
           DataSource = dsListagem
@@ -438,14 +437,14 @@ inherited frmProVendas: TfrmProVendas
     object fdqry1vendaId: TFDAutoIncField
       DisplayLabel = 'Codigo Venda'
       FieldName = 'vendaId'
-      Origin = 'vendas'
+      Origin = 'vendas.vendaId'
       ProviderFlags = [pfInWhere, pfInKey]
       ReadOnly = True
     end
     object fdqry1clienteId: TIntegerField
       DisplayLabel = 'Cliente Id'
       FieldName = 'clienteId'
-      Origin = 'vendas'
+      Origin = 'vendas.clienteId'
       Required = True
     end
     object fdqry1nome: TStringField
