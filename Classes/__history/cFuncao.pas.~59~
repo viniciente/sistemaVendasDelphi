@@ -1,0 +1,435 @@
+unit cFuncao;
+
+interface
+
+uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, cUsuarioLogado,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      RLReport, Vcl.Forms, System.SysUtils, Vcl.Imaging.pngimage, Vcl.Imaging.jpeg, Vcl.Graphics,
+      Vcl.ExtDlgs, UTelaHeranca, Vcl.Grids, Vcl.DBGrids, System.UITypes, Winapi.Windows;
+      // lista de Units
+
+type
+  TFuncao = class
+  private
+    class function SomenteLetras(aSentenca: string): String; static;  public
+    class function FiltrarPorCampo(const ASQL, ACampoAlias, AValor: string): string; static;
+    class procedure ZebrarGrid(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+      State: TGridDrawState); static;
+    class function FormatarTelefone(const V: string): string; static;
+    class function FormatarCEP(const V: string): string; static;
+    class function FormatarCNPJ(const V: string): string; static;
+    class function FormatarCPF(const V: string): string; static;
+    class procedure CarregarImagem(aImage: TImage); static;
+    class procedure LimparImagem(var aImage: TImage); static;
+    class procedure CriarForm(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado; aConexao:TFDConnection); static;
+    class procedure CriarRelatorio(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado ; aConexao:TFDConnection); static;
+    class function ValidarCPF(aCPF: string): Boolean;
+    class function ValidarCNPJ(aCNPJ: string): Boolean;
+    class function SomenteNumeros(aSentenca:string): String;
+    class procedure ApenasNumeros(var Key: Char); static;
+  end;
+
+implementation
+
+{$REGION'CRIAR FORM & RELATORIO'}
+class procedure TFuncao.CriarForm(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado; aConexao:TFDConnection);
+var form: TForm;
+begin
+  try
+    form := aNomeForm.Create(nil);
+    if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, form.Name, aConexao) then
+    begin
+      form.ShowModal;
+    end
+    else begin
+       MessageDlg('Usuário: '+oUsuarioLogado.nome +' Não tem Permissão de Acesso',mtWarning,[mbOK],0);
+    end;
+  finally
+    if Assigned(form) then
+       form.Release;
+  end;
+end;
+
+
+class procedure TFuncao.CriarRelatorio(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado; aConexao:TFDConnection);
+var form: TForm;
+    aRelatorio:TRLReport;
+    i:Integer;
+begin
+  try
+    form := aNomeForm.Create(Application);
+    if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, form.Name, aConexao) then
+    begin
+      for I := 0 to form.ComponentCount-1 do
+      begin
+        if form.Components[i] is TRLReport then
+        begin
+           TRLReport(form.Components[i]).PreviewModal;
+           Break;
+        end;
+      end;
+    end
+    else begin
+       MessageDlg('Usuário: '+oUsuarioLogado.nome +', não tem permissão de acesso',mtWarning,[mbOK],0);
+    end;
+  finally
+    if Assigned(form) then
+       form.Release;
+  end;
+end;
+
+{$ENDREGION}
+
+{$REGION'LIMPAR IMAGEM'}
+
+class procedure TFuncao.LimparImagem(var aImage:TImage);
+begin
+  if aImage <> nil then
+  begin
+    aImage.Picture := nil; // Limpa a imagem
+
+    // Se a imagem estiver dentro de um Painel, garantimos que
+    // o painel continue visível e o componente também.
+    aImage.Visible := True;
+
+    if aImage.Parent is TPanel then
+      TPanel(aImage.Parent).Visible := True;
+  end;
+end;
+
+class procedure TFuncao.CarregarImagem(aImage:TImage);
+var
+  Bmp, BmpTrans: Vcl.Graphics.TBitmap;
+  Jpg: TJPEGImage;
+  Pic: TPicture;
+  Png: TPngImage;
+  opdSelecionar:TOpenPictureDialog;
+  iWidth:Integer;
+  iHeight:Integer;
+begin
+  Try
+    iWidth:=160;
+    iHeight:=130;
+    opdSelecionar:=TOpenPictureDialog.Create(nil);
+    opdSelecionar.Filter:='All (*.bmp;*.jpg; *.jpeg;*.png)|*.jpg; *.jpeg; *.bmp;*.png|Bitmaps '+
+                          '(*.bmp)|*.bmp|JPEG Image File (*.jpg;*.jpeg)|*.jpg; *.jpeg| '+
+                          'PNG(*.png)|*.png';
+    opdSelecionar.Title:='Selecione a Imagem';
+    opdSelecionar.Execute;
+
+    if opdSelecionar.FileName<>EmptyStr then begin
+      if (Pos('.JPG',UpperCase(opdSelecionar.FileName))>0) or ( Pos('.JPEG',UpperCase(opdSelecionar.FileName))>0) then begin
+        Bmp := Vcl.Graphics.TBitmap.Create;
+        Jpg := TJPEGImage.Create;
+        Pic := TPicture.Create;
+        try
+          Pic.LoadFromFile(opdSelecionar.FileName);
+          Jpg.Assign(Pic);
+          Jpg.CompressionQuality :=7;
+          Bmp.Width  :=iWidth;
+          Bmp.Height :=iHeight;
+          Bmp.Canvas.StretchDraw(Rect(0, 0, Bmp.width, Bmp.Height), Jpg);
+          aImage.Picture.Bitmap:=Bmp;
+        finally
+          Pic.Free;
+          Jpg.Free;
+          Bmp.Free;
+        end
+      End
+      else if Pos('.PNG',UpperCase(opdSelecionar.FileName))>0 then begin
+        Bmp := Vcl.Graphics.TBitmap.Create;
+        png := TPngImage.Create;
+        Pic := TPicture.Create;
+        try
+          Pic.LoadFromFile(opdSelecionar.FileName);
+          png.Assign(Pic);
+          Bmp.Width  :=iWidth;
+          Bmp.Height :=iHeight;
+          Bmp.Canvas.StretchDraw(Rect(0, 0, Bmp.width, Bmp.Height), png);
+
+          aImage.Picture.Bitmap:=Bmp;
+
+        finally
+          Pic.Free;
+          png.Free;
+          Bmp.Free;
+        end
+      end
+      else begin
+        try
+          Bmp := Vcl.Graphics.TBitmap.Create;
+          BmpTrans:= Vcl.Graphics.TBitmap.Create;
+          Pic := TPicture.Create;
+
+          Pic.LoadFromFile(opdSelecionar.FileName);
+          BmpTrans.Assign(Pic.Bitmap);
+          Bmp.Width :=iWidth;
+          Bmp.Height:=iHeight;
+          Bmp.Canvas.StretchDraw(Rect(0, 0, Bmp.width, Bmp.Height), BmpTrans);
+          aImage.Picture.Bitmap:=Bmp;
+        finally
+          Pic.Free;
+          BmpTrans.Free;
+          Bmp.Free;
+        end;
+      end;
+    end;
+
+  Finally
+     FreeAndNil(opdSelecionar);
+  End;
+
+end;
+
+{$ENDREGION}
+
+{$REGION 'FORMATAÇÃO'}
+
+class function TFuncao.FormatarCPF(const V: string): string;
+var
+  S: string;
+begin
+  S := SomenteNumeros(V);
+  if Length(S) <= 3 then
+    Result := S
+  else if Length(S) <= 6 then
+    Result := Copy(S, 1, 3) + '.' + Copy(S, 4, 3)
+  else if Length(S) <= 9 then
+    Result := Copy(S, 1, 3) + '.' + Copy(S, 4, 3) + '.' + Copy(S, 7, 3)
+  else
+    Result := Copy(S, 1, 3) + '.' + Copy(S, 4, 3) + '.' + Copy(S, 7, 3) + '-' + Copy(S, 10, 2);
+end;
+
+class function TFuncao.FormatarCNPJ(const V: string): string;
+var
+  S: string;
+begin
+  S := SomenteNumeros(V);
+  if Length(S) <= 2 then
+    Result := S
+  else if Length(S) <= 5 then
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3)
+  else if Length(S) <= 8 then
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3) + '.' + Copy(S, 6, 3)
+  else if Length(S) <= 12 then
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3) + '.' + Copy(S, 6, 3) + '/' + Copy(S, 9, 4)
+  else
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3) + '.' + Copy(S, 6, 3) + '/' + Copy(S, 9, 4) + '-' + Copy(S, 13, 2);
+end;
+
+class function TFuncao.FormatarTelefone(const V: string): string;
+var
+  S: string;
+  Tam: Integer;
+begin
+  S := SomenteNumeros(V);
+  Tam := Length(S);
+
+  if Tam = 0 then
+  begin
+    Result := '';
+    Exit;
+  end;
+
+  if (S[1] = '0') and (S[2] in ['1'..'9']) and (S[3] = '0') and (S[4] = '0') then
+  begin
+    if Tam <= 4 then
+      Result := S
+    else if Tam <= 7 then
+      Result := Copy(S, 1, 4) + ' ' + Copy(S, 5, Tam - 4)
+    else
+      Result := Copy(S, 1, 4) + ' ' + Copy(S, 5, 3) + ' ' + Copy(S, 8, 4);
+  end
+
+  else
+  begin
+    if Tam <= 2 then
+      Result := '(' + S
+    else if Tam <= 6 then
+      Result := '(' + Copy(S, 1, 2) + ') ' + Copy(S, 3, Tam - 2)
+    else if Tam <= 10 then
+      // Formato Fixo: (11) 3333-4444
+      Result := '(' + Copy(S, 1, 2) + ') ' + Copy(S, 3, 4) + '-' + Copy(S, 7, Tam - 6)
+    else
+      // Formato Celular: (11) 98888-7777 (quando atinge 11 dígitos)
+      Result := '(' + Copy(S, 1, 2) + ') ' + Copy(S, 3, 5) + '-' + Copy(S, 8, 4);
+  end;
+end;
+
+class function TFuncao.FormatarCEP(const V: string): string;
+var
+  TextoLimpo: string;
+begin
+  // Remove qualquer caractere que não seja número
+  TextoLimpo := SomenteNumeros(V);
+
+  // Se tiver até 5 números, não coloca o traço ainda
+  if Length(TextoLimpo) <= 5 then
+    Result := TextoLimpo
+  else
+    // A partir do 6º número, monta a máscara: 00000-000
+    Result := Copy(TextoLimpo, 1, 5) + '-' + Copy(TextoLimpo, 6, 3);
+end;
+
+{$ENDREGION}
+
+{$REGION 'VALIDAÇÃO CPF/CNPJ'}
+
+class function TFuncao.ValidarCPF(aCPF: string): Boolean;
+var
+  d1, d2, n: array[1..11] of Integer;
+  i, somatorio: Integer;
+begin
+  Result := False;
+  if Length(aCPF) <> 11 then Exit;
+  if (aCPF = '00000000000') or (aCPF = '11111111111') then Exit;
+
+  try
+    for i := 1 to 11 do n[i] := StrToInt(aCPF[i]);
+
+    // Cálculo do 1º Dígito
+    somatorio := n[1]*10 + n[2]*9 + n[3]*8 + n[4]*7 + n[5]*6 + n[6]*5 + n[7]*4 + n[8]*3 + n[9]*2;
+    d1[1] := 11 - (somatorio mod 11);
+    if d1[1] >= 10 then d1[1] := 0;
+
+    // Cálculo do 2º Dígito
+    somatorio := n[1]*11 + n[2]*10 + n[3]*9 + n[4]*8 + n[5]*7 + n[6]*6 + n[7]*5 + n[8]*4 + n[9]*3 + d1[1]*2;
+    d2[1] := 11 - (somatorio mod 11);
+    if d2[1] >= 10 then d2[1] := 0;
+
+    Result := (n[10] = d1[1]) and (n[11] = d2[1]);
+  except
+    Result := False;
+  end;
+end;
+
+class function TFuncao.ValidarCNPJ(aCNPJ: string): Boolean;
+var
+  v: array[1..2] of Integer;
+  s, i, p, j: Integer;
+begin
+  Result := False;
+  if (Length(aCNPJ) <> 14) then Exit;
+
+  try
+    // usa 'j' para controlar o loop
+    for j := 1 to 2 do
+    begin
+      s := 0;
+      p := 2;
+
+      // O loop interno percorre os dígitos para o cálculo
+      for i := (11 + j) downto 1 do
+      begin
+        s := s + (StrToInt(aCNPJ[i]) * p);
+        Inc(p);
+        if p > 9 then p := 2;
+      end;
+
+      v[j] := 11 - (s mod 11);
+      if v[j] >= 10 then v[j] := 0;
+    end;
+
+    // compara os dígitos verificadores calculados com os reais (posições 13 e 14)
+    Result := (StrToInt(aCNPJ[13]) = v[1]) and (StrToInt(aCNPJ[14]) = v[2]);
+  except
+    Result := False;
+  end;
+end;
+
+{$ENDREGION}
+
+{$REGION 'ZEBRAR'}
+
+ class procedure TFuncao.ZebrarGrid(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+var
+  Grid: TDBGrid;
+begin
+  if not (Sender is TDBGrid) then Exit;
+
+  Grid := TDBGrid(Sender);
+
+  if not (gdSelected in State) then
+  begin
+    // Usa RecNo para alternar as cores das linhas
+    if Odd(Grid.DataSource.DataSet.RecNo) then
+      Grid.Canvas.Brush.Color := $00F2F2F2
+    else
+      Grid.Canvas.Brush.Color := $00E1E1E1;
+
+    Grid.Canvas.Font.Color := clBlack;
+  end
+  else
+  begin
+    Grid.Canvas.Brush.Color := clHighlight;
+    Grid.Canvas.Font.Color := clHighlightText;
+  end;
+
+  Grid.Canvas.FillRect(Rect);
+  Grid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+end;
+
+{$ENDREGION}
+
+class function TFuncao.SomenteNumeros(aSentenca: string): String;
+var I:Integer;
+begin
+  Result:='';
+  for I:=1 to Length(aSentenca) do
+  begin
+  //verifica se o caractere na posição I é numero de 0 a 9
+  if aSentenca[I] in ['0'..'9'] then
+    Result := Result+aSentenca[i]
+  end;
+
+end;
+
+class function TFuncao.SomenteLetras(aSentenca: string): String;
+var I:Integer;
+begin
+  Result:='';
+  for I:=1 to Length(aSentenca) do
+  begin
+  //verifica se o caractere na posição I é numero de 0 a 9
+  if aSentenca[I] in ['a'..'z'] and ['A'..'Z'] then
+    Result := Result+aSentenca[i]
+  end;
+
+end;
+
+class function TFuncao.FiltrarPorCampo(const ASQL, ACampoAlias, AValor: string): string;
+var
+  SQLBase: string;
+  PosOrder: Integer;
+begin
+  SQLBase := ASQL;
+
+  // Remove o ORDER BY para poder encaixar o WHERE
+  PosOrder := Pos('order by', LowerCase(SQLBase));
+  if PosOrder > 0 then
+    SQLBase := Trim(Copy(SQLBase, 1, PosOrder - 1));
+
+  // Monta o SQL com filtro e devolve
+  Result := SQLBase
+          + ' WHERE ' + ACampoAlias + ' = ' + AValor
+          + ' ORDER BY cl.nome';
+end;
+
+class procedure TFuncao.ApenasNumeros(var Key: Char);
+begin
+  // #8  = Backspace
+  // #3  = Ctrl + C (Copiar)
+  // #22 = Ctrl + V (Colar)
+  // #13 = Enter (Opcional, mas bom para pular de campo)
+
+  if not (Key in ['0'..'9', #8, #3, #22, #13]) then
+    Key := #0;
+end;
+
+end.
+

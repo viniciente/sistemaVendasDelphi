@@ -3649,7 +3649,7 @@ object frmLogin: TfrmLogin
       AlignWithMargins = True
       Left = 4
       Top = 4
-      Width = 51
+      Width = 295
       Height = 18
       Align = alTop
       Alignment = taCenter
@@ -3660,6 +3660,7 @@ object frmLogin: TfrmLogin
       Font.Name = 'Arial'
       Font.Style = [fsBold, fsItalic, fsUnderline]
       ParentFont = False
+      ExplicitWidth = 51
     end
     object lblUsuario: TLabel
       Left = 40
@@ -3696,10 +3697,9 @@ object frmLogin: TfrmLogin
     end
     object edtSenha: TEdit
       Left = 40
-      Top = 113
+      Top = 107
       Width = 217
       Height = 21
-      Color = clBtnFace
       PasswordChar = '*'
       TabOrder = 1
     end

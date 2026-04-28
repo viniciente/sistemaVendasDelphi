@@ -161,73 +161,6 @@ begin
   TFuncao.CriarRelatorio(TfrmRelCadCliente, oUsuarioLogado, dtmConexao.FDConexao);
 end;
 
-procedure TfrmPrincipal.DesenharAvatarArredondado(aBitmap: TBitmap);
-var
-  gpGrafico  : TGPGraphics;
-  gpImagem   : TGPImage;
-  gpCaneta   : TGPPen;
-  gpCaminho  : TGPGraphicsPath;
-  bmpDestino : TBitmap;
-  sArqTemp   : string;
-  W, H, R    : Integer;
-begin
-  if (aBitmap = nil) or aBitmap.Empty then Exit;
-
-  W := imgAvatar.Width;
-  H := imgAvatar.Height;
-  R := Min(W, H);
-
-  sArqTemp   := TPath.GetTempFileName;
-  bmpDestino := TBitmap.Create;
-  try
-    aBitmap.SaveToFile(sArqTemp);
-    gpImagem := TGPImage.Create(sArqTemp);
-    try
-      bmpDestino.PixelFormat := pf32bit;
-      bmpDestino.SetSize(W, H);
-      bmpDestino.Canvas.Brush.Color := clBtnFace;
-      bmpDestino.Canvas.FillRect(Rect(0, 0, W, H));
-
-      gpGrafico := TGPGraphics.Create(bmpDestino.Canvas.Handle);
-      try
-        gpGrafico.SetSmoothingMode(SmoothingModeAntiAlias);
-        gpGrafico.SetInterpolationMode(InterpolationModeHighQualityBicubic);
-        gpGrafico.SetPixelOffsetMode(PixelOffsetModeHighQuality);
-
-        gpCaminho := TGPGraphicsPath.Create;
-        try
-          gpCaminho.AddEllipse(1, 1, R - 2, R - 2);
-          gpGrafico.SetClip(gpCaminho);
-          gpGrafico.DrawImage(gpImagem, 1, 1, R - 2, R - 2);
-        finally
-          gpCaminho.Free;
-        end;
-
-        gpGrafico.ResetClip;
-
-        gpCaneta := TGPPen.Create(MakeColor(180, 160, 160, 160), 1.5);
-        try
-          gpGrafico.DrawEllipse(gpCaneta, 1, 1, R - 2, R - 2);
-        finally
-          gpCaneta.Free;
-        end;
-
-      finally
-        gpGrafico.Free;
-      end;
-
-    finally
-      gpImagem.Free;
-    end;
-
-    imgAvatar.Picture.Assign(bmpDestino);
-
-  finally
-    bmpDestino.Free;
-    TFile.Delete(sArqTemp);
-  end;
-end;
-
 procedure TfrmPrincipal.FichadeCliente1Click(Sender: TObject);
 begin
   TFuncao.CriarRelatorio(TfrmRelCadClienteFicha, oUsuarioLogado, dtmConexao.FDConexao);
@@ -241,32 +174,6 @@ end;
 procedure TfrmPrincipal.ProdutoporCategoria1Click(Sender: TObject);
 begin
   TFuncao.CriarRelatorio(TfrmRelCadProdutoComGrupoCategoria, oUsuarioLogado, dtmConexao.FDConexao);
-end;
-
-procedure TfrmPrincipal.Vendapordata1Click(Sender: TObject);
-begin
-  Try
-    frmSelecionarData:=TfrmSelecionarData.Create(Self);
-    if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, frmSelecionarData.Name, dtmConexao.FDConexao) then
-    begin
-      frmSelecionarData.ShowModal;
-
-      frmRelVendaPorData:=TfrmRelVendaPorData.Create(Self);
-      frmRelVendaPorData.QryVenda.Close;
-      frmRelVendaPorData.QryVenda.ParamByName('DATAINICIO').AsDate:=frmSelecionarData.edtDataInicio.Date;
-      frmRelVendaPorData.QryVenda.ParamByName('DATAFIM').AsDate:=frmSelecionarData.edtDataFinal.Date;
-      frmRelVendaPorData.QryVenda.Open;
-      frmRelVendaPorData.Relatorio.PreviewModal;
-    end
-    else begin
-      MessageDlg('Usuario: '+oUsuarioLogado.nome +', não tem permissão de acesso',mtWarning,[mbOK],0)
-    end;
-  Finally
-    if Assigned(frmSelecionarData) then
-      frmSelecionarData.Release;
-    if Assigned(frmRelVendaPorData) then
-      frmRelVendaPorData.Release;
-  End;
 end;
 
 {$ENDREGION}
@@ -392,10 +299,102 @@ end;
 
 {$ENDREGION}
 
+procedure TfrmPrincipal.DesenharAvatarArredondado(aBitmap: TBitmap);
+var
+  gpGrafico  : TGPGraphics;
+  gpImagem   : TGPImage;
+  gpCaneta   : TGPPen;
+  gpCaminho  : TGPGraphicsPath;
+  bmpDestino : TBitmap;
+  sArqTemp   : string;
+  W, H, R    : Integer;
+begin
+  if (aBitmap = nil) or aBitmap.Empty then Exit;
+
+  W := imgAvatar.Width;
+  H := imgAvatar.Height;
+  R := Min(W, H);
+
+  sArqTemp   := TPath.GetTempFileName;
+  bmpDestino := TBitmap.Create;
+  try
+    aBitmap.SaveToFile(sArqTemp);
+    gpImagem := TGPImage.Create(sArqTemp);
+    try
+      bmpDestino.PixelFormat := pf32bit;
+      bmpDestino.SetSize(W, H);
+      bmpDestino.Canvas.Brush.Color := clBtnFace;
+      bmpDestino.Canvas.FillRect(Rect(0, 0, W, H));
+
+      gpGrafico := TGPGraphics.Create(bmpDestino.Canvas.Handle);
+      try
+        gpGrafico.SetSmoothingMode(SmoothingModeAntiAlias);
+        gpGrafico.SetInterpolationMode(InterpolationModeHighQualityBicubic);
+        gpGrafico.SetPixelOffsetMode(PixelOffsetModeHighQuality);
+
+        gpCaminho := TGPGraphicsPath.Create;
+        try
+          gpCaminho.AddEllipse(1, 1, R - 2, R - 2);
+          gpGrafico.SetClip(gpCaminho);
+          gpGrafico.DrawImage(gpImagem, 1, 1, R - 2, R - 2);
+        finally
+          gpCaminho.Free;
+        end;
+
+        gpGrafico.ResetClip;
+
+        gpCaneta := TGPPen.Create(MakeColor(180, 160, 160, 160), 1.5);
+        try
+          gpGrafico.DrawEllipse(gpCaneta, 1, 1, R - 2, R - 2);
+        finally
+          gpCaneta.Free;
+        end;
+
+      finally
+        gpGrafico.Free;
+      end;
+
+    finally
+      gpImagem.Free;
+    end;
+
+    imgAvatar.Picture.Assign(bmpDestino);
+
+  finally
+    bmpDestino.Free;
+    TFile.Delete(sArqTemp);
+  end;
+end;
+
+procedure TfrmPrincipal.Vendapordata1Click(Sender: TObject);
+begin
+  Try
+    frmSelecionarData:=TfrmSelecionarData.Create(Self);
+    if TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, frmSelecionarData.Name, dtmConexao.FDConexao) then
+    begin
+      frmSelecionarData.ShowModal;
+
+      frmRelVendaPorData:=TfrmRelVendaPorData.Create(Self);
+      frmRelVendaPorData.QryVenda.Close;
+      frmRelVendaPorData.QryVenda.ParamByName('DATAINICIO').AsDate:=frmSelecionarData.edtDataInicio.Date;
+      frmRelVendaPorData.QryVenda.ParamByName('DATAFIM').AsDate:=frmSelecionarData.edtDataFinal.Date;
+      frmRelVendaPorData.QryVenda.Open;
+      frmRelVendaPorData.Relatorio.PreviewModal;
+    end
+    else begin
+      MessageDlg('Usuario: '+oUsuarioLogado.nome +', não tem permissão de acesso',mtWarning,[mbOK],0)
+    end;
+  Finally
+    if Assigned(frmSelecionarData) then
+      frmSelecionarData.Release;
+    if Assigned(frmRelVendaPorData) then
+      frmRelVendaPorData.Release;
+  End;
+end;
+
 procedure TfrmPrincipal.mnuFecharClick(Sender: TObject);
 begin
- //Close
- Application.Terminate;
+  Application.Terminate;
 end;
 
 procedure TfrmPrincipal.AtualizarDashBord;

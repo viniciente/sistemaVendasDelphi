@@ -14,8 +14,8 @@ uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
 
 type
   TFuncao = class
-  private
   public
+    class function FiltrarPorCampo(const ASQL, ACampoAlias, AValor: string): string; static;
     class procedure ZebrarGrid(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState); static;
     class function FormatarTelefone(const V: string): string; static;
@@ -29,6 +29,7 @@ type
     class function ValidarCPF(aCPF: string): Boolean;
     class function ValidarCNPJ(aCNPJ: string): Boolean;
     class function SomenteNumeros(aSentenca:string): String;
+    class procedure ApenasNumeros(var Key: Char); static;
   end;
 
 implementation
@@ -383,6 +384,34 @@ end;
 
 {$ENDREGION}
 
+class function TFuncao.FiltrarPorCampo(const ASQL, ACampoAlias, AValor: string): string;
+var
+  SQLBase: string;
+  PosOrder: Integer;
+begin
+  SQLBase := ASQL;
+
+  // Remove o ORDER BY para poder encaixar o WHERE
+  PosOrder := Pos('order by', LowerCase(SQLBase));
+  if PosOrder > 0 then
+    SQLBase := Trim(Copy(SQLBase, 1, PosOrder - 1));
+
+  // Monta o SQL com filtro e devolve
+  Result := SQLBase
+          + ' WHERE ' + ACampoAlias + ' = ' + AValor
+          + ' ORDER BY cl.nome';
+end;
+
+class procedure TFuncao.ApenasNumeros(var Key: Char);
+begin
+  // #8  = Backspace
+  // #3  = Ctrl + C (Copiar)
+  // #22 = Ctrl + V (Colar)
+  // #13 = Enter
+
+  if not (Key in ['0'..'9', #8, #3, #22, #13]) then
+    Key := #0;
+end;
 
 end.
 

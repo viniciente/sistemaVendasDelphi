@@ -89,6 +89,8 @@ uses Unit2, cFuncao;
 //TAG: 2 - CAMPOS OBRIGATORIOS
 {$ENDREGION}
 
+{$REGION 'METODOS'}
+
 procedure TfrmTelaHeranca.ControlarBotoes;
 var
   EditandoOuInserindo: Boolean;
@@ -197,6 +199,8 @@ begin
   end;
 end;
 
+{$ENDREGION}
+
 {$REGION 'METODOS VIRTUAIS'}
 function TfrmTelaHeranca.Apagar: Boolean;
 begin
@@ -213,6 +217,38 @@ begin
   Result := True;
 end;
 {$ENDREGION}
+
+{$REGION 'BTN'}
+
+procedure TfrmTelaHeranca.btnGravarClick(Sender: TObject);
+begin
+
+  if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, self.Name+'_'+TBitBtn(Sender).Name, dtmConexao.FDConexao) then
+  begin
+     MessageDlg('Usuario: '+oUsuarioLogado.nome +', não tem permissão de acesso',mtWarning,[mbOK],0);
+     Abort
+  end;
+
+  if (ExisteCampoObrigatorio) then
+    Abort;
+
+  try
+    try
+      if Gravar(EstadoDoCadastro) then
+      begin
+        FDQuery1.Refresh;
+        ControlarIndiceTab(pgcPrincipal, 0);
+        ControlarBotoes;
+        EstadoDoCadastro := ecNenhum;
+        LimparEdits;
+      end
+      else
+        MessageDlg('A gravação não pôde ser concluída.', mtWarning, [mbOK], 0);
+    except
+    end;
+  finally
+  end;
+end;
 
 procedure TfrmTelaHeranca.btnNovoClick(Sender: TObject);
 begin
@@ -395,188 +431,9 @@ begin
   Close;
 end;
 
-procedure TfrmTelaHeranca.dbgrdListagemDblClick(Sender: TObject);
-begin
-  btnAlterar.Click;
-end;
-
-procedure TfrmTelaHeranca.dbgrdListagemDrawColumnCell(Sender: TObject;
-  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
-begin
-  TFuncao.ZebrarGrid(Sender, Rect, DataCol, Column, State);
-end;
-
-procedure TfrmTelaHeranca.dbgrdListagemKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-var
-  Grid: TDBGrid;
-begin
-  BloqueiaCTRL_DEL_DBGrid(Key, Shift);
-
-  Grid := TDBGrid(Sender);
-
-  case Key of
-    VK_LEFT:
-    begin
-      // Move coluna para esquerda, sem mudar de registro
-      if Grid.SelectedIndex > 0 then
-      begin
-        Grid.SelectedIndex := Grid.SelectedIndex - 1;
-        Key := 0; // consome a tecla — não deixa o dataset reagir
-      end;
-    end;
-
-    VK_RIGHT:
-    begin
-      // Move coluna para direita, sem mudar de registro
-      if Grid.SelectedIndex < Grid.Columns.Count - 1 then
-      begin
-        Grid.SelectedIndex := Grid.SelectedIndex + 1;
-        Key := 0;
-      end;
-    end;
-
-    VK_RETURN:
-    begin
-      // Enter abre o alterar — igual ao duplo clique
-      btnAlterar.Click;
-      Key := 0;
-    end;
-  end;
-end;
-
-procedure TfrmTelaHeranca.btnGravarClick(Sender: TObject);
-begin
-
-  if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo, self.Name+'_'+TBitBtn(Sender).Name, dtmConexao.FDConexao) then
-  begin
-     MessageDlg('Usuario: '+oUsuarioLogado.nome +', não tem permissão de acesso',mtWarning,[mbOK],0);
-     Abort
-  end;
-
-  if (ExisteCampoObrigatorio) then
-    Abort;
-
-  try
-    try
-      if Gravar(EstadoDoCadastro) then
-      begin
-        FDQuery1.Refresh;
-        ControlarIndiceTab(pgcPrincipal, 0);
-        ControlarBotoes;
-        EstadoDoCadastro := ecNenhum;
-        LimparEdits;
-      end
-      else
-        MessageDlg('A gravação não pôde ser concluída.', mtWarning, [mbOK], 0);
-    except
-    end;
-  finally
-  end;
-end;
-
-procedure TfrmTelaHeranca.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  SalvarConfiguracaoGrid(dbgrdListagem);
-  if FDQuery1.Active then
-    FDQuery1.Close;
-end;
-
-procedure TfrmTelaHeranca.FormCreate(Sender: TObject);
-var i: Integer;
-begin
-  FDQuery1.Connection := dtmConexao.FDConexao;
-  dsListagem.DataSet  := FDQuery1;
-  dbgrdListagem.DataSource := dsListagem;
-
-  dbgrdListagem.Options := [dgTitles, dgIndicator, dgColumnResize,
-                             dgColLines, dgRowLines, dgTabs,
-                             dgAlwaysShowSelection, dgCancelOnExit,
-                             dgTitleClick, dgTitleHotTrack];
-
-  for i := 0 to dbgrdListagem.Columns.Count - 1 do
-  begin
-    dbgrdListagem.Columns[i].Title.Font.Color := clWhite;
-    dbgrdListagem.Columns[i].Title.Font.Style := [fsBold];
-  end;
-  CentralizarColunas;
-end;
-
-procedure TfrmTelaHeranca.dbgrdListagemTitleClick(Column: TColumn);
-begin
-  IndiceAtual := Column.FieldName;
-  FDQuery1.IndexFieldNames := IndiceAtual;
-  ExibirLabelIndice(IndiceAtual, lblIndice);
-end;
-
-procedure TfrmTelaHeranca.FormShow(Sender: TObject);
-begin
-  CarregarConfiguracaoGrid(dbgrdListagem);
-
-  if FDQuery1.SQL.Text <> EmptyStr then
-  begin
-    FDQuery1.IndexFieldNames := IndiceAtual;
-    ExibirLabelIndice(IndiceAtual, lblIndice);
-    SelectOriginal := FDQuery1.SQL.Text;
-
-    FDQuery1.Close;
-    FDQuery1.Open;
-  end;
-
-  ControlarIndiceTab(pgcPrincipal, 0);
-  lblIndice.Caption := IndiceAtual;
-  DesabilitarEditPK;
-
-  EstadoDoCadastro := ecNenhum;
-  ControlarBotoes;
-end;
-
-{$REGION 'PESQUISA'}
-
-procedure TfrmTelaHeranca.maskPesquisarChange(Sender: TObject);
-var Date:TDateTime;
-begin
-
-  if(trim(TMaskEdit(Sender).Text) = '')then
-    Exit;
-
-  if(FDQuery1.FieldByName(IndiceAtual).DataType in [ftString, ftWideString] )then
-  begin
-    FDQuery1.Locate(IndiceAtual, TMaskEdit(Sender).Text, [loPartialKey])
-  end
-
-  else if(FDQuery1.FieldByName(IndiceAtual).DataType in [ftFloat, ftCurrency, ftFMTBcd] )then
-  begin
-   try
-     FDQuery1.Locate(IndiceAtual, TMaskEdit(Sender).Text, [])
-   except
-
-   end;
-  end
-
-  else if(FDQuery1.FieldByName(IndiceAtual).DataType in [ftDate, ftDateTime, ftTimeStamp] )then
-  begin
-   if TryStrToDate(TMaskEdit(Sender).Text, Date) then
-   begin
-     FDQuery1.Locate(IndiceAtual, Date, []);
-   end
-  end
-  else
-     FDQuery1.Locate(IndiceAtual, TMaskEdit(Sender).Text, [])
-end;
-
 {$ENDREGION}
 
-{$REGION 'Bloqueio de CTRL+DEL'}
-
-procedure TfrmTelaHeranca.BloqueiaCTRL_DEL_DBGrid(var Key: Word; Shift: TShiftState);
-begin
-  if (Shift = [ssCtrl]) and (Key = 46) then
-    Key := 0;
-end;
-
-{$ENDREGION}
-
-{$REGION 'CONFIGURAÇÃO GRID'}
+{$REGION 'CONFIG GRID'}
 
 procedure TfrmTelaHeranca.SalvarConfiguracaoGrid(pGrid: TDBGrid);
 var
@@ -660,6 +517,157 @@ begin
   end;
 end;
 
+procedure TfrmTelaHeranca.dbgrdListagemTitleClick(Column: TColumn);
+begin
+  IndiceAtual := Column.FieldName;
+  FDQuery1.IndexFieldNames := IndiceAtual;
+  ExibirLabelIndice(IndiceAtual, lblIndice);
+end;
+
+procedure TfrmTelaHeranca.dbgrdListagemDblClick(Sender: TObject);
+begin
+  btnAlterar.Click;
+end;
+
+procedure TfrmTelaHeranca.dbgrdListagemDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  TFuncao.ZebrarGrid(Sender, Rect, DataCol, Column, State);
+end;
+
+procedure TfrmTelaHeranca.dbgrdListagemKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  Grid: TDBGrid;
+begin
+  BloqueiaCTRL_DEL_DBGrid(Key, Shift);
+
+  Grid := TDBGrid(Sender);
+
+  case Key of
+    VK_LEFT:
+    begin
+      // Move coluna para esquerda, sem mudar de registro
+      if Grid.SelectedIndex > 0 then
+      begin
+        Grid.SelectedIndex := Grid.SelectedIndex - 1;
+        Key := 0; // consome a tecla — não deixa o dataset reagir
+      end;
+    end;
+
+    VK_RIGHT:
+    begin
+      // Move coluna para direita, sem mudar de registro
+      if Grid.SelectedIndex < Grid.Columns.Count - 1 then
+      begin
+        Grid.SelectedIndex := Grid.SelectedIndex + 1;
+        Key := 0;
+      end;
+    end;
+
+    VK_RETURN:
+    begin
+      // Enter abre o alterar — igual ao duplo clique
+      btnAlterar.Click;
+      Key := 0;
+    end;
+  end;
+end;
+
 {$ENDREGION}
+
+{$REGION 'PESQUISA'}
+
+procedure TfrmTelaHeranca.maskPesquisarChange(Sender: TObject);
+var Date:TDateTime;
+begin
+
+  if(trim(TMaskEdit(Sender).Text) = '')then
+    Exit;
+
+  if(FDQuery1.FieldByName(IndiceAtual).DataType in [ftString, ftWideString] )then
+  begin
+    FDQuery1.Locate(IndiceAtual, TMaskEdit(Sender).Text, [loPartialKey])
+  end
+
+  else if(FDQuery1.FieldByName(IndiceAtual).DataType in [ftFloat, ftCurrency, ftFMTBcd] )then
+  begin
+   try
+     FDQuery1.Locate(IndiceAtual, TMaskEdit(Sender).Text, [])
+   except
+
+   end;
+  end
+
+  else if(FDQuery1.FieldByName(IndiceAtual).DataType in [ftDate, ftDateTime, ftTimeStamp] )then
+  begin
+   if TryStrToDate(TMaskEdit(Sender).Text, Date) then
+   begin
+     FDQuery1.Locate(IndiceAtual, Date, []);
+   end
+  end
+  else
+     FDQuery1.Locate(IndiceAtual, TMaskEdit(Sender).Text, [])
+end;
+
+{$ENDREGION}
+
+{$REGION 'Bloqueio de CTRL+DEL'}
+
+procedure TfrmTelaHeranca.BloqueiaCTRL_DEL_DBGrid(var Key: Word; Shift: TShiftState);
+begin
+  if (Shift = [ssCtrl]) and (Key = 46) then
+    Key := 0;
+end;
+
+{$ENDREGION}
+
+procedure TfrmTelaHeranca.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  SalvarConfiguracaoGrid(dbgrdListagem);
+  if FDQuery1.Active then
+    FDQuery1.Close;
+end;
+
+procedure TfrmTelaHeranca.FormCreate(Sender: TObject);
+var i: Integer;
+begin
+  FDQuery1.Connection := dtmConexao.FDConexao;
+  dsListagem.DataSet  := FDQuery1;
+  dbgrdListagem.DataSource := dsListagem;
+
+  dbgrdListagem.Options := [dgTitles, dgIndicator, dgColumnResize,
+                             dgColLines, dgRowLines, dgTabs,
+                             dgAlwaysShowSelection, dgCancelOnExit,
+                             dgTitleClick, dgTitleHotTrack];
+
+  for i := 0 to dbgrdListagem.Columns.Count - 1 do
+  begin
+    dbgrdListagem.Columns[i].Title.Font.Color := clWhite;
+    dbgrdListagem.Columns[i].Title.Font.Style := [fsBold];
+  end;
+  CentralizarColunas;
+end;
+
+procedure TfrmTelaHeranca.FormShow(Sender: TObject);
+begin
+  CarregarConfiguracaoGrid(dbgrdListagem);
+
+  if FDQuery1.SQL.Text <> EmptyStr then
+  begin
+    FDQuery1.IndexFieldNames := IndiceAtual;
+    ExibirLabelIndice(IndiceAtual, lblIndice);
+    SelectOriginal := FDQuery1.SQL.Text;
+
+    FDQuery1.Close;
+    FDQuery1.Open;
+  end;
+
+  ControlarIndiceTab(pgcPrincipal, 0);
+  lblIndice.Caption := IndiceAtual;
+  DesabilitarEditPK;
+
+  EstadoDoCadastro := ecNenhum;
+  ControlarBotoes;
+end;
 
 end.

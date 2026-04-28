@@ -14,7 +14,6 @@ inherited frmCadCliente: TfrmCadCliente
       end
     end
     inherited pgcPrincipal: TPageControl
-      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited pnlListagemTopo: TPanel
           inherited maskPesquisar: TMaskEdit
@@ -958,6 +957,7 @@ inherited frmCadCliente: TfrmCadCliente
     Top = 0
   end
   inherited FDQuery1: TFDQuery
+    Active = True
     SQL.Strings = (
       'SELECT '
       '    cl.clienteId, '
@@ -1058,6 +1058,7 @@ inherited frmCadCliente: TfrmCadCliente
       DisplayLabel = 'Documento'
       FieldName = 'cpf_cnpj'
       Origin = 'cpf_cnpj'
+      OnGetText = FDQuery1cpf_cnpjGetText
     end
     object FDQuery1numero: TStringField
       DisplayLabel = 'Numero'

@@ -149,6 +149,8 @@ begin
     Result := oProduto.Atualizar;
 end;
 
+{$ENDREGION}
+
 procedure TfrmCadProduto.imgProdutoClick(Sender: TObject);
 var
   P: TPoint;
@@ -163,8 +165,6 @@ begin
       popMenu.Popup(P.X, P.Y);
     end;
 end;
-
-{$ENDREGION}
 
 {$REGION 'BTNS'}
 procedure TfrmCadProduto.btnAlterarClick(Sender: TObject);

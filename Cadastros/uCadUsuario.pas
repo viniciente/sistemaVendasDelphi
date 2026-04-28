@@ -165,8 +165,6 @@ begin
   oUsuario.status := lkpStatusUsuario.KeyValue;
   oUsuario.foto.Assign(imgImagem.Picture.Graphic);
 
-  // Só atualiza a senha se o campo estiver visível e preenchido
-  // No Alterar, o campo está oculto — mantém a senha que veio do banco
   if edtSenha.Visible and (edtSenha.Text <> '') then
     oUsuario.senha := Criptografar(edtSenha.Text);
   // Se não, oUsuario.senha já tem o hash correto vindo do Selecionar

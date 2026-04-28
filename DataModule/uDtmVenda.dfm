@@ -97,10 +97,12 @@ object dtmVendas: TdtmVendas
     object cdsItensVendasvalorUnitario: TFloatField
       DisplayLabel = 'Valor Unitario'#13#10
       FieldName = 'valorUnitario'
+      DisplayFormat = 'R$ #,##0.00'
     end
     object cdsItensVendasvalorTotalProduto: TFloatField
       DisplayLabel = 'Valor Total Produto'#13#10
       FieldName = 'valorTotalProduto'
+      DisplayFormat = 'R$ #,##0.00'
     end
   end
 end

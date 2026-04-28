@@ -197,42 +197,62 @@ begin
     pgcPrincipal.ActivePageIndex := 0;
 end;
 
-procedure TfrmProVendas.lkpClienteClick(Sender: TObject);
+{$ENDREGION}
+
+{$REGION 'METODOS'}
+procedure TfrmProVendas.AjustarDesign;
+  var
+  FieldCategoria: TField;
 begin
-  if EstadoDoCadastro <> ecInserir then
-    Exit;
+  // Busca o campo de forma segura
+  FieldCategoria := dtmVendas.QryProdutos.FindField('categoriasId');
 
-  if dtmVendas.cdsItensVendas.IsEmpty then
-    Exit;
-
-  // Confirma antes de limpar, pra n surpreender o operador
-  if MessageDlg('Trocar o cliente vai limpar os itens da venda.' + #13 +
-                'Deseja continuar?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+  if (FieldCategoria <> nil) and (lkpProduto.KeyValue <> Null) then
   begin
-    lkpCliente.KeyValue := Null;
-    Exit;
-  end;
+    if FieldCategoria.AsInteger = 46 then // 46 = Servi os
+    begin
+      // Modo Serviço
+      lblQuantidade.Visible := False;
+      edtQuantidade.Visible := False;
+      lblTotalProduto.Visible := False;
+      edtTotalProduto.Visible := False;
+      lblValorUnitario.Caption := 'Valor';
 
-  // Limpa tudo
-  LimparCds;
-  LimparComponenteItem;
-  edtValorTotal.Value := 0;
+      edtQuantidade.Value := 1;
+    end
+    else
+    begin
+      // Modo Produto
+      lblQuantidade.Visible := True;
+      edtQuantidade.Visible := True;
+      lblTotalProduto.Visible := True;
+      edtTotalProduto.Visible := True;
+      lblValorUnitario.Caption := 'Valor Unitario';
+    end;
+  end;
 end;
 
-procedure TfrmProVendas.lkpProdutoClick(Sender: TObject);
+function TfrmProVendas.TotalizarProduto(valorUnitario, Quantidade:Double):Double;
 begin
-  inherited;
-  AjustarDesign;
+  result :=valorUnitario * Quantidade;
 end;
 
-procedure TfrmProVendas.lkpProdutoExit(Sender: TObject);
+function TfrmProVendas.TotalizarVenda:Double;
 begin
-  inherited;
-  if TDBLookupComboBox(Sender).KeyValue<>null then begin
-    edtValorUnitario.Value:=dtmVendas.QryProdutos.FieldByName('valor').AsFloat;
-    edtQuantidade.Value:=1;
-    edtTotalProduto.Value:=TotalizarProduto(edtValorUnitario.Value, edtQuantidade.Value);
+  result:=0;
+  dtmVendas.cdsItensVendas.First;
+  while not dtmVendas.cdsItensVendas.Eof do begin
+    result := result + dtmVendas.cdsItensVendas.FieldByName('valorTotalProduto').AsFloat;
+    dtmVendas.cdsItensVendas.Next;
   end;
+end;
+
+procedure TfrmProVendas.CarregarRegistroSelecionado;
+begin
+  lkpProduto.KeyValue    := dtmVendas.cdsItensVendas.FieldByName('produtoId').AsInteger;
+  edtQuantidade.Value    := dtmVendas.cdsItensVendas.FieldByName('quantidade').AsFloat;
+  edtValorUnitario.Value := dtmVendas.cdsItensVendas.FieldByName('valorUnitario').AsFloat;
+  edtTotalProduto.Value  := dtmVendas.cdsItensVendas.FieldByName('valorTotalProduto').AsFloat;
 end;
 
 {$ENDREGION}
@@ -305,38 +325,6 @@ begin
 
   finally
     frmConClientes.Release;
-  end;
-end;
-
-procedure TfrmProVendas.AjustarDesign;
-  var
-  FieldCategoria: TField;
-begin
-  // Busca o campo de forma segura
-  FieldCategoria := dtmVendas.QryProdutos.FindField('categoriasId');
-
-  if (FieldCategoria <> nil) and (lkpProduto.KeyValue <> Null) then
-  begin
-    if FieldCategoria.AsInteger = 46 then // 46 = Servi os
-    begin
-      // Modo Serviço
-      lblQuantidade.Visible := False;
-      edtQuantidade.Visible := False;
-      lblTotalProduto.Visible := False;
-      edtTotalProduto.Visible := False;
-      lblValorUnitario.Caption := 'Valor';
-
-      edtQuantidade.Value := 1;
-    end
-    else
-    begin
-      // Modo Produto
-      lblQuantidade.Visible := True;
-      edtQuantidade.Visible := True;
-      lblTotalProduto.Visible := True;
-      edtTotalProduto.Visible := True;
-      lblValorUnitario.Caption := 'Valor Unit rio';
-    end;
   end;
 end;
 
@@ -454,68 +442,6 @@ end;
 
 {$ENDREGION}
 
-function TfrmProVendas.TotalizarProduto(valorUnitario, Quantidade:Double):Double;
-begin
-  result :=valorUnitario * Quantidade;
-end;
-
-function TfrmProVendas.TotalizarVenda:Double;
-begin
-  result:=0;
-  dtmVendas.cdsItensVendas.First;
-  while not dtmVendas.cdsItensVendas.Eof do begin
-    result := result + dtmVendas.cdsItensVendas.FieldByName('valorTotalProduto').AsFloat;
-    dtmVendas.cdsItensVendas.Next;
-  end;
-end;
-
-procedure TfrmProVendas.FormClose(Sender: TObject; var Action: TCloseAction);
-begin
-  inherited;
-  if Assigned(dtmVendas)then
-     FreeAndNil(dtmVendas);
-
-  if Assigned(oVenda) then
-     FreeAndNil(oVenda);
-end;
-
-procedure TfrmProVendas.FormCreate(Sender: TObject);
-var i:Integer;
-begin
-  inherited;
-  dtmVendas:=TdtmVendas.Create(Self);
-  oVenda:=TVenda.Create(dtmConexao.FdConexao);
-
-  IndiceAtual:='nome';
-
-  for i := 0 to dbGridItensVendas.Columns.Count - 1 do
-  begin
-    dbGridItensVendas.Columns[i].Title.Font.Color := clWhite;
-    dbGridItensVendas.Columns[i].Title.Font.Style := [fsBold]
-  end;
-  CentralizarColunas;
-end;
-
-procedure TfrmProVendas.CarregarRegistroSelecionado;
-begin
-  lkpProduto.KeyValue    := dtmVendas.cdsItensVendas.FieldByName('produtoId').AsInteger;
-  edtQuantidade.Value    := dtmVendas.cdsItensVendas.FieldByName('quantidade').AsFloat;
-  edtValorUnitario.Value := dtmVendas.cdsItensVendas.FieldByName('valorUnitario').AsFloat;
-  edtTotalProduto.Value  := dtmVendas.cdsItensVendas.FieldByName('valorTotalProduto').AsFloat;
-end;
-
-
-procedure TfrmProVendas.dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
-  State: TGridDrawState);
-begin
-   TFuncao.ZebrarGrid(Sender, Rect, DataCol, Column, State);
-end;
-
-procedure TfrmProVendas.dbGridItensVendasDblClick(Sender: TObject);
-begin
-  CarregarRegistroSelecionado;
-end;
-
 {$REGION 'CONFIGURAÇÕES DO GRID'}
 procedure TfrmProVendas.dbGridItensVendasDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
   Column: TColumn; State: TGridDrawState);
@@ -551,14 +477,89 @@ begin
   end;
 end;
 
+procedure TfrmProVendas.dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+begin
+   TFuncao.ZebrarGrid(Sender, Rect, DataCol, Column, State);
+end;
+
+procedure TfrmProVendas.dbGridItensVendasDblClick(Sender: TObject);
+begin
+  CarregarRegistroSelecionado;
+end;
+
 {$ENDREGION}
+
+procedure TfrmProVendas.lkpClienteClick(Sender: TObject);
+begin
+  if EstadoDoCadastro <> ecInserir then
+    Exit;
+
+  if dtmVendas.cdsItensVendas.IsEmpty then
+    Exit;
+
+  // Confirma antes de limpar, pra n surpreender o operador
+  if MessageDlg('Trocar o cliente vai limpar os itens da venda.' + #13 +
+                'Deseja continuar?', mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+  begin
+    lkpCliente.KeyValue := Null;
+    Exit;
+  end;
+
+  // Limpa tudo
+  LimparCds;
+  LimparComponenteItem;
+  edtValorTotal.Value := 0;
+end;
+
+procedure TfrmProVendas.lkpProdutoClick(Sender: TObject);
+begin
+  inherited;
+  AjustarDesign;
+end;
+
+procedure TfrmProVendas.lkpProdutoExit(Sender: TObject);
+begin
+  inherited;
+  if TDBLookupComboBox(Sender).KeyValue<>null then begin
+    edtValorUnitario.Value:=dtmVendas.QryProdutos.FieldByName('valor').AsFloat;
+    edtQuantidade.Value:=1;
+    edtTotalProduto.Value:=TotalizarProduto(edtValorUnitario.Value, edtQuantidade.Value);
+  end;
+end;
+
+procedure TfrmProVendas.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  inherited;
+  if Assigned(dtmVendas)then
+     FreeAndNil(dtmVendas);
+
+  if Assigned(oVenda) then
+     FreeAndNil(oVenda);
+end;
+
+procedure TfrmProVendas.FormCreate(Sender: TObject);
+var i:Integer;
+begin
+  inherited;
+  dtmVendas:=TdtmVendas.Create(Self);
+  oVenda:=TVenda.Create(dtmConexao.FdConexao);
+
+  IndiceAtual:='nome';
+
+  for i := 0 to dbGridItensVendas.Columns.Count - 1 do
+  begin
+    dbGridItensVendas.Columns[i].Title.Font.Color := clWhite;
+    dbGridItensVendas.Columns[i].Title.Font.Style := [fsBold]
+  end;
+  CentralizarColunas;
+end;
 
 procedure TfrmProVendas.dsListagemStateChange(Sender: TObject);
 begin
   inherited;
   ControlarBotoes;
 end;
-
 
 end.
 

@@ -293,7 +293,7 @@ object frmPrincipal: TfrmPrincipal
       Left = 41
       Top = 0
       Width = 0
-      Height = 32
+      Height = 46
       Align = alLeft
       Caption = #13#10
       Font.Charset = DEFAULT_CHARSET
@@ -303,6 +303,7 @@ object frmPrincipal: TfrmPrincipal
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
+      ExplicitHeight = 32
     end
     object imgAvatar: TImage
       Left = 0
@@ -329,7 +330,7 @@ object frmPrincipal: TfrmPrincipal
     object Label1: TLabel
       Left = 1
       Top = 7
-      Width = 85
+      Width = 890
       Height = 19
       Align = alBottom
       Alignment = taCenter
@@ -342,6 +343,7 @@ object frmPrincipal: TfrmPrincipal
       Font.Style = [fsBold]
       ParentColor = False
       ParentFont = False
+      ExplicitWidth = 85
     end
   end
   object mainPrincipal: TMainMenu

@@ -20,6 +20,7 @@ inherited frmProVendas: TfrmProVendas
       end
     end
     inherited pgcPrincipal: TPageControl
+      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
         inherited dbgrdListagem: TDBGrid
           DataSource = dsListagem
@@ -225,7 +226,7 @@ inherited frmProVendas: TfrmProVendas
               Font.Height = -11
               Font.Name = 'Tahoma'
               Font.Style = []
-              Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgRowSelect, dgAlwaysShowSelection, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+              Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
               ParentFont = False
               TabOrder = 0
               TitleFont.Charset = DEFAULT_CHARSET
@@ -333,7 +334,7 @@ inherited frmProVendas: TfrmProVendas
               Top = 12
               Width = 72
               Height = 21
-              DisplayFormat = '0.00;- ,0.00'
+              DisplayFormat = 'R$ #,##0.00'
               Enabled = False
               TabOrder = 1
             end
@@ -353,7 +354,7 @@ inherited frmProVendas: TfrmProVendas
               Width = 68
               Height = 21
               TabStop = False
-              DisplayFormat = '0.00;- ,0.00'
+              DisplayFormat = 'R$ #,##0.00'
               Enabled = False
               ParentColor = True
               ReadOnly = True
