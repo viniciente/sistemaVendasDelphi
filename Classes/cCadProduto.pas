@@ -88,10 +88,10 @@ begin
     FdConexao.StartTransaction;
     Qry.ExecSQL;
     FdConexao.Commit;
+    Result := True;
   except
-      MessageDlg('Erro ao excluir produto', mtError, [mbOK], 0);
       FdConexao.Rollback;
-      Result:=True;
+      Result := False;
   end;
 
   finally
@@ -143,7 +143,7 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-          ShowMessage('Erro técnico');
+          ShowMessage('Erro ao alterar');
           FdConexao.Rollback;
           Result := False;
     end;
@@ -189,7 +189,6 @@ begin
       Qry.ExecSQL;
       FdConexao.Commit;
     except
-          ShowMessage('Erro técnico');
           FdConexao.Rollback;
           Result := False;
     end;

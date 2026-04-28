@@ -26,6 +26,7 @@ inherited frmCadProduto: TfrmCadProduto
     end
     inherited pgcPrincipal: TPageControl
       Width = 864
+      ActivePage = tsManutencao
       ExplicitWidth = 864
       inherited tsListagem: TTabSheet
         ExplicitWidth = 856
@@ -57,19 +58,16 @@ inherited frmCadProduto: TfrmCadProduto
             item
               Expanded = False
               FieldName = 'nome'
-              Width = 143
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'descricao'
-              Width = 130
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'quantidade'
-              Width = 68
               Visible = True
             end
             item
@@ -79,7 +77,17 @@ inherited frmCadProduto: TfrmCadProduto
             end
             item
               Expanded = False
+              FieldName = 'categoriasId'
+              Visible = True
+            end
+            item
+              Expanded = False
               FieldName = 'categorias'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'fornecedor'
               Visible = True
             end>
         end
@@ -225,7 +233,7 @@ inherited frmCadProduto: TfrmCadProduto
           Height = 143
           AutoSelect = False
           AutoSize = False
-          TabOrder = 4
+          TabOrder = 2
         end
         object lkpCategoria: TDBLookupComboBox
           Left = 215
@@ -235,7 +243,7 @@ inherited frmCadProduto: TfrmCadProduto
           KeyField = 'categoriasId'
           ListField = 'descricao'
           ListSource = dtsCategoria
-          TabOrder = 2
+          TabOrder = 4
           OnClick = lkpCategoriaClick
         end
         object edtValor: TCurrencyEdit
@@ -243,7 +251,7 @@ inherited frmCadProduto: TfrmCadProduto
           Top = 304
           Width = 121
           Height = 21
-          TabOrder = 5
+          TabOrder = 3
         end
         object edtQuantidade: TCurrencyEdit
           Left = 187
@@ -261,7 +269,7 @@ inherited frmCadProduto: TfrmCadProduto
           KeyField = 'fornecedorId'
           ListField = 'nomeFantasia'
           ListSource = dsFornecedor
-          TabOrder = 3
+          TabOrder = 5
         end
         object pnlFotoProduto: TPanel
           Left = 542
@@ -381,6 +389,7 @@ inherited frmCadProduto: TfrmCadProduto
       DisplayLabel = 'Valor'
       FieldName = 'valor'
       Origin = 'valor'
+      DisplayFormat = 'R$ #,##0.00'
       Precision = 18
       Size = 5
     end

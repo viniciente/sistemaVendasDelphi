@@ -12,7 +12,8 @@ uses
   FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait,
   FireDAC.Comp.Client, FireDAC.Phys.MSSQL,
-  FireDAC.Phys.MSSQLDef, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Comp.DataSet;
+  FireDAC.Phys.MSSQLDef, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt,
+  FireDAC.Comp.DataSet, cFuncao;
 
 type
   TfrmTelaHerancaConsulta = class(TForm)
@@ -92,30 +93,7 @@ end;
 procedure TfrmTelaHerancaConsulta.grdPesquisaDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
   Column: TColumn; State: TGridDrawState);
 begin
-  // 1. Define as cores de fundo (Zebrado)
-  if not (gdSelected in State) then
-  begin
-    if Odd(TDBGrid(Sender).DataSource.DataSet.RecNo) then
-      TDBGrid(Sender).Canvas.Brush.Color := $00F2F2F2 // Cinza quase branco
-    else
-      TDBGrid(Sender).Canvas.Brush.Color := $00E1E1E1; // Cinza um pouco mais escuro
-
-    // FORÇA A COR DA FONTE para preto nas linhas normais
-    TDBGrid(Sender).Canvas.Font.Color := clBlack;
-  end
-  else
-  begin
-    // 2. Cores para a linha SELECIONADA (Fundo azul com letra branca, por exemplo)
-    TDBGrid(Sender).Canvas.Brush.Color := clHighlight; // Cor padrão de seleção do Windows
-    TDBGrid(Sender).Canvas.Font.Color := clHighlightText; // Branco padrão de seleção
-  end;
-
-  // Aplica a cor definida no fundo
-  TDBGrid(Sender).Canvas.FillRect(Rect);
-
-  // 3. Pinta o texto.
-  // O DefaultDrawColumnCell agora usará as cores de Canvas que definimos acima.
-  TDBGrid(Sender).DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  TFuncao.ZebrarGrid(Sender, Rect, DataCol, Column, State);
 end;
 
 procedure TfrmTelaHerancaConsulta.grdPesquisaKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);

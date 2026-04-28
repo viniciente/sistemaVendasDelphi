@@ -8,6 +8,10 @@ inherited frmCadCliente: TfrmCadCliente
       inherited dbnvgrNavigator: TDBNavigator
         Hints.Strings = ()
       end
+      inherited btnGravar: TBitBtn
+        Left = 245
+        ExplicitLeft = 245
+      end
     end
     inherited pgcPrincipal: TPageControl
       ActivePage = tsManutencao
@@ -32,6 +36,7 @@ inherited frmCadCliente: TfrmCadCliente
               Top = 0
               Width = 20
               Height = 20
+              Cursor = crHandPoint
               Center = True
               Picture.Data = {
                 07544269746D617036030000424D360300000000000036000000280000001000
@@ -68,6 +73,7 @@ inherited frmCadCliente: TfrmCadCliente
               Top = 4
               Width = 35
               Height = 13
+              Cursor = crHandPoint
               Caption = 'ATIVO'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -75,12 +81,14 @@ inherited frmCadCliente: TfrmCadCliente
               Font.Name = 'Tahoma'
               Font.Style = [fsBold]
               ParentFont = False
+              OnClick = lblStatusAtivoClick
             end
             object Image2: TImage
               Left = 71
               Top = 1
               Width = 20
               Height = 20
+              Cursor = crHandPoint
               Center = True
               Picture.Data = {
                 07544269746D617036030000424D360300000000000036000000280000001000
@@ -117,6 +125,7 @@ inherited frmCadCliente: TfrmCadCliente
               Top = 1
               Width = 20
               Height = 20
+              Cursor = crHandPoint
               Center = True
               Picture.Data = {
                 07544269746D617036030000424D360300000000000036000000280000001000
@@ -153,6 +162,7 @@ inherited frmCadCliente: TfrmCadCliente
               Top = 1
               Width = 20
               Height = 20
+              Cursor = crHandPoint
               Center = True
               Picture.Data = {
                 07544269746D617036030000424D360300000000000036000000280000001000
@@ -189,6 +199,7 @@ inherited frmCadCliente: TfrmCadCliente
               Top = 1
               Width = 20
               Height = 20
+              Cursor = crHandPoint
               Center = True
               Picture.Data = {
                 07544269746D617036030000424D360300000000000036000000280000001000
@@ -225,6 +236,7 @@ inherited frmCadCliente: TfrmCadCliente
               Top = 4
               Width = 67
               Height = 13
+              Cursor = crHandPoint
               Caption = 'BLOQUEADO'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -232,12 +244,14 @@ inherited frmCadCliente: TfrmCadCliente
               Font.Name = 'Tahoma'
               Font.Style = [fsBold]
               ParentFont = False
+              OnClick = lblStatusBloqueadoClick
             end
             object lblStatusAtencao: TLabel
               Left = 191
               Top = 4
               Width = 51
               Height = 13
+              Cursor = crHandPoint
               Caption = 'ATEN'#199#195'O'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -245,12 +259,14 @@ inherited frmCadCliente: TfrmCadCliente
               Font.Name = 'Tahoma'
               Font.Style = [fsBold]
               ParentFont = False
+              OnClick = lblStatusAtencaoClick
             end
             object lblStatusInativo: TLabel
               Left = 266
               Top = 4
               Width = 47
               Height = 13
+              Cursor = crHandPoint
               Caption = 'INATIVO'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -258,12 +274,14 @@ inherited frmCadCliente: TfrmCadCliente
               Font.Name = 'Tahoma'
               Font.Style = [fsBold]
               ParentFont = False
+              OnClick = lblStatusInativoClick
             end
             object lblStatusProspecto: TLabel
               Left = 340
               Top = 4
               Width = 65
               Height = 13
+              Cursor = crHandPoint
               Caption = 'PROSPECTO'
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
@@ -271,6 +289,7 @@ inherited frmCadCliente: TfrmCadCliente
               Font.Name = 'Tahoma'
               Font.Style = [fsBold]
               ParentFont = False
+              OnClick = lblStatusProspectoClick
             end
           end
         end
@@ -289,7 +308,52 @@ inherited frmCadCliente: TfrmCadCliente
             end
             item
               Expanded = False
+              FieldName = 'endereco'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'cidade'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'bairro'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'estado'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'cep'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'telefone'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'email'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'dataNascimento'
+              Visible = True
+            end
+            item
+              Expanded = False
               FieldName = 'statusId'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'pessoaId'
               Visible = True
             end
             item
@@ -546,12 +610,13 @@ inherited frmCadCliente: TfrmCadCliente
           Width = 21
           Height = 21
           BevelOuter = bvNone
+          BorderStyle = bsSingle
           TabOrder = 14
           object imgStatus: TImage
             Left = 0
             Top = 0
-            Width = 21
-            Height = 21
+            Width = 17
+            Height = 17
             Align = alClient
             Center = True
             Proportional = True
@@ -993,7 +1058,6 @@ inherited frmCadCliente: TfrmCadCliente
       DisplayLabel = 'Documento'
       FieldName = 'cpf_cnpj'
       Origin = 'cpf_cnpj'
-      OnGetText = FDQuery1cpf_cnpjGetText
     end
     object FDQuery1numero: TStringField
       DisplayLabel = 'Numero'

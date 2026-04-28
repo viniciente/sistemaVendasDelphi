@@ -7,7 +7,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UTelaHeranca, Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
   FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf, FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.Grids, Vcl.DBGrids, Vcl.StdCtrls, Vcl.Mask, Vcl.ComCtrls, Vcl.DBCtrls,
-  Vcl.ExtCtrls, cCadUsuario, uEnum, uDtmnConexao, Vcl.Buttons, cAcaoAcesso,cFuncao, Vcl.Menus, Vcl.Imaging.jpeg;
+  Vcl.ExtCtrls, cCadUsuario, uEnum, uDtmnConexao, Vcl.Buttons, cAcaoAcesso,cFuncao, Vcl.Menus, Vcl.Imaging.jpeg,
+  uFuncaoCriptografia;
 
 type
   TfrmCadUsuario = class(TfrmTelaHeranca)
@@ -148,40 +149,27 @@ end;
 
 procedure TfrmCadUsuario.btnGravarClick(Sender: TObject);
 begin
-  //verifica se ja n existe esse usuario
   if (EstadoDoCadastro = ecInserir) and oUsuario.UsuarioExiste(edtNome.Text) then
   begin
-    MessageDlg('Usuário já cadastrado', mtInformation, [mbok], 0);
+    MessageDlg('Usuário já cadastrado', mtInformation, [mbOk], 0);
     edtNome.SetFocus;
-    abort;
+    Abort;
   end;
 
-  //atribui o id
   if edtUsuarioId.Text <> EmptyStr then
     oUsuario.codigo := StrToInt(edtUsuarioId.Text)
   else
     oUsuario.codigo := 0;
 
-  //pega o campo nome e senha
-  oUsuario.nome  := edtNome.Text;
-  oUsuario.senha := edtSenha.Text;
+  oUsuario.nome     := edtNome.Text;
+  oUsuario.status := lkpStatusUsuario.KeyValue;
+  oUsuario.foto.Assign(imgImagem.Picture.Graphic);
 
-    if lkpStatusUsuario.KeyValue <> Null then
-    oUsuario.status := lkpStatusUsuario.KeyValue
-  else
-    oUsuario.status:= 1;
-
-  //pega a foto caso tenha
-  if (imgImagem.Picture.Graphic <> nil) and (not imgImagem.Picture.Graphic.Empty) then
-  begin
-    // Se tem imagem no componente, passa para o objeto
-    oUsuario.foto.Assign(imgImagem.Picture.Graphic);
-  end
-  else
-  begin
-    // Se a imagem estiver vazia no componente, limpa o objeto oUsuario.foto
-    oUsuario.foto.Assign(nil);
-  end;
+  // Só atualiza a senha se o campo estiver visível e preenchido
+  // No Alterar, o campo está oculto — mantém a senha que veio do banco
+  if edtSenha.Visible and (edtSenha.Text <> '') then
+    oUsuario.senha := Criptografar(edtSenha.Text);
+  // Se não, oUsuario.senha já tem o hash correto vindo do Selecionar
 
   inherited;
 end;

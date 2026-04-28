@@ -1,0 +1,760 @@
+﻿unit uCadCliente;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UTelaHeranca, Data.DB, FireDAC.Stan.Intf,
+  FireDAC.Stan.Option, FireDAC.Stan.Param,
+  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.ExtCtrls, Vcl.Grids,
+  Vcl.DBGrids, Vcl.StdCtrls, Vcl.Mask, Vcl.ComCtrls,
+  Vcl.DBCtrls, RxToolEdit, cCadCliente, uEnum, uDtmnConexao, Vcl.Buttons,
+  System.ImageList, Vcl.ImgList, System.Net.HttpClient, System.Net.HttpClientComponent,
+  System.JSON, System.RegularExpressions, System.Character;
+
+type
+  TfrmCadCliente = class(TfrmTelaHeranca)
+    qryStatus: TFDQuery;
+    dsStatus: TDataSource;
+    qryPessoa: TFDQuery;
+    dsPessoa: TDataSource;
+    qryPessoapessoaId: TFDAutoIncField;
+    qryPessoadescricao: TStringField;
+    qryStatusstatusId: TFDAutoIncField;
+    qryStatusdescricao: TStringField;
+    imglStatus: TImageList;
+    edtClienteId: TEdit;
+    edtNome: TEdit;
+    edtEmail: TEdit;
+    edtCEP: TEdit;
+    edtEndereco: TEdit;
+    edtBairro: TEdit;
+    edtCidade: TEdit;
+    edtNumero: TEdit;
+    edtEstado: TEdit;
+    edtTelefone: TEdit;
+    edtDataNascimento: TDateEdit;
+    edtCPFCNPJ: TEdit;
+    lkpPessoa: TDBLookupComboBox;
+    lpkStatus: TDBLookupComboBox;
+    lblCPFCNPJ: TLabel;
+    lblCodigo: TLabel;
+    lblNome: TLabel;
+    lblEmail: TLabel;
+    lblCEP: TLabel;
+    lblEndereco: TLabel;
+    lblBairro: TLabel;
+    lblCidade: TLabel;
+    lblEstado: TLabel;
+    lblNumero: TLabel;
+    lblTelefone: TLabel;
+    lblTipoPessoa: TLabel;
+    lblStatus: TLabel;
+    lblData: TLabel;
+    FDQuery1clienteId: TFDAutoIncField;
+    FDQuery1nome: TStringField;
+    FDQuery1endereco: TStringField;
+    FDQuery1cidade: TStringField;
+    FDQuery1bairro: TStringField;
+    FDQuery1estado: TStringField;
+    FDQuery1cep: TStringField;
+    FDQuery1telefone: TStringField;
+    FDQuery1email: TStringField;
+    FDQuery1dataNascimento: TSQLTimeStampField;
+    FDQuery1statusId: TIntegerField;
+    FDQuery1pessoaId: TIntegerField;
+    FDQuery1cpf_cnpj: TStringField;
+    FDQuery1numero: TStringField;
+    FDQuery1status: TStringField;
+    FDQuery1tipoPessoa: TStringField;
+    Panel1: TPanel;
+    Image1: TImage;
+    lblStatusAtivo: TLabel;
+    Image2: TImage;
+    Image3: TImage;
+    Image4: TImage;
+    Image5: TImage;
+    lblStatusBloqueado: TLabel;
+    lblStatusAtencao: TLabel;
+    lblStatusInativo: TLabel;
+    lblStatusProspecto: TLabel;
+    pnlImage: TPanel;
+    imgStatus: TImage;
+    procedure FormCreate(Sender: TObject);
+    procedure btnNovoClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure btnAlterarClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
+    procedure lkpPessoaClick(Sender: TObject);
+    procedure edtCPFCNPJChange(Sender: TObject);
+    procedure edtTelefoneChange(Sender: TObject);
+    procedure dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+      State: TGridDrawState);
+    procedure dsListagemStateChange(Sender: TObject);
+    procedure edtCEPExit(Sender: TObject);
+    procedure edtCEPKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure btnPesquisarClick(Sender: TObject);
+    procedure fdqry1cepGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+    procedure fdqry1telefoneGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+    procedure fdqry1cpf_cnpjGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+    procedure edtNumeroChange(Sender: TObject);
+    procedure edtNomeKeyPress(Sender: TObject; var Key: Char);
+    procedure edtCEPKeyPress(Sender: TObject; var Key: Char);
+    procedure edtNumeroKeyPress(Sender: TObject; var Key: Char);
+    procedure edtTelefoneKeyPress(Sender: TObject; var Key: Char);
+    procedure edtCPFCNPJKeyPress(Sender: TObject; var Key: Char);
+    procedure Image1Click(Sender: TObject);
+    procedure Image2Click(Sender: TObject);
+    procedure Image3Click(Sender: TObject);
+    procedure Image4Click(Sender: TObject);
+    procedure Image5Click(Sender: TObject);
+    procedure FDQuery1cepGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+    procedure FDQuery1telefoneGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+    procedure edtCEPChange(Sender: TObject);
+    procedure dsListagemDataChange(Sender: TObject; Field: TField);
+    procedure lpkStatusClick(Sender: TObject);
+    procedure btnFecharClick(Sender: TObject);
+  private
+    { Private declarations }
+    oCliente:TCliente;
+    function Apagar:Boolean; override;
+    function Gravar(EstadoDoCadastro:TEstadoDoCadastro):Boolean; override;
+    function FormatarCEP(const Value: string):string;
+    function EmailValido(const Email: string): Boolean;
+    procedure FiltrarPorStatus(AStatusID: Integer);
+  public
+    { Public declarations }
+    FdConexao: TFDConnection;
+  end;
+
+var
+  frmCadCliente: TfrmCadCliente;
+
+implementation
+
+uses cFuncao;
+
+{$R *.dfm}
+
+{$REGION 'Override'}
+function TfrmCadCliente.Apagar: Boolean;
+begin
+  if oCliente.Selecionar(FDQuery1.FieldByName('clienteId').AsInteger)then begin
+     Result:=oCliente.Apagar;
+  end;
+end;
+
+function TfrmCadCliente.Gravar(EstadoDoCadastro: TEstadoDoCadastro): Boolean;
+var
+  vDocLimpo: string;
+begin
+  //remove a formatação do texto, (ponto, traço, barra)
+  vDocLimpo := TFuncao.SomenteNumeros(edtCPFCNPJ.Text);
+
+  //Validação do cpf
+  if lkpPessoa.KeyValue = 1 then // Pessoa Física
+  begin
+    if not TFuncao.ValidarCPF(vDocLimpo) then
+    begin
+      MessageDlg('CPF Inválido! Por favor, verifique os números.', mtError, [mbOK], 0);
+      edtCPFCNPJ.SetFocus;
+      Result := False;
+      Exit;
+    end;
+  end
+  //validação do CNPJ
+  else if lkpPessoa.KeyValue = 2 then // Pessoa Jurídica
+  begin
+    if not TFuncao.ValidarCNPJ(vDocLimpo) then
+    begin
+      MessageDlg('CNPJ Inválido! Por favor, verifique os números.', mtError, [mbOK], 0);
+      edtCPFCNPJ.SetFocus;
+      Result := False;
+      Exit;
+    end;
+  end;
+
+  //verifica se o campos do email esta vazio ou n
+  if (edtEmail.Text <> '') and (not EmailValido(edtEmail.Text)) then
+  begin
+    edtEmail.SetFocus;
+    Abort; // Para a execução e não grava
+  end;
+
+  // Se o código chegou aqui, significa que o CPF/CNPJ é válido.
+
+  // Tratamento do ID
+  if edtClienteId.Text <> EmptyStr then
+    oCliente.codigo := StrToInt(edtClienteId.Text)
+  else
+    oCliente.codigo := 0;
+
+  // Atribuição de campos de texto
+  oCliente.nome           := edtNome.Text;
+  oCliente.endereco       := edtEndereco.Text;
+  oCliente.estado         := edtEstado.Text;
+  oCliente.bairro         := edtBairro.Text;
+  oCliente.cidade         := edtCidade.Text;
+  oCliente.email          := edtEmail.Text;
+  oCliente.dataNascimento := edtDataNascimento.Date;
+  oCliente.numero         := TFuncao.SomenteNumeros(edtNumero.Text);
+
+  oCliente.cep      := TFuncao.SomenteNumeros(edtCEP.Text);
+  oCliente.telefone := TFuncao.SomenteNumeros(edtTelefone.Text);
+  oCliente.cpf_cnpj := vDocLimpo; // Já usamos a variável que limpamos lá no topo
+
+  // Uso do tipo pessoa
+  if lkpPessoa.KeyValue <> null then
+    oCliente.pessoaId := lkpPessoa.KeyValue
+  else
+    oCliente.pessoaId := 1;
+
+  // Uso do status
+  if lpkStatus.KeyValue <> Null then
+    oCliente.statusId := lpkStatus.KeyValue
+  else
+    oCliente.statusId := 1;
+
+  // Execução da gravação
+  if (EstadoDoCadastro = ecInserir) then
+    Result := oCliente.Inserir
+  else if (EstadoDoCadastro = ecAlterar) then
+    Result := oCliente.Atualizar;
+end;
+
+procedure TfrmCadCliente.Image1Click(Sender: TObject);
+begin
+  FiltrarPorStatus(1);
+end;
+
+procedure TfrmCadCliente.Image2Click(Sender: TObject);
+begin
+  FiltrarPorStatus(2);
+end;
+
+procedure TfrmCadCliente.Image3Click(Sender: TObject);
+begin
+  FiltrarPorStatus(3);
+end;
+
+procedure TfrmCadCliente.Image4Click(Sender: TObject);
+begin
+  FiltrarPorStatus(4);
+end;
+
+procedure TfrmCadCliente.Image5Click(Sender: TObject);
+begin
+  FiltrarPorStatus(5);
+end;
+
+procedure TfrmCadCliente.FDQuery1cepGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+begin
+  Text := TFuncao.FormatarCEP(Sender.AsString);
+end;
+
+procedure TfrmCadCliente.FDQuery1telefoneGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+begin
+  Text := TFuncao.FormatarTelefone(Sender.AsString);
+end;
+
+procedure TfrmCadCliente.FiltrarPorStatus(AStatusID: Integer);
+var
+  SQLBase, SQLFinal: string;
+  PosOrder: Integer;
+begin
+  // Pega o SelectOriginal da herança (já preenchido no FormShow)
+  SQLBase := SelectOriginal;
+
+  // Remove o ORDER BY para poder adicionar WHERE antes
+  PosOrder := Pos('order by', LowerCase(SQLBase));
+  if PosOrder > 0 then
+    SQLBase := Trim(Copy(SQLBase, 1, PosOrder - 1));
+
+  // Monta SQL com filtro
+  SQLFinal := SQLBase + ' WHERE cl.statusId = ' + IntToStr(AStatusID)
+            + ' ORDER BY cl.nome';
+
+  //fecha a query
+  FDQuery1.Close;
+  FDQuery1.SQL.Text := SQLFinal;
+  try
+    FDQuery1.Open;
+  except
+    //caso de erro, mostra a imagem
+    ShowMessage('Erro ao pesquisar');
+  end;
+
+  //volta para a pagina de listagem
+  pgcPrincipal.ActivePage := tsListagem;
+  lblIndice.Caption := 'Filtrado por Status';
+end;
+
+{$ENDREGION}
+
+{$REGION'BTNS"}
+procedure TfrmCadCliente.btnAlterarClick(Sender: TObject);
+begin
+  if oCliente.Selecionar(FDQuery1.FieldByName('clienteId').AsInteger) then
+  begin
+    edtClienteId.Text          := IntToStr(oCliente.codigo);
+    edtNome.Text               := oCliente.nome;
+    edtEstado.Text             := oCliente.estado;
+    edtEndereco.Text           := oCliente.endereco;
+    edtBairro.Text             := oCliente.bairro;
+    edtCidade.Text             := oCliente.cidade;
+    edtEmail.Text              := oCliente.email;
+    edtDataNascimento.Date     := oCliente.dataNascimento;
+    edtNumero.Text             := oCliente.numero;
+
+    edtCEP.Text      := oCliente.cep;
+    edtCEPChange(edtCEP);
+
+    edtTelefone.Text := oCliente.telefone;
+    edtTelefoneChange(edtTelefone);
+
+    lkpPessoa.KeyValue := oCliente.pessoaId;
+    edtCPFCNPJ.Text  := oCliente.cpf_cnpj;
+    edtCPFCNPJChange(edtCPFCNPJ);
+
+    lpkStatus.KeyValue := oCliente.statusId;
+    lpkStatusClick(lpkStatus);
+  end
+  else
+  begin
+    btnCancelar.Click;
+    Abort;
+  end;
+  inherited;
+end;
+
+procedure TfrmCadCliente.btnFecharClick(Sender: TObject);
+begin
+Self.ModalResult := mrCancel;
+end;
+
+procedure TfrmCadCliente.btnNovoClick(Sender: TObject);
+begin
+  inherited;
+  edtDataNascimento.Date:=Date;
+  pgcPrincipal.ActivePage := tsManutencao;
+  imgStatus.Picture := nil;
+  if edtNome.CanFocus then
+    edtNome.SetFocus;
+end;
+
+procedure TfrmCadCliente.btnPesquisarClick(Sender: TObject);
+begin
+  inherited;
+end;
+
+{$ENDREGION}
+
+{$REGION 'GRID'}
+procedure TfrmCadCliente.dbgrdListagemDrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+var
+  vStatusID: Integer;
+begin
+  inherited;
+  //verifica se a coluna é do Id
+  if Column.FieldName = 'statusId' then
+  begin
+    //Limpeza
+    TDBGrid(Sender).Canvas.FillRect(Rect);
+
+    //Pega o valor do Id
+    vStatusID := Column.Field.AsInteger;
+
+    //ajusta id com a imgem
+    vStatusID := vStatusID - 1;
+
+    //deixa a imagem centralizada
+    if (vStatusID >= 0) and (vStatusID < imglStatus.Count) then
+      imglStatus.Draw(TDBGrid(Sender).Canvas,
+                     Rect.Left + (Rect.Width div 2) - 8,
+                     Rect.Top + (Rect.Height div 2) - 8,
+                     vStatusID);
+  end;
+end;
+
+procedure TfrmCadCliente.dsListagemDataChange(Sender: TObject; Field: TField);
+begin
+  lpkStatusClick(lpkStatus);
+end;
+
+procedure TfrmCadCliente.dsListagemStateChange(Sender: TObject);
+begin
+  inherited;
+  ControlarBotoes;
+end;
+
+{$ENDREGION}
+
+{$REGION'EDT E LKP'}
+
+procedure TfrmCadCliente.edtCEPChange(Sender: TObject);
+var
+  Edit: TEdit;
+begin
+  Edit := TEdit(Sender);
+
+  Edit.OnChange := nil;
+  try
+    Edit.MaxLength := 9;
+
+    Edit.Text := TFuncao.FormatarCEP(Edit.Text);
+
+    Edit.SelStart := Length(Edit.Text);
+  finally
+    Edit.OnChange := edtCEPChange;
+  end;
+end;
+
+procedure TfrmCadCliente.edtCEPExit(Sender: TObject);
+var
+  HTTP: THTTPClient;
+  Response: IHTTPResponse;
+  JSONObj: TJSONObject;
+  CEP, URL: string;
+begin
+  CEP := Trim(edtCEP.Text);
+  // Limpa máscara (deixa só números)
+  CEP := StringReplace(CEP, '-', '', [rfReplaceAll]);
+  CEP := StringReplace(CEP, '.', '', [rfReplaceAll]);
+
+  if Length(CEP) <> 8 then Exit;
+
+  URL := 'https://viacep.com.br/ws/' + CEP + '/json/';
+  HTTP := THTTPClient.Create;
+  try
+    try
+      Response := HTTP.Get(URL);
+
+      if Response.StatusCode = 200 then
+      begin
+        JSONObj := TJSONObject.ParseJSONValue(Response.ContentAsString) as TJSONObject;
+        try
+          if Assigned(JSONObj) then
+          begin
+            // A API do ViaCEP retorna "erro: true" se o CEP for válido mas não existir
+            if JSONObj.GetValue('erro') <> nil then
+            begin
+              ShowMessage('CEP não encontrado!');
+              Exit;
+            end;
+
+            // Preenche os campos (Use os nomes dos seus componentes aqui)
+            edtEndereco.Text := JSONObj.GetValue('logradouro').Value;
+            edtBairro.Text   := JSONObj.GetValue('bairro').Value;
+            edtCidade.Text   := JSONObj.GetValue('localidade').Value;
+            edtEstado.Text  := JSONObj.GetValue('uf').Value;
+
+            //edtNumero.SetFocus;
+
+          end;
+        finally
+          JSONObj.Free;
+        end;
+      end;
+    except
+      on E: Exception do
+        ShowMessage('Falha ao conectar com ViaCEP: ' + E.Message);
+    end;
+  finally
+    HTTP.Free;
+  end;
+end;
+
+procedure TfrmCadCliente.edtCEPKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  // if not (Key in ['0'..'9', #8, #3, #22]) then Key := #0;
+end;
+
+procedure TfrmCadCliente.edtCEPKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  TextoFormatado: string;
+begin
+  // Ignora teclas de controle (setas, backspace, etc) para não atrapalhar a navegação
+  if Key in [VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN, VK_BACK, VK_DELETE, VK_TAB, VK_RETURN] then
+    Exit;
+
+  // Aplica a formatação
+  TextoFormatado := FormatarCEP(TEdit(Sender).Text);
+
+  // Atualiza o texto do campo
+  TEdit(Sender).Text := TextoFormatado;
+
+  // Joga o cursor sempre para o final do texto
+  TEdit(Sender).SelStart := Length(TextoFormatado);
+end;
+
+procedure TfrmCadCliente.edtCPFCNPJChange(Sender: TObject);
+var
+  Edit: TEdit;
+begin
+  Edit := TEdit(Sender);
+  Edit.OnChange := nil;
+  try
+    if lkpPessoa.KeyValue = 1 then
+    begin
+      Edit.MaxLength := 14;
+      Edit.Text := TFuncao.FormatarCPF(Edit.Text);
+    end
+    else if lkpPessoa.KeyValue = 2 then
+    begin
+      Edit.MaxLength := 18;
+      Edit.Text := TFuncao.FormatarCNPJ(Edit.Text);
+    end;
+
+    Edit.SelStart := Length(Edit.Text);
+  finally
+    Edit.OnChange := edtCPFCNPJChange;
+  end;
+end;
+
+procedure TfrmCadCliente.edtCPFCNPJKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not (Key in ['0'..'9', #8, #3, #22]) then Key := #0;
+end;
+
+procedure TfrmCadCliente.edtNomeKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not (IsLetter(Key) or (Key = #8) or (Key = #32) or (Key = #3) or (Key = #22)) then
+  begin
+    Key := #0;
+  end;
+  // se não for uma letra entre a ... z ou backspace (#8) não digita nada
+end;
+
+procedure TfrmCadCliente.edtNumeroChange(Sender: TObject);
+var
+  TextoLimpo: string;
+begin
+  inherited;
+   TextoLimpo := TFuncao.SomenteNumeros(TEdit(Sender).Text);
+end;
+
+procedure TfrmCadCliente.edtNumeroKeyPress(Sender: TObject; var Key: Char);
+begin
+   if not (Key in ['0'..'9', #8, #3, #22]) then Key := #0;
+end;
+
+procedure TfrmCadCliente.edtTelefoneChange(Sender: TObject);
+var
+  TextoLimpo: string;
+  Tam: Integer;
+begin
+  TextoLimpo := TFuncao.SomenteNumeros(TEdit(Sender).Text);
+  Tam := Length(TextoLimpo);
+
+  TEdit(Sender).OnChange := nil;
+  try
+    TEdit(Sender).MaxLength := 15;
+
+    // 0800 / 0400 (Iniciando com 0)
+    if (Tam > 0) and (TextoLimpo[1] = '0') then
+    begin
+      if Tam <= 4 then
+        TEdit(Sender).Text := TextoLimpo
+      else if Tam <= 7 then
+        TEdit(Sender).Text := Copy(TextoLimpo, 1, 4) + ' ' + Copy(TextoLimpo, 5, 3)
+      else
+        TEdit(Sender).Text := Copy(TextoLimpo, 1, 4) + ' ' + Copy(TextoLimpo, 5, 3) + ' ' + Copy(TextoLimpo, 8, 4);
+    end
+
+    //CELULAR (11 dígitos)
+    else if (Tam = 11) then
+    begin
+      TEdit(Sender).Text := '(' + Copy(TextoLimpo, 1, 2) + ')' + Copy(TextoLimpo, 3, 5) + '-' + Copy(TextoLimpo, 8, 4);
+    end
+
+    //FIXO (Até 10 dígitos)
+    else
+    begin
+      if Tam <= 2 then
+        TEdit(Sender).Text := TextoLimpo
+      else if Tam <= 6 then
+        TEdit(Sender).Text := '(' + Copy(TextoLimpo, 1, 2) + ')' + Copy(TextoLimpo, 3, 4)
+      else
+        TEdit(Sender).Text := '(' + Copy(TextoLimpo, 1, 2) + ')' + Copy(TextoLimpo, 3, 4) + '-' + Copy(TextoLimpo, 7, 4);
+    end;
+
+    TEdit(Sender).SelStart := Length(TEdit(Sender).Text);
+
+  finally
+    TEdit(Sender).OnChange := edtTelefoneChange;
+  end;
+end;
+
+procedure TfrmCadCliente.edtTelefoneKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+  if not (Key in ['0'..'9', #8, #3, #22]) then Key := #0;
+end;
+
+procedure TfrmCadCliente.fdqry1cepGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+begin
+  if Length(Trim(Sender.AsString)) = 8 then
+    Text := Copy(Sender.AsString, 1, 5) + '-' + Copy(Sender.AsString, 6, 3)
+  else
+    Text := Sender.AsString;
+end;
+
+procedure TfrmCadCliente.fdqry1cpf_cnpjGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+var
+  V: string;
+begin
+  V := Trim(Sender.AsString);
+  if Length(V) = 11 then // CPF
+    Text := Copy(V, 1, 3) + '.' + Copy(V, 4, 3) + '.' + Copy(V, 7, 3) + '-' + Copy(V, 10, 2)
+  else if Length(V) = 14 then // CNPJ
+    Text := Copy(V, 1, 2) + '.' + Copy(V, 3, 3) + '.' + Copy(V, 6, 3) + '/' + Copy(V, 9, 4) + '-' + Copy(V, 13, 2)
+  else
+    Text := V;
+end;
+
+procedure TfrmCadCliente.fdqry1telefoneGetText(Sender: TField; var Text: string; DisplayText: Boolean);
+var
+  V: string;
+begin
+
+  V := Trim(Sender.AsString);
+
+  //Formato 0800: 0800 000 0000 (11 dígitos começando com 0)
+  if (Length(V) = 11) and (V[1] = '0') then
+    Text := Copy(V, 1, 4) + ' ' + Copy(V, 5, 3) + ' ' + Copy(V, 8, 4)
+
+  //Celular comum com 9º dígito: (11) 98888-7777 (11 dígitos)
+  else if (Length(V) = 11) then
+    Text := '(' + Copy(V, 1, 2) + ') ' + Copy(V, 3, 5) + '-' + Copy(V, 8, 4)
+
+  //Telefone Fixo: (11) 3333-4444 (10 dígitos)
+  else if (Length(V) = 10) then
+    Text := '(' + Copy(V, 1, 2) + ') ' + Copy(V, 3, 4) + '-' + Copy(V, 7, 4)
+
+  else
+    Text := V; // Caso não se encaixe em nenhum, mostra o número puro
+end;
+
+procedure TfrmCadCliente.lkpPessoaClick(Sender: TObject);
+begin
+  edtCPFCNPJ.Clear; //limpa o campo para não ficar com numero caso mude de pessoa
+
+  if lkpPessoa.KeyValue <> null then
+  begin
+    if lkpPessoa.KeyValue = 1 then
+    begin
+      lblCPFCNPJ.Caption := 'CPF';
+    end
+    else
+    begin
+      lblCPFCNPJ.Caption := 'CNPJ'
+    end;
+  end;
+
+  edtCPFCNPJ.SetFocus; //foco fica no edit pra começar a digitar
+end;
+
+procedure TfrmCadCliente.lpkStatusClick(Sender: TObject);
+var
+  iStatusID: Integer;
+  R: TRect;
+begin
+  if VarIsNull(lpkStatus.KeyValue) then
+  begin
+    imgStatus.Picture := nil;
+    Exit;
+  end;
+
+  iStatusID := lpkStatus.KeyValue;
+
+  if (iStatusID >= 1) and (iStatusID <= imglStatus.Count) then
+  begin
+    // Prepara o Bitmap
+    imgStatus.Picture.Bitmap.SetSize(imgStatus.Width, imgStatus.Height);
+
+    // Se o imgStatus estiver dentro de um Panel1, ele usará a cor do Panel1
+    imgStatus.Picture.Bitmap.Canvas.Brush.Color := Self.Color;
+
+    R := Rect(0, 0, imgStatus.Width, imgStatus.Height);
+    imgStatus.Picture.Bitmap.Canvas.FillRect(R);
+
+    //Desenha a bolinha centralizada
+    imglStatus.Draw(imgStatus.Picture.Bitmap.Canvas,
+                    (imgStatus.Width  div 2) - (imglStatus.Width  div 2),
+                    (imgStatus.Height div 2) - (imglStatus.Height div 2),
+                    iStatusID - 1);
+  end
+  else
+    imgStatus.Picture := nil;
+end;
+
+{$ENDREGION}
+
+{$REGION 'FUCTION FORMATARCEP'}
+function TfrmCadCliente.FormatarCEP(const Value: string): string;
+var
+  S: string;
+  i: Integer;
+begin
+  // Remove tudo que não for número
+  S := '';
+  for i := 1 to Length(Value) do
+    if Value[i] in ['0'..'9'] then
+      S := S + Value[i];
+
+  // limita a 8 digitos
+  if Length(S) > 8 then
+    S := Copy(S, 1, 8);
+
+  //mascara
+  if Length(S) > 5 then
+    Insert('-', S, 6);
+
+  Result := S;
+end;
+
+{$ENDREGION}
+
+ function TfrmCadCliente.EmailValido(const Email: string): Boolean;
+var
+  RegEx: TRegEx;
+begin
+  // Esse padrão verifica se tem letras, @, ponto e se termina com um domínio
+  Result := TRegEx.IsMatch(Email, '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+end;
+
+
+procedure TfrmCadCliente.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  inherited;
+  if Assigned(oCliente) then
+     FreeAndNil(oCliente);
+end;
+
+procedure TfrmCadCliente.FormCreate(Sender: TObject);
+begin
+  inherited;
+  FDQuery1.Connection := dtmConexao.FDConexao;
+  oCliente:=TCliente.Create(dtmConexao.FdConexao);
+  IndiceAtual:= 'nome';
+end;
+
+procedure TfrmCadCliente.FormShow(Sender: TObject);
+begin
+  inherited;
+
+  //força a abertura das qry
+  qryStatus.Close;
+  qryStatus.Open;
+
+  qryPessoa.Close;
+  qryPessoa.Open;
+end;
+
+end.

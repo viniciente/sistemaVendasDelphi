@@ -63,6 +63,8 @@ type
     procedure lkpProdutoClick(Sender: TObject);
 
     procedure btnIncluirClientesClick(Sender: TObject);
+    procedure dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+      State: TGridDrawState);
 
   private
     { Private declarations }
@@ -70,6 +72,7 @@ type
     oVenda:TVenda;
     function Gravar(EstadoDoCadastro :TEstadoDoCadastro): Boolean; override;
     function Apagar:Boolean; override;
+    procedure ControlarBotoes; override;
     function TotalizarProduto(valorUnitario, Quantidade: Double): Double;
     procedure LimparCds;
     procedure LimparComponenteItem;
@@ -169,6 +172,30 @@ begin
   Result := True;
 end;
 
+procedure TfrmProVendas.ControlarBotoes;
+var
+  EditandoOuInserindo: Boolean;
+  TemDados: Boolean;
+begin
+  // Na tela de vendas, o estado vem do EstadoDoCadastro
+  // não do FDQuery1, pois o FDQuery1 é só a listagem
+  EditandoOuInserindo := EstadoDoCadastro in [ecInserir, ecAlterar];
+  TemDados := not FDQuery1.IsEmpty;
+
+  btnNovo.Enabled     := not EditandoOuInserindo;
+  btnAlterar.Enabled  := (not EditandoOuInserindo) and TemDados;
+  btnApagar.Enabled   := (not EditandoOuInserindo) and TemDados;
+  btnGravar.Enabled   := EditandoOuInserindo;
+  btnCancelar.Enabled := EditandoOuInserindo;
+
+  dbnvgrNavigator.Enabled  := not EditandoOuInserindo;
+  pgcPrincipal.Pages[0].TabVisible := not EditandoOuInserindo;
+
+  if EditandoOuInserindo then
+    pgcPrincipal.ActivePageIndex := 1
+  else
+    pgcPrincipal.ActivePageIndex := 0;
+end;
 
 procedure TfrmProVendas.lkpClienteClick(Sender: TObject);
 begin
@@ -236,12 +263,21 @@ begin
 end;
 
 procedure TfrmProVendas.btnIncluirClientesClick(Sender: TObject);
+var
+  vEstadoAnterior: TEstadoDoCadastro;
 begin
-  inherited;
+  vEstadoAnterior := EstadoDoCadastro;
+
   TFuncao.CriarForm(TfrmCadCliente, oUsuarioLogado, dtmConexao.FDConexao);
+  EstadoDoCadastro := vEstadoAnterior;
   FDQuery1.Refresh;
+  ControlarBotoes;
 
   pgcPrincipal.ActivePage := tsManutencao;
+
+  // Devolve o foco pro lookup de cliente
+  if lkpCliente.CanFocus then
+    lkpCliente.SetFocus;
 end;
 
 procedure TfrmProVendas.btnNovoClick(Sender: TObject);
@@ -469,12 +505,18 @@ begin
 end;
 
 
+procedure TfrmProVendas.dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+  State: TGridDrawState);
+begin
+   TFuncao.ZebrarGrid(Sender, Rect, DataCol, Column, State);
+end;
+
 procedure TfrmProVendas.dbGridItensVendasDblClick(Sender: TObject);
 begin
   CarregarRegistroSelecionado;
 end;
 
-{$REGION 'CONFIGURA  ES DO GRID'}
+{$REGION 'CONFIGURAÇÕES DO GRID'}
 procedure TfrmProVendas.dbGridItensVendasDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer;
   Column: TColumn; State: TGridDrawState);
 begin
@@ -516,6 +558,7 @@ begin
   inherited;
   ControlarBotoes;
 end;
+
 
 end.
 

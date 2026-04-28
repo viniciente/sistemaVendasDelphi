@@ -462,6 +462,7 @@ inherited frmProVendas: TfrmProVendas
       DisplayLabel = 'Total Venda'
       FieldName = 'totalVenda'
       Origin = 'vendas'
+      DisplayFormat = 'R$ #,##0.00'
       Precision = 18
       Size = 5
     end

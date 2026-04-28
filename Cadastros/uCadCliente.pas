@@ -111,12 +111,16 @@ type
     procedure Image4Click(Sender: TObject);
     procedure Image5Click(Sender: TObject);
     procedure FDQuery1cepGetText(Sender: TField; var Text: string; DisplayText: Boolean);
-    procedure FDQuery1cpf_cnpjGetText(Sender: TField; var Text: string; DisplayText: Boolean);
     procedure FDQuery1telefoneGetText(Sender: TField; var Text: string; DisplayText: Boolean);
     procedure edtCEPChange(Sender: TObject);
     procedure dsListagemDataChange(Sender: TObject; Field: TField);
     procedure lpkStatusClick(Sender: TObject);
     procedure btnFecharClick(Sender: TObject);
+    procedure lblStatusAtivoClick(Sender: TObject);
+    procedure lblStatusBloqueadoClick(Sender: TObject);
+    procedure lblStatusAtencaoClick(Sender: TObject);
+    procedure lblStatusInativoClick(Sender: TObject);
+    procedure lblStatusProspectoClick(Sender: TObject);
   private
     { Private declarations }
     oCliente:TCliente;
@@ -152,7 +156,7 @@ var
   vDocLimpo: string;
 begin
   //remove a formatação do texto, (ponto, traço, barra)
-  vDocLimpo := SomenteNumeros(edtCPFCNPJ.Text);
+  vDocLimpo := TFuncao.SomenteNumeros(edtCPFCNPJ.Text);
 
   //Validação do cpf
   if lkpPessoa.KeyValue = 1 then // Pessoa Física
@@ -202,11 +206,10 @@ begin
   oCliente.cidade         := edtCidade.Text;
   oCliente.email          := edtEmail.Text;
   oCliente.dataNascimento := edtDataNascimento.Date;
-  oCliente.numero         := SomenteNumeros(edtNumero.Text);
+  oCliente.numero         := TFuncao.SomenteNumeros(edtNumero.Text);
 
-  // Uso do método "SomenteNumeros" salva somente os numeros no banco
-  oCliente.cep      := SomenteNumeros(edtCEP.Text);
-  oCliente.telefone := SomenteNumeros(edtTelefone.Text);
+  oCliente.cep      := TFuncao.SomenteNumeros(edtCEP.Text);
+  oCliente.telefone := TFuncao.SomenteNumeros(edtTelefone.Text);
   oCliente.cpf_cnpj := vDocLimpo; // Já usamos a variável que limpamos lá no topo
 
   // Uso do tipo pessoa
@@ -256,11 +259,6 @@ end;
 procedure TfrmCadCliente.FDQuery1cepGetText(Sender: TField; var Text: string; DisplayText: Boolean);
 begin
   Text := TFuncao.FormatarCEP(Sender.AsString);
-end;
-
-procedure TfrmCadCliente.FDQuery1cpf_cnpjGetText(Sender: TField; var Text: string; DisplayText: Boolean);
-begin
-  Text := TFuncao.FormatarCPFCNPJ(Sender.AsString);
 end;
 
 procedure TfrmCadCliente.FDQuery1telefoneGetText(Sender: TField; var Text: string; DisplayText: Boolean);
@@ -405,22 +403,19 @@ end;
 
 procedure TfrmCadCliente.edtCEPChange(Sender: TObject);
 var
-  TextoLimpo: string;
+  Edit: TEdit;
 begin
-  //trabalha apenas com numeros
-  TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
-  TEdit(Sender).OnChange := nil;
+  Edit := TEdit(Sender);
+
+  Edit.OnChange := nil;
   try
-    TEdit(Sender).MaxLength := 9; // Limite de caracteres do CEP
+    Edit.MaxLength := 9;
 
-    if Length(TextoLimpo) <= 5 then
-        TEdit(Sender).Text := TextoLimpo
-    else
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 5) + '-' + Copy(TextoLimpo, 6, 3);
+    Edit.Text := TFuncao.FormatarCEP(Edit.Text);
 
-    TEdit(Sender).SelStart := Length(TEdit(Sender).Text);
+    Edit.SelStart := Length(Edit.Text);
   finally
-    TEdit(Sender).OnChange := edtCEPChange;
+    Edit.OnChange := edtCEPChange;
   end;
 end;
 
@@ -505,51 +500,25 @@ end;
 
 procedure TfrmCadCliente.edtCPFCNPJChange(Sender: TObject);
 var
-  TextoLimpo: string;
+  Edit: TEdit;
 begin
-  //trabalha apenas com numeros
-  TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
-
-  //evita loop infinito
-  TEdit(Sender).OnChange := nil;
+  Edit := TEdit(Sender);
+  Edit.OnChange := nil;
   try
-    //aplica a mascara se for a pessoa fisica
     if lkpPessoa.KeyValue = 1 then
     begin
-      TEdit(Sender).MaxLength := 14; // Limite de caracteres do CPF
-
-      if Length(TextoLimpo) <= 3 then
-        TEdit(Sender).Text := TextoLimpo
-      else if Length(TextoLimpo) <= 6 then           // se tiver + 6 numeros
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 3) + '.' + Copy(TextoLimpo, 4, 3)
-      else if Length(TextoLimpo) <= 9 then           // se tiver + 9 numeros
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 3) + '.' + Copy(TextoLimpo, 4, 3) + '.' + Copy(TextoLimpo, 7, 3)
-      else
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 3) + '.' + Copy(TextoLimpo, 4, 3) + '.' +
-                              Copy(TextoLimpo, 7, 3) + '-' + Copy(TextoLimpo, 10, 2);
+      Edit.MaxLength := 14;
+      Edit.Text := TFuncao.FormatarCPF(Edit.Text);
     end
     else if lkpPessoa.KeyValue = 2 then
     begin
-      TEdit(Sender).MaxLength := 18; // Limite de caracteres do CNPJ
-
-      if Length(TextoLimpo) <= 2 then
-        TEdit(Sender).Text := TextoLimpo
-      else if Length(TextoLimpo) <= 5 then
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3)
-      else if Length(TextoLimpo) <= 8 then
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' + Copy(TextoLimpo, 6, 3)
-      else if Length(TextoLimpo) <= 12 then
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
-                              Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4)
-      else
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
-                              Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4) + '-' + Copy(TextoLimpo, 13, 2);
+      Edit.MaxLength := 18;
+      Edit.Text := TFuncao.FormatarCNPJ(Edit.Text);
     end;
 
-    TEdit(Sender).SelStart := Length(TEdit(Sender).Text);
-
+    Edit.SelStart := Length(Edit.Text);
   finally
-    TEdit(Sender).OnChange := edtCPFCNPJChange;
+    Edit.OnChange := edtCPFCNPJChange;
   end;
 end;
 
@@ -574,7 +543,7 @@ var
   TextoLimpo: string;
 begin
   inherited;
-   TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
+   TextoLimpo := TFuncao.SomenteNumeros(TEdit(Sender).Text);
 end;
 
 procedure TfrmCadCliente.edtNumeroKeyPress(Sender: TObject; var Key: Char);
@@ -584,48 +553,17 @@ end;
 
 procedure TfrmCadCliente.edtTelefoneChange(Sender: TObject);
 var
-  TextoLimpo: string;
-  Tam: Integer;
+  Edit: TEdit;
 begin
-  TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
-  Tam := Length(TextoLimpo);
-
-  TEdit(Sender).OnChange := nil;
+  Edit := TEdit(Sender);
+  Edit.OnChange := nil;
   try
-    TEdit(Sender).MaxLength := 15;
+    Edit.MaxLength := 15;
+    Edit.Text := TFuncao.FormatarTelefone(Edit.Text);
 
-    // 0800 / 0400 (Iniciando com 0)
-    if (Tam > 0) and (TextoLimpo[1] = '0') then
-    begin
-      if Tam <= 4 then
-        TEdit(Sender).Text := TextoLimpo
-      else if Tam <= 7 then
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 4) + ' ' + Copy(TextoLimpo, 5, 3)
-      else
-        TEdit(Sender).Text := Copy(TextoLimpo, 1, 4) + ' ' + Copy(TextoLimpo, 5, 3) + ' ' + Copy(TextoLimpo, 8, 4);
-    end
-
-    //CELULAR (11 dígitos)
-    else if (Tam = 11) then
-    begin
-      TEdit(Sender).Text := '(' + Copy(TextoLimpo, 1, 2) + ')' + Copy(TextoLimpo, 3, 5) + '-' + Copy(TextoLimpo, 8, 4);
-    end
-
-    //FIXO (Até 10 dígitos)
-    else
-    begin
-      if Tam <= 2 then
-        TEdit(Sender).Text := TextoLimpo
-      else if Tam <= 6 then
-        TEdit(Sender).Text := '(' + Copy(TextoLimpo, 1, 2) + ')' + Copy(TextoLimpo, 3, 4)
-      else
-        TEdit(Sender).Text := '(' + Copy(TextoLimpo, 1, 2) + ')' + Copy(TextoLimpo, 3, 4) + '-' + Copy(TextoLimpo, 7, 4);
-    end;
-
-    TEdit(Sender).SelStart := Length(TEdit(Sender).Text);
-
+    Edit.SelStart := Length(Edit.Text);
   finally
-    TEdit(Sender).OnChange := edtTelefoneChange;
+    Edit.OnChange := edtTelefoneChange;
   end;
 end;
 
@@ -677,6 +615,31 @@ begin
 
   else
     Text := V; // Caso não se encaixe em nenhum, mostra o número puro
+end;
+
+procedure TfrmCadCliente.lblStatusAtencaoClick(Sender: TObject);
+begin
+  FiltrarPorStatus(3);
+end;
+
+procedure TfrmCadCliente.lblStatusAtivoClick(Sender: TObject);
+begin
+  FiltrarPorStatus(1);
+end;
+
+procedure TfrmCadCliente.lblStatusBloqueadoClick(Sender: TObject);
+begin
+  FiltrarPorStatus(2);
+end;
+
+procedure TfrmCadCliente.lblStatusInativoClick(Sender: TObject);
+begin
+  FiltrarPorStatus(4);
+end;
+
+procedure TfrmCadCliente.lblStatusProspectoClick(Sender: TObject);
+begin
+  FiltrarPorStatus(5);
 end;
 
 procedure TfrmCadCliente.lkpPessoaClick(Sender: TObject);

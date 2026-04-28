@@ -71,7 +71,7 @@ type
     function Gravar(EstadoDoCadastro: TEstadoDoCadastro): Boolean; virtual;
     procedure BloqueiaCTRL_DEL_DBGrid(var Key: Word; Shift: TShiftState);
     procedure ControlarBotoes; virtual;
-    function SomenteNumeros (aSentenca:String): string;
+
   end;
 
 var
@@ -87,22 +87,6 @@ uses Unit2, cFuncao;
 {$REGION 'OBSERVAÇÔES'}
 //TAG: 1 - CHAVE PRIMARIA
 //TAG: 2 - CAMPOS OBRIGATORIOS
-{$ENDREGION}
-
-{$REGION 'Metodo SomenteNumeros'}
-
-function TfrmTelaHeranca.SomenteNumeros(aSentenca:string):string;
-var I:Integer;
-begin
-  Result:='';
-  for I:=1 to Length(aSentenca) do
-  begin
-  //verifica se o caractere na posição I é numero de 0 a 9
-  if aSentenca[I] in ['0'..'9'] then
-    Result := Result+aSentenca[i]
-  end;
-end;
-
 {$ENDREGION}
 
 procedure TfrmTelaHeranca.ControlarBotoes;
@@ -364,37 +348,35 @@ end;
 
 procedure TfrmTelaHeranca.btnApagarClick(Sender: TObject);
 begin
-  // 1. Verificação de Segurança: O objeto foi criado?
   if not Assigned(oUsuarioLogado) then
   begin
-    MessageDlg('Erro Crítico: Sessão do usuário não inicializada. Recomenda-se reiniciar o sistema.', mtError, [mbOK], 0);
+    MessageDlg('Erro Crítico: Sessão do usuário não inicializada.', mtError, [mbOK], 0);
     Abort;
   end;
 
   if not TUsuarioLogado.TenhoAcesso(oUsuarioLogado.codigo,
          Self.Name + '_' + TBitBtn(Sender).Name,
          dtmConexao.FDConexao) then
-    begin
-      MessageDlg('Usuário: ' + oUsuarioLogado.nome +
-                 ', não tem permissão para apagar registros.',
-                 mtWarning, [mbOK], 0);
-      Abort;
-    end;
+  begin
+    MessageDlg('Usuário: ' + oUsuarioLogado.nome +
+               ', não tem permissão para apagar registros.', mtWarning, [mbOK], 0);
+    Abort;
+  end;
 
-  // 3. Execução da Exclusão
   try
-    if (Apagar) then
+    if Apagar then
     begin
+      FDQuery1.Refresh;
       ControlarBotoes;
       LimparEdits;
-      FDQuery1.Refresh;
       ShowMessage('Registro excluído com sucesso!');
     end
     else
-    begin
-      MessageDlg('Erro ao Apagar: O registro pode estar sendo usado por outro processo.', mtError, [mbOK], 0);
-    end;
-  finally
+      MessageDlg('Não foi possível excluir o registro.' + #13 +
+                 'Verifique se ele está sendo utilizado em outro cadastro.',
+                 mtWarning, [mbOK], 0);
+  except
+    on E: EAbort do
     EstadoDoCadastro := ecNenhum;
   end;
 end;
@@ -421,35 +403,45 @@ end;
 procedure TfrmTelaHeranca.dbgrdListagemDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
-  // 1. Define as cores de fundo (Zebrado)
-  if not (gdSelected in State) then
-  begin
-    if Odd(TDBGrid(Sender).DataSource.DataSet.RecNo) then
-      TDBGrid(Sender).Canvas.Brush.Color := $00F2F2F2 // Cinza quase branco
-    else
-      TDBGrid(Sender).Canvas.Brush.Color := $00E1E1E1; // Cinza um pouco mais escuro
-
-    // FORÇA A COR DA FONTE para preto nas linhas normais
-    TDBGrid(Sender).Canvas.Font.Color := clBlack;
-  end
-  else
-  begin
-    // 2. Cores para a linha SELECIONADA (Fundo azul com letra branca, por exemplo)
-    TDBGrid(Sender).Canvas.Brush.Color := clHighlight; // Cor padrão de seleção do Windows
-    TDBGrid(Sender).Canvas.Font.Color := clHighlightText; // Branco padrão de seleção
-  end;
-
-  // Aplica a cor definida no fundo
-  TDBGrid(Sender).Canvas.FillRect(Rect);
-
-  // 3. Pinta o texto.
-  // O DefaultDrawColumnCell agora usará as cores de Canvas que definimos acima.
-  TDBGrid(Sender).DefaultDrawColumnCell(Rect, DataCol, Column, State);
+  TFuncao.ZebrarGrid(Sender, Rect, DataCol, Column, State);
 end;
 
 procedure TfrmTelaHeranca.dbgrdListagemKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+var
+  Grid: TDBGrid;
 begin
   BloqueiaCTRL_DEL_DBGrid(Key, Shift);
+
+  Grid := TDBGrid(Sender);
+
+  case Key of
+    VK_LEFT:
+    begin
+      // Move coluna para esquerda, sem mudar de registro
+      if Grid.SelectedIndex > 0 then
+      begin
+        Grid.SelectedIndex := Grid.SelectedIndex - 1;
+        Key := 0; // consome a tecla — não deixa o dataset reagir
+      end;
+    end;
+
+    VK_RIGHT:
+    begin
+      // Move coluna para direita, sem mudar de registro
+      if Grid.SelectedIndex < Grid.Columns.Count - 1 then
+      begin
+        Grid.SelectedIndex := Grid.SelectedIndex + 1;
+        Key := 0;
+      end;
+    end;
+
+    VK_RETURN:
+    begin
+      // Enter abre o alterar — igual ao duplo clique
+      btnAlterar.Click;
+      Key := 0;
+    end;
+  end;
 end;
 
 procedure TfrmTelaHeranca.btnGravarClick(Sender: TObject);
@@ -477,7 +469,6 @@ begin
       else
         MessageDlg('A gravação não pôde ser concluída.', mtWarning, [mbOK], 0);
     except
-        MessageDlg('Erro ao gravar', mtError, [mbOK], 0);
     end;
   finally
   end;
@@ -491,18 +482,21 @@ begin
 end;
 
 procedure TfrmTelaHeranca.FormCreate(Sender: TObject);
-var i:Integer;
+var i: Integer;
 begin
   FDQuery1.Connection := dtmConexao.FDConexao;
-  dsListagem.DataSet := FDQuery1;
+  dsListagem.DataSet  := FDQuery1;
   dbgrdListagem.DataSource := dsListagem;
-  dbgrdListagem.Options := [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines,
-    dgTabs, dgRowSelect, dgAlwaysShowSelection, dgCancelOnExit, dgTitleClick, dgTitleHotTrack];
+
+  dbgrdListagem.Options := [dgTitles, dgIndicator, dgColumnResize,
+                             dgColLines, dgRowLines, dgTabs,
+                             dgAlwaysShowSelection, dgCancelOnExit,
+                             dgTitleClick, dgTitleHotTrack];
 
   for i := 0 to dbgrdListagem.Columns.Count - 1 do
   begin
     dbgrdListagem.Columns[i].Title.Font.Color := clWhite;
-    dbgrdListagem.Columns[i].Title.Font.Style := [fsBold]
+    dbgrdListagem.Columns[i].Title.Font.Style := [fsBold];
   end;
   CentralizarColunas;
 end;

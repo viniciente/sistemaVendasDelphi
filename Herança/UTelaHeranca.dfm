@@ -49,6 +49,7 @@ object frmTelaHeranca: TfrmTelaHeranca
         Top = 2
         Width = 75
         Height = 25
+        Cursor = crHandPoint
         Caption = '&NOVO'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
@@ -86,6 +87,7 @@ object frmTelaHeranca: TfrmTelaHeranca
         Top = 2
         Width = 75
         Height = 25
+        Cursor = crHandPoint
         Caption = '&ALTERAR'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
@@ -122,6 +124,7 @@ object frmTelaHeranca: TfrmTelaHeranca
         Top = 2
         Width = 75
         Height = 25
+        Cursor = crHandPoint
         Caption = '&CANCELAR'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
@@ -159,6 +162,7 @@ object frmTelaHeranca: TfrmTelaHeranca
         Top = 2
         Width = 75
         Height = 25
+        Cursor = crHandPoint
         Caption = '&GRAVAR'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
@@ -196,6 +200,7 @@ object frmTelaHeranca: TfrmTelaHeranca
         Top = 2
         Width = 75
         Height = 25
+        Cursor = crHandPoint
         Caption = 'A&PAGAR'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
@@ -232,6 +237,7 @@ object frmTelaHeranca: TfrmTelaHeranca
         Top = 2
         Width = 75
         Height = 25
+        Cursor = crHandPoint
         Caption = '&FECHAR'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100
@@ -303,6 +309,7 @@ object frmTelaHeranca: TfrmTelaHeranca
             Top = 22
             Width = 75
             Height = 25
+            Cursor = crHandPoint
             Caption = 'P&ESQUISAR'
             Glyph.Data = {
               36030000424D3603000000000000360000002800000010000000100000000100
@@ -348,7 +355,7 @@ object frmTelaHeranca: TfrmTelaHeranca
           Font.Height = -11
           Font.Name = 'Tahoma'
           Font.Style = [fsBold]
-          Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+          Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
           ParentFont = False
           TabOrder = 1
           TitleFont.Charset = DEFAULT_CHARSET

@@ -9,23 +9,26 @@ uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
       FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB, cUsuarioLogado,
       FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
       RLReport, Vcl.Forms, System.SysUtils, Vcl.Imaging.pngimage, Vcl.Imaging.jpeg, Vcl.Graphics,
-      Vcl.ExtDlgs, UTelaHeranca;
+      Vcl.ExtDlgs, UTelaHeranca, Vcl.Grids, Vcl.DBGrids, System.UITypes, Winapi.Windows;
       // lista de Units
 
 type
   TFuncao = class
   private
   public
-    class function FormatarCPFCNPJ(const V: string): string; static;
+    class procedure ZebrarGrid(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
+      State: TGridDrawState); static;
     class function FormatarTelefone(const V: string): string; static;
     class function FormatarCEP(const V: string): string; static;
     class function FormatarCNPJ(const V: string): string; static;
+    class function FormatarCPF(const V: string): string; static;
     class procedure CarregarImagem(aImage: TImage); static;
     class procedure LimparImagem(var aImage: TImage); static;
     class procedure CriarForm(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado; aConexao:TFDConnection); static;
     class procedure CriarRelatorio(aNomeForm: TFormClass; oUsuarioLogado: TUsuarioLogado ; aConexao:TFDConnection); static;
     class function ValidarCPF(aCPF: string): Boolean;
     class function ValidarCNPJ(aCNPJ: string): Boolean;
+    class function SomenteNumeros(aSentenca:string): String;
   end;
 
 implementation
@@ -96,9 +99,22 @@ begin
   end;
 end;
 
+class function TFuncao.SomenteNumeros(aSentenca: string): String;
+var I:Integer;
+begin
+  Result:='';
+  for I:=1 to Length(aSentenca) do
+  begin
+  //verifica se o caractere na posição I é numero de 0 a 9
+  if aSentenca[I] in ['0'..'9'] then
+    Result := Result+aSentenca[i]
+  end;
+
+end;
+
 class procedure TFuncao.CarregarImagem(aImage:TImage);
 var
-  Bmp, BmpTrans: TBitmap;
+  Bmp, BmpTrans: Vcl.Graphics.TBitmap;
   Jpg: TJPEGImage;
   Pic: TPicture;
   Png: TPngImage;
@@ -118,7 +134,7 @@ begin
 
     if opdSelecionar.FileName<>EmptyStr then begin
       if (Pos('.JPG',UpperCase(opdSelecionar.FileName))>0) or ( Pos('.JPEG',UpperCase(opdSelecionar.FileName))>0) then begin
-        Bmp := TBitmap.Create;
+        Bmp := Vcl.Graphics.TBitmap.Create;
         Jpg := TJPEGImage.Create;
         Pic := TPicture.Create;
         try
@@ -136,7 +152,7 @@ begin
         end
       End
       else if Pos('.PNG',UpperCase(opdSelecionar.FileName))>0 then begin
-        Bmp := TBitmap.Create;
+        Bmp := Vcl.Graphics.TBitmap.Create;
         png := TPngImage.Create;
         Pic := TPicture.Create;
         try
@@ -156,8 +172,8 @@ begin
       end
       else begin
         try
-          Bmp := TBitmap.Create;
-          BmpTrans:= TBitmap.Create;
+          Bmp := Vcl.Graphics.TBitmap.Create;
+          BmpTrans:= Vcl.Graphics.TBitmap.Create;
           Pic := TPicture.Create;
 
           Pic.LoadFromFile(opdSelecionar.FileName);
@@ -182,51 +198,93 @@ end;
 
 {$ENDREGION}
 
-class function TFuncao.FormatarCPFCNPJ(const V: string): string;
-var S: string;
+class function TFuncao.FormatarCPF(const V: string): string;
+var
+  S: string;
 begin
-  S := Trim(V);
-  if Length(S) = 11 then // CPF: 000.000.000-00
-    Result := Copy(S,1,3)+'.'+Copy(S,4,3)+'.'+Copy(S,7,3)+'-'+Copy(S,10,2)
-  else if Length(S) = 14 then // CNPJ: 00.000.000/0000-00
-    Result := Copy(S,1,2)+'.'+Copy(S,3,3)+'.'+Copy(S,6,3)+'/'+Copy(S,9,4)+'-'+Copy(S,13,2)
+  S := SomenteNumeros(V);
+  if Length(S) <= 3 then
+    Result := S
+  else if Length(S) <= 6 then
+    Result := Copy(S, 1, 3) + '.' + Copy(S, 4, 3)
+  else if Length(S) <= 9 then
+    Result := Copy(S, 1, 3) + '.' + Copy(S, 4, 3) + '.' + Copy(S, 7, 3)
   else
-    Result := S;
-end;
-
-class function TFuncao.FormatarTelefone(const V: string): string;
-var S: string;
-begin
-  S := Trim(V);
-  if (Length(S) = 11) and (S[1] = '0') then       // 0800 000 0000
-    Result := Copy(S,1,4)+' '+Copy(S,5,3)+' '+Copy(S,8,4)
-  else if Length(S) = 11 then                       // (11) 98888-7777
-    Result := '('+Copy(S,1,2)+') '+Copy(S,3,5)+'-'+Copy(S,8,4)
-  else if Length(S) = 10 then                       // (11) 3333-4444
-    Result := '('+Copy(S,1,2)+') '+Copy(S,3,4)+'-'+Copy(S,7,4)
-  else
-    Result := S;
-end;
-
-class function TFuncao.FormatarCEP(const V: string): string;
-var S: string;
-begin
-  S := Trim(V);
-  if Length(S) = 8 then  // 00000-000
-    Result := Copy(S,1,5)+'-'+Copy(S,6,3)
-  else
-    Result := S;
+    Result := Copy(S, 1, 3) + '.' + Copy(S, 4, 3) + '.' + Copy(S, 7, 3) + '-' + Copy(S, 10, 2);
 end;
 
 class function TFuncao.FormatarCNPJ(const V: string): string;
-var S: string;
+var
+  S: string;
 begin
-  S := Trim(V);
-  if Length(S) = 14 then
-    Result := Copy(S,1,2)+'.'+Copy(S,3,3)+'.'+Copy(S,6,3)+'/'+Copy(S,9,4)+'-'+Copy(S,13,2)
+  S := SomenteNumeros(V);
+  if Length(S) <= 2 then
+    Result := S
+  else if Length(S) <= 5 then
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3)
+  else if Length(S) <= 8 then
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3) + '.' + Copy(S, 6, 3)
+  else if Length(S) <= 12 then
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3) + '.' + Copy(S, 6, 3) + '/' + Copy(S, 9, 4)
   else
-    Result := S;
+    Result := Copy(S, 1, 2) + '.' + Copy(S, 3, 3) + '.' + Copy(S, 6, 3) + '/' + Copy(S, 9, 4) + '-' + Copy(S, 13, 2);
 end;
+
+class function TFuncao.FormatarTelefone(const V: string): string;
+var
+  S: string;
+  Tam: Integer;
+begin
+  S := SomenteNumeros(V);
+  Tam := Length(S);
+
+  if Tam = 0 then
+  begin
+    Result := '';
+    Exit;
+  end;
+
+  if (S[1] = '0') and (S[2] in ['1'..'9']) and (S[3] = '0') and (S[4] = '0') then
+  begin
+    if Tam <= 4 then
+      Result := S
+    else if Tam <= 7 then
+      Result := Copy(S, 1, 4) + ' ' + Copy(S, 5, Tam - 4)
+    else
+      Result := Copy(S, 1, 4) + ' ' + Copy(S, 5, 3) + ' ' + Copy(S, 8, 4);
+  end
+
+  else
+  begin
+    if Tam <= 2 then
+      Result := '(' + S
+    else if Tam <= 6 then
+      Result := '(' + Copy(S, 1, 2) + ') ' + Copy(S, 3, Tam - 2)
+    else if Tam <= 10 then
+      // Formato Fixo: (11) 3333-4444
+      Result := '(' + Copy(S, 1, 2) + ') ' + Copy(S, 3, 4) + '-' + Copy(S, 7, Tam - 6)
+    else
+      // Formato Celular: (11) 98888-7777 (quando atinge 11 dígitos)
+      Result := '(' + Copy(S, 1, 2) + ') ' + Copy(S, 3, 5) + '-' + Copy(S, 8, 4);
+  end;
+end;
+
+class function TFuncao.FormatarCEP(const V: string): string;
+var
+  TextoLimpo: string;
+begin
+  // Remove qualquer caractere que não seja número
+  TextoLimpo := SomenteNumeros(V);
+
+  // Se tiver até 5 números, não coloca o traço ainda
+  if Length(TextoLimpo) <= 5 then
+    Result := TextoLimpo
+  else
+    // A partir do 6º número, monta a máscara: 00000-000
+    Result := Copy(TextoLimpo, 1, 5) + '-' + Copy(TextoLimpo, 6, 3);
+end;
+
+{$REGION 'VALIDAÇÃO CPF/CNPJ'}
 
 class function TFuncao.ValidarCPF(aCPF: string): Boolean;
 var
@@ -289,6 +347,42 @@ begin
     Result := False;
   end;
 end;
+
+{$ENDREGION}
+
+{$REGION 'ZEBRAR'}
+
+ class procedure TFuncao.ZebrarGrid(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+var
+  Grid: TDBGrid;
+begin
+  if not (Sender is TDBGrid) then Exit;
+
+  Grid := TDBGrid(Sender);
+
+  if not (gdSelected in State) then
+  begin
+    // Usa RecNo para alternar as cores das linhas
+    if Odd(Grid.DataSource.DataSet.RecNo) then
+      Grid.Canvas.Brush.Color := $00F2F2F2
+    else
+      Grid.Canvas.Brush.Color := $00E1E1E1;
+
+    Grid.Canvas.Font.Color := clBlack;
+  end
+  else
+  begin
+    Grid.Canvas.Brush.Color := clHighlight;
+    Grid.Canvas.Font.Color := clHighlightText;
+  end;
+
+  Grid.Canvas.FillRect(Rect);
+  Grid.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+end;
+
+{$ENDREGION}
+
 
 end.
 

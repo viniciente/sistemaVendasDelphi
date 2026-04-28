@@ -77,7 +77,7 @@ var
   vDocLimpo: string;
 begin
 
-  vDocLimpo := SomenteNumeros(edtCNPJ.Text);
+  vDocLimpo := TFuncao.SomenteNumeros(edtCNPJ.Text);
 
   if not TFuncao.ValidarCNPJ(vDocLimpo) then
   begin
@@ -104,7 +104,7 @@ begin
   oFornecedor.razaoSocial            := edtRazaoSocial.Text;
   oFornecedor.email                  := edtEmail.Text;
 
-  oFornecedor.telefone := SomenteNumeros(edtTelefone.Text);
+  oFornecedor.telefone := TFuncao.SomenteNumeros(edtTelefone.Text);
   oFornecedor.cnpj := vDocLimpo;
 
     // Execução da gravação
@@ -127,10 +127,10 @@ begin
     edtEmail.Text        := oFornecedor.email;
 
     edtTelefone.Text := oFornecedor.telefone;
-    edtTelefoneChange(edtTelefone); // aplica máscara telefone
+    edtTelefoneChange(edtTelefone);
 
     edtCNPJ.Text := oFornecedor.cnpj;
-    edtCNPJChange(edtCNPJ);         //aplica máscara
+    edtCNPJChange(edtCNPJ);
   end
   else
   begin
@@ -148,34 +148,19 @@ end;
 
 procedure TfrmCadFornecedor.edtCNPJChange(Sender: TObject);
 var
-  TextoLimpo: string;
-  PosicaoCursor: Integer;
+  Edit: TEdit;
 begin
-  PosicaoCursor := TEdit(Sender).SelStart;
+  Edit := TEdit(Sender);
 
-  TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
-
-  TEdit(Sender).OnChange := nil;
-
+  Edit.OnChange := nil;
   try
-    TEdit(Sender).MaxLength := 18;
+    Edit.MaxLength := 18;
 
-    if Length(TextoLimpo) <= 2 then
-      TEdit(Sender).Text := TextoLimpo
-    else if Length(TextoLimpo) <= 5 then
-      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3)
-    else if Length(TextoLimpo) <= 8 then
-      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' + Copy(TextoLimpo, 6, 3)
-    else if Length(TextoLimpo) <= 12 then
-      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
-                            Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4)
-    else
-      TEdit(Sender).Text := Copy(TextoLimpo, 1, 2) + '.' + Copy(TextoLimpo, 3, 3) + '.' +
-                            Copy(TextoLimpo, 6, 3) + '/' + Copy(TextoLimpo, 9, 4) + '-' + Copy(TextoLimpo, 13, 2);
-    TEdit(Sender).SelStart := PosicaoCursor + (Length(TEdit(Sender).Text) - Length(TextoLimpo));
+    Edit.Text := TFuncao.FormatarCNPJ(Edit.Text);
 
+    Edit.SelStart := Length(Edit.Text);
   finally
-    TEdit(Sender).OnChange := edtCNPJChange;
+    Edit.OnChange := edtCNPJChange;
   end;
 end;
 
@@ -190,7 +175,7 @@ var
   TextoLimpo: string;
   Tam: Integer;
 begin
-  TextoLimpo := SomenteNumeros(TEdit(Sender).Text);
+  TextoLimpo := TFuncao.SomenteNumeros(TEdit(Sender).Text);
   Tam := Length(TextoLimpo);
 
   TEdit(Sender).OnChange := nil;

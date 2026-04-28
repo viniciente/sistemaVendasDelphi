@@ -32,6 +32,10 @@ inherited frmCadAcaoAcesso: TfrmCadAcaoAcesso
         end
       end
       inherited tsManutencao: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
         object lblCodigo: TLabel
           Left = 35
           Top = 37

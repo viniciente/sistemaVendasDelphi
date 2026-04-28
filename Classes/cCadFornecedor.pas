@@ -82,8 +82,41 @@ begin
 end;
 
 function TFornecedor.Atualizar: Boolean;
+var
+  qry: TFDQuery;
 begin
+  Result := False;
+  // Usamos um bloco try..finally para garantir que o qry seja liberado da memória
+  qry := TFDQuery.Create(nil);
+  try
+    // 1. Vincule a Query à sua conexão (ajuste o nome da sua conexão global se necessário)
+    Qry.Connection := FdConexao;
 
+    // 2. Monte o SQL de Update utilizando parâmetros (:)
+    qry.SQL.Add('UPDATE fornecedor SET ');
+    qry.SQL.Add('  nomeFantasia = :nomeFantasia, ');
+    qry.SQL.Add('  razaoSocial = :razaoSocial, ');
+    qry.SQL.Add('  cnpj = :cnpj, ');
+    qry.SQL.Add('  telefone = :telefone, ');
+    qry.SQL.Add('  email = :email ');
+    qry.SQL.Add('WHERE fornecedorId = :fornecedorId');
+
+    qry.ParamByName('nomeFantasia').AsString := Self.nomeFantasia;
+    qry.ParamByName('razaoSocial').AsString  := Self.razaoSocial;
+    qry.ParamByName('cnpj').AsString         := Self.cnpj;
+    qry.ParamByName('telefone').AsString     := Self.telefone;
+    qry.ParamByName('email').AsString        := Self.email;
+    qry.ParamByName('fornecedorId').AsInteger          := Self.codigo;
+
+    try
+      qry.ExecSQL;
+      Result := True;
+    except
+        raise Exception.Create('Erro ao atualizar fornecedor');
+    end;
+  finally
+    qry.Free;
+  end;
 end;
 
 function TFornecedor.Inserir: Boolean;
@@ -99,7 +132,7 @@ begin
     Qry.ParamByName('nome').AsString  := F_nomeFantasia;
     Qry.ParamByName('razao').AsString := F_razaoSocial;
     Qry.ParamByName('cnpj').AsString  := F_cnpj;
-    Qry.ParamByName('tel').AsString   := F_telefone;
+    Qry.ParamByName('telefone').AsString   := F_telefone;
     Qry.ParamByName('email').AsString := F_email;
 
     try

@@ -98,17 +98,31 @@ begin
   try
     Qry.Connection := FdConexao;
 
-    Qry.SQL.Add('UPDATE usuarios ');
-    Qry.SQL.Add('   SET nome    = :nome, ');
-    Qry.SQL.Add('       senha   = :senha, ');
-    Qry.SQL.Add('       foto    = :foto,  ' );
-    Qry.SQL.Add('       statusId = :statusId' );
-    Qry.SQL.Add(' WHERE usuarioId = :usuarioId');
+    // Se a senha estiver preenchida, atualiza tudo
+    // Se não, atualiza tudo EXCETO a senha — protege o hash do banco
+    if Self.F_senha <> '' then
+    begin
+      Qry.SQL.Add('UPDATE usuarios');
+      Qry.SQL.Add('   SET nome     = :nome,');
+      Qry.SQL.Add('       senha    = :senha,');
+      Qry.SQL.Add('       foto     = :foto,');
+      Qry.SQL.Add('       statusId = :statusId');
+      Qry.SQL.Add(' WHERE usuarioId = :usuarioId');
+      Qry.ParamByName('senha').AsString := Self.F_senha;
+    end
+    else
+    begin
+      // Alterar foto/nome/status SEM tocar na senha
+      Qry.SQL.Add('UPDATE usuarios');
+      Qry.SQL.Add('   SET nome     = :nome,');
+      Qry.SQL.Add('       foto     = :foto,');
+      Qry.SQL.Add('       statusId = :statusId');
+      Qry.SQL.Add(' WHERE usuarioId = :usuarioId');
+    end;
 
     Qry.ParamByName('usuarioId').AsInteger := Self.F_usuarioId;
-    Qry.ParamByName('nome').AsString        := Self.F_nome;
-    Qry.ParamByName('senha').AsString       := Self.F_senha;
-    Qry.ParamByName('statusId').AsInteger   := Self.F_statusId;
+    Qry.ParamByName('nome').AsString       := Self.F_nome;
+    Qry.ParamByName('statusId').AsInteger  := Self.F_statusId;
 
     if (Self.F_foto <> nil) and (not Self.F_foto.Empty) then
     begin
@@ -118,22 +132,20 @@ begin
     end
     else
     begin
-      // SE NÃO TIVER FOTO, PRECISA DECLARAR COMO NULL
       Qry.ParamByName('foto').DataType := ftBlob;
       Qry.ParamByName('foto').Value    := Null;
     end;
 
     try
       FdConexao.StartTransaction;
-      Qry.ExecSQL;      // Executa a alteração no banco
-      FdConexao.Commit;  // Confirma as alterações
+      Qry.ExecSQL;
+      FdConexao.Commit;
     except
-        FdConexao.Rollback;
-        ShowMessage('Erro técnico ao atualizar');
-        Result := False;
+      FdConexao.Rollback;
+      ShowMessage('Erro técnico ao atualizar');
+      Result := False;
     end;
   finally
-    // Limpeza de memória
     ms.Free;
     FreeAndNil(Qry);
   end;

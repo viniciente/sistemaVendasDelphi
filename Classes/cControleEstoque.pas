@@ -43,61 +43,81 @@ end;
 {$endRegion}
 
 function TControleEstoque.BaixarEstoque: Boolean;
-var Qry:TFDQuery;
+var
+  Qry: TFDQuery;
+  vEhServico: Boolean;
 begin
+  Result := True;
   try
-    Result:=true;
-    Qry:=TFDQuery.Create(nil);
-    Qry.Connection:=FdConexao;
+    Qry := TFDQuery.Create(nil);
+    Qry.Connection := FdConexao;
+
+    // Verifica se é serviço ANTES de baixar estoque
+    Qry.SQL.Text := 'SELECT p.categoriasId FROM produtos p WHERE p.produtoId = :pId';
+    Qry.ParamByName('pId').AsInteger := ProdutoId;
+    Qry.Open;
+
+    vEhServico := (not Qry.IsEmpty) and (Qry.FieldByName('categoriasId').AsInteger = 46);
+    Qry.Close;
+
+    // Serviço não tem estoque — sai sem fazer nada
+    if vEhServico then
+      Exit;
 
     Qry.SQL.Clear;
-    Qry.SQL.Add('UPDATE produtos '+
-                '   SET quantidade = quantidade - :qtdeBaixa '+
-                ' WHERE produtoId=:produtoId ');
-    Qry.ParamByName('produtoId').AsInteger :=ProdutoId;
-    Qry.ParamByName('qtdeBaixa').AsFloat   :=Quantidade;
-    Try
+    Qry.SQL.Add('UPDATE produtos SET quantidade = quantidade - :qtdeBaixa WHERE produtoId = :produtoId');
+    Qry.ParamByName('produtoId').AsInteger := ProdutoId;
+    Qry.ParamByName('qtdeBaixa').AsFloat   := Quantidade;
+    try
       FdConexao.StartTransaction;
       Qry.ExecSQL;
       FdConexao.Commit;
-    Except
+    except
       FdConexao.Rollback;
-      Result:=false;
-    End;
+      Result := False;
+    end;
 
   finally
-    if Assigned(Qry) then
-       FreeAndNil(Qry);
+    FreeAndNil(Qry);
   end;
 end;
 
-
 function TControleEstoque.RetornarEstoque: Boolean;
-var Qry:TFDQuery;
+var
+  Qry: TFDQuery;
+  vEhServico: Boolean;
 begin
+  Result := True;
   try
-    Result:=true;
-    Qry:=TFDQuery.Create(nil);
-    Qry.Connection:=FdConexao;
+    Qry := TFDQuery.Create(nil);
+    Qry.Connection := FdConexao;
+
+    // Mesma verificação no retorno — estorno de venda cancelada
+    Qry.SQL.Text := 'SELECT p.categoriasId FROM produtos p WHERE p.produtoId = :pId';
+    Qry.ParamByName('pId').AsInteger := ProdutoId;
+    Qry.Open;
+
+    vEhServico := (not Qry.IsEmpty) and (Qry.FieldByName('categoriasId').AsInteger = 46);
+    Qry.Close;
+
+    if vEhServico then
+      Exit;
 
     Qry.SQL.Clear;
-    Qry.SQL.Add('UPDATE produtos '+
-                '   SET quantidade = quantidade + :qtdeRetorno '+
-                ' WHERE produtoId=:produtoId ');
-    Qry.ParamByName('produtoId').AsInteger :=ProdutoId;
-    Qry.ParamByName('qtdeRetorno').AsFloat :=Quantidade;
-    Try
+    Qry.SQL.Add('UPDATE produtos SET quantidade = quantidade + :qtdeRetorno WHERE produtoId = :produtoId');
+    Qry.ParamByName('produtoId').AsInteger := ProdutoId;
+    Qry.ParamByName('qtdeRetorno').AsFloat := Quantidade;
+    try
       FdConexao.StartTransaction;
       Qry.ExecSQL;
       FdConexao.Commit;
-    Except
+    except
       FdConexao.Rollback;
-      Result:=false;
-    End;
+      Result := False;
+    end;
 
   finally
-    if Assigned(Qry) then
-       FreeAndNil(Qry);
+    FreeAndNil(Qry);
   end;
 end;
 
