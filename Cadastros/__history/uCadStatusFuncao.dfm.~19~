@@ -1,0 +1,202 @@
+inherited frmCadStatusFuncao: TfrmCadStatusFuncao
+  Caption = 'CADASTRO DE FUN'#199#195'O'
+  PixelsPerInch = 96
+  TextHeight = 13
+  inherited pnlFundo: TPanel
+    inherited pnlRodape: TPanel
+      inherited dbnvgrNavigator: TDBNavigator
+        Hints.Strings = ()
+      end
+    end
+    inherited pgcPrincipal: TPageControl
+      ActivePage = tsManutencao
+      inherited tsListagem: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
+        inherited dbgrdListagem: TDBGrid
+          DataSource = dsListagem
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'statusId'
+              Visible = True
+            end
+            item
+              Expanded = False
+              FieldName = 'descricao'
+              Visible = True
+            end>
+        end
+      end
+      inherited tsManutencao: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
+        object pnlTop: TPanel
+          Left = 0
+          Top = 0
+          Width = 740
+          Height = 105
+          Align = alTop
+          TabOrder = 0
+          object Label1: TLabel
+            Left = 27
+            Top = 1
+            Width = 33
+            Height = 13
+            Caption = 'Codigo'
+          end
+          object lblNome: TLabel
+            Left = 27
+            Top = 43
+            Width = 80
+            Height = 13
+            Caption = 'Nome da Fun'#231#227'o'
+          end
+          object edtStatusId: TEdit
+            Left = 27
+            Top = 16
+            Width = 60
+            Height = 21
+            Enabled = False
+            TabOrder = 0
+          end
+          object edtDescricao: TEdit
+            Left = 27
+            Top = 56
+            Width = 300
+            Height = 21
+            TabOrder = 1
+          end
+          object pnlInstrucao: TPanel
+            Left = 1
+            Top = 83
+            Width = 738
+            Height = 21
+            Align = alBottom
+            Caption = 'Permiss'#245'es - Duplo clique para Liberar/Bloquear'
+            Color = 8143884
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWhite
+            Font.Height = -11
+            Font.Name = 'Tahoma'
+            Font.Style = [fsBold]
+            ParentBackground = False
+            ParentFont = False
+            TabOrder = 2
+          end
+        end
+        object grdAcoes: TDBGrid
+          Left = 0
+          Top = 105
+          Width = 740
+          Height = 268
+          Align = alClient
+          DataSource = dtsAcoes
+          DrawingStyle = gdsClassic
+          FixedColor = clGray
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBlack
+          Font.Height = -11
+          Font.Name = 'Tahoma'
+          Font.Style = [fsBold]
+          Options = [dgTitles, dgIndicator, dgColumnResize, dgColLines, dgRowLines, dgTabs, dgAlwaysShowSelection, dgCancelOnExit, dgTitleClick, dgTitleHotTrack]
+          ParentFont = False
+          TabOrder = 1
+          TitleFont.Charset = DEFAULT_CHARSET
+          TitleFont.Color = clWhite
+          TitleFont.Height = -11
+          TitleFont.Name = 'Tahoma'
+          TitleFont.Style = [fsBold]
+          OnDrawColumnCell = grdAcoesDrawColumnCell
+          Columns = <
+            item
+              Expanded = False
+              FieldName = 'descricao'
+              Visible = True
+            end>
+        end
+      end
+    end
+  end
+  inherited dsListagem: TDataSource
+    Left = 320
+    Top = 16
+  end
+  inherited FDQuery1: TFDQuery
+    Active = True
+    SQL.Strings = (
+      'SELECT statusId, descricao'
+      'FROM statusUsuario'
+      'ORDER BY descricao')
+    Left = 252
+    Top = 16
+    object FDQuery1statusId: TIntegerField
+      FieldName = 'statusId'
+      Origin = 'statusId'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object FDQuery1descricao: TStringField
+      FieldName = 'descricao'
+      Origin = 'descricao'
+      Required = True
+      Size = 50
+    end
+  end
+  object QryAcoes: TFDQuery
+    Active = True
+    Connection = dtmConexao.fdConexao
+    SQL.Strings = (
+      'SELECT saa.usuarioId,'
+      '       saa.acaoAcessoId,'
+      '       aa.chave AS descricao,'
+      '       saa.ativo'
+      'FROM usuariosAcaoAcesso saa'
+      'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId'
+      'WHERE saa.usuarioId = :statusId'
+      'ORDER BY aa.chave')
+    Left = 540
+    Top = 32
+    ParamData = <
+      item
+        Name = 'STATUSID'
+        DataType = ftInteger
+        ParamType = ptInput
+        Value = Null
+      end>
+    object QryAcoesusuarioId: TIntegerField
+      FieldName = 'usuarioId'
+      Origin = 'usuarioId'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Visible = False
+    end
+    object QryAcoesacaoAcessoId: TIntegerField
+      FieldName = 'acaoAcessoId'
+      Origin = 'acaoAcessoId'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Visible = False
+    end
+    object QryAcoesdescricao: TStringField
+      FieldName = 'descricao'
+      Origin = 'descricao'
+      Required = True
+      Size = 60
+    end
+    object QryAcoesativo: TBooleanField
+      FieldName = 'ativo'
+      Origin = 'ativo'
+      Required = True
+    end
+  end
+  object dtsAcoes: TDataSource
+    DataSet = QryAcoes
+    Left = 588
+    Top = 32
+  end
+end

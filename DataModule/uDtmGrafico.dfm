@@ -12,11 +12,15 @@ object DtmGrafico: TDtmGrafico
     Top = 49
     object qryProdutoEstoqueLabel: TStringField
       FieldName = 'Label'
+      Origin = 'Label'
       ReadOnly = True
       Size = 93
     end
-    object qryProdutoEstoqueValue: TIntegerField
+    object qryProdutoEstoqueValue: TFMTBCDField
       FieldName = 'Value'
+      Origin = 'Value'
+      Precision = 18
+      Size = 5
     end
   end
   object qryVendaPorCliente: TFDQuery
@@ -74,7 +78,6 @@ object DtmGrafico: TDtmGrafico
     end
   end
   object qryVendaUltimaSemana: TFDQuery
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'SELECT vendas.dataVenda AS Label,'

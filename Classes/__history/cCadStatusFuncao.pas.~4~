@@ -1,0 +1,222 @@
+unit cCadStatusFuncao;
+
+interface
+
+uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      System.SysUtils, System.Variants;
+      // lista de Units
+
+type
+  TStatusFuncao = class
+  private
+    FdConexao: TFDConnection;
+    F_statusId:  Integer;
+    F_descricao: string;
+  public
+    constructor Create(aConexao: TFDConnection);
+
+    function Inserir: Boolean;
+    function Atualizar: Boolean;
+    function Apagar: Boolean;
+    function Selecionar(aId: Integer): Boolean;
+    function DescricaoExiste(const aDescricao: string): Boolean;
+    procedure PreencherAcoesDoStatus;
+
+  published
+    property statusId:  Integer read F_statusId  write F_statusId;
+    property descricao: string  read F_descricao write F_descricao;
+  end;
+
+implementation
+
+constructor TStatusFuncao.Create(aConexao: TFDConnection);
+begin
+  FdConexao := aConexao;
+end;
+
+function TStatusFuncao.DescricaoExiste(const aDescricao: string): Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'SELECT 1 FROM statusUsuario ' +
+                   'WHERE descricao = :descricao ' +
+                   '  AND statusId <> :statusId';
+    Qry.ParamByName('descricao').AsString := aDescricao;
+    Qry.ParamByName('statusId').AsInteger := F_statusId;
+    Qry.Open;
+    Result := not Qry.IsEmpty;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TStatusFuncao.Inserir: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'INSERT INTO statusUsuario (descricao) ' +
+                   'VALUES (:descricao)';
+    Qry.ParamByName('descricao').AsString := F_descricao;
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+
+      // Pega o ID gerado
+      Qry.SQL.Text := 'SELECT SCOPE_IDENTITY() AS novoId';
+      Qry.Open;
+      F_statusId := Qry.FieldByName('novoId').AsInteger;
+
+      FdConexao.Commit;
+      Result := True;
+
+      // Preenche as permissões padrão para o novo perfil
+      PreencherAcoesDoStatus;
+    except
+      FdConexao.Rollback;
+      Result := False;
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TStatusFuncao.Atualizar: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'UPDATE statusUsuario SET descricao = :descricao ' +
+                   'WHERE statusId = :statusId';
+    Qry.ParamByName('descricao').AsString := F_descricao;
+    Qry.ParamByName('statusId').AsInteger := F_statusId;
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+      Result := True;
+    except
+      FdConexao.Rollback;
+      Result := False;
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TStatusFuncao.Apagar: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+
+  if MessageDlg('Apagar o perfil: ' + F_descricao + '?' + #13 +
+                'As permissões vinculadas também serão removidas.',
+                mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+  begin
+    Abort;
+  end;
+
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    try
+      FdConexao.StartTransaction;
+
+      // Remove permissões do perfil primeiro (FK)
+      Qry.SQL.Text := 'DELETE FROM usuariosAcaoAcesso WHERE usuarioId = :statusId';
+      Qry.ParamByName('statusId').AsInteger := F_statusId;
+      Qry.ExecSQL;
+
+      // Remove o perfil
+      Qry.SQL.Text := 'DELETE FROM statusUsuario WHERE statusId = :statusId';
+      Qry.ParamByName('statusId').AsInteger := F_statusId;
+      Qry.ExecSQL;
+
+      FdConexao.Commit;
+      Result := True;
+    except
+      FdConexao.Rollback;
+      Result := False;
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+function TStatusFuncao.Selecionar(aId: Integer): Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'SELECT statusId, descricao FROM statusUsuario ' +
+                   'WHERE statusId = :statusId';
+    Qry.ParamByName('statusId').AsInteger := aId;
+    Qry.Open;
+    if not Qry.IsEmpty then
+    begin
+      F_statusId  := Qry.FieldByName('statusId').AsInteger;
+      F_descricao := Qry.FieldByName('descricao').AsString;
+      Result := True;
+    end;
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+procedure TStatusFuncao.PreencherAcoesDoStatus;
+var
+  QryAcoes, QryInsert: TFDQuery;
+begin
+  // Busca todas as ações cadastradas e insere uma a uma
+  // com ativo = 1 (tudo liberado por padrão)
+  QryAcoes  := TFDQuery.Create(nil);
+  QryInsert := TFDQuery.Create(nil);
+  try
+    QryAcoes.Connection  := FdConexao;
+    QryInsert.Connection := FdConexao;
+
+    QryAcoes.SQL.Text := 'SELECT acaoAcessoId FROM acaoAcesso';
+    QryAcoes.Open;
+
+    QryInsert.SQL.Text :=
+      'IF NOT EXISTS (' +
+      '  SELECT 1 FROM usuariosAcaoAcesso ' +
+      '  WHERE usuarioId = :statusId AND acaoAcessoId = :acaoId' +
+      ') ' +
+      'INSERT INTO usuariosAcaoAcesso (usuarioId, acaoAcessoId, ativo) ' +
+      'VALUES (:statusId, :acaoId, 1)';
+
+    try
+      FdConexao.StartTransaction;
+      while not QryAcoes.Eof do
+      begin
+        QryInsert.ParamByName('statusId').AsInteger := F_statusId;
+        QryInsert.ParamByName('acaoId').AsInteger   := QryAcoes.FieldByName('acaoAcessoId').AsInteger;
+        QryInsert.ExecSQL;
+        QryAcoes.Next;
+      end;
+      FdConexao.Commit;
+    except
+      FdConexao.Rollback;
+    end;
+  finally
+    FreeAndNil(QryAcoes);
+    FreeAndNil(QryInsert);
+  end;
+end;
+
+end.

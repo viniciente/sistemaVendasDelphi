@@ -11,6 +11,10 @@ inherited frmCadAcaoAcesso: TfrmCadAcaoAcesso
     end
     inherited pgcPrincipal: TPageControl
       inherited tsListagem: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
         inherited dbgrdListagem: TDBGrid
           DataSource = dsListagem
           Columns = <
@@ -83,6 +87,7 @@ inherited frmCadAcaoAcesso: TfrmCadAcaoAcesso
     end
   end
   inherited FDQuery1: TFDQuery
+    Active = True
     SQL.Strings = (
       'SELECT '
       '    acaoAcessoId, '

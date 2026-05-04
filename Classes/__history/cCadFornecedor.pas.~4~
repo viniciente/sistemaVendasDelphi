@@ -1,0 +1,178 @@
+unit cCadFornecedor;
+
+interface
+
+uses  System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      System.SysUtils, System.Variants;
+      // lista de Units
+
+type
+  TFornecedor = class
+    private
+    FdConexao: TFDConnection;
+    F_fornecedorId: Integer;
+    F_nomeFantasia: string;
+    F_razaoSocial: string;
+    F_cnpj: string;
+    F_telefone: string;
+    F_email: string;
+
+    public
+    constructor Create(aConexao:TFDConnection);
+    destructor Destroy; override;
+    function Inserir:Boolean;
+    function Atualizar:Boolean;
+    function Apagar:Boolean;
+    function Selecionar(id:Integer):Boolean;
+
+    published
+    property codigo       :integer      read F_fornecedorId write F_fornecedorId;
+    property nomeFantasia :string       read F_nomeFantasia write F_nomeFantasia;
+    property razaoSocial  :string       read F_razaoSocial  write F_razaoSocial;
+    property cnpj         :string       read F_cnpj         write F_cnpj;
+    property telefone     :string       read F_telefone     write F_telefone;
+    property email        :string       read F_email        write F_email;
+  end;
+
+implementation
+
+{ TFornecedor }
+
+{$REGION'COntructor Destructor'}
+
+constructor TFornecedor.Create(aConexao: TFDConnection);
+begin
+  FdConexao:=aConexao;
+end;
+
+destructor TFornecedor.Destroy;
+begin
+  inherited;
+end;
+
+{$ENDREGION}
+
+function TFornecedor.Apagar: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'DELETE FROM fornecedor WHERE fornecedorId = :id';
+    Qry.ParamByName('id').AsInteger := F_fornecedorId;
+
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+      Result := True;
+    except
+      FdConexao.Rollback;
+      raise;
+    end;
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TFornecedor.Atualizar: Boolean;
+var
+  qry: TFDQuery;
+begin
+  Result := False;
+  // Usamos um bloco try..finally para garantir que o qry seja liberado da memória
+  qry := TFDQuery.Create(nil);
+  try
+    // 1. Vincule a Query à sua conexão (ajuste o nome da sua conexão global se necessário)
+    Qry.Connection := FdConexao;
+
+    // 2. Monte o SQL de Update utilizando parâmetros (:)
+    qry.SQL.Add('UPDATE fornecedor SET ');
+    qry.SQL.Add('  nomeFantasia = :nomeFantasia, ');
+    qry.SQL.Add('  razaoSocial = :razaoSocial, ');
+    qry.SQL.Add('  cnpj = :cnpj, ');
+    qry.SQL.Add('  telefone = :telefone, ');
+    qry.SQL.Add('  email = :email ');
+    qry.SQL.Add('WHERE fornecedorId = :fornecedorId');
+
+    qry.ParamByName('nomeFantasia').AsString := Self.nomeFantasia;
+    qry.ParamByName('razaoSocial').AsString  := Self.razaoSocial;
+    qry.ParamByName('cnpj').AsString         := Self.cnpj;
+    qry.ParamByName('telefone').AsString     := Self.telefone;
+    qry.ParamByName('email').AsString        := Self.email;
+    qry.ParamByName('fornecedorId').AsInteger          := Self.codigo;
+
+    try
+      qry.ExecSQL;
+      Result := True;
+    except
+        raise Exception.Create('Erro ao atualizar fornecedor');
+    end;
+  finally
+    qry.Free;
+  end;
+end;
+
+function TFornecedor.Inserir: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'INSERT INTO fornecedor (nomeFantasia, razaoSocial, cnpj, telefone, email) ' +
+                    'VALUES (:nome, :razao, :cnpj, :tel, :email)';
+
+    Qry.ParamByName('nome').AsString  := F_nomeFantasia;
+    Qry.ParamByName('razao').AsString := F_razaoSocial;
+    Qry.ParamByName('cnpj').AsString  := F_cnpj;
+    Qry.ParamByName('telefone').AsString   := F_telefone;
+    Qry.ParamByName('email').AsString := F_email;
+
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+      Result := True;
+    except
+      FdConexao.Rollback;
+      raise; // Repassa o erro para o usuário ver
+    end;
+  finally
+    Qry.Free;
+  end;
+end;
+
+function TFornecedor.Selecionar(id: Integer): Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'SELECT * FROM fornecedor WHERE fornecedorId = :id';
+    Qry.ParamByName('id').AsInteger := id;
+    Qry.Open;
+
+    if not Qry.IsEmpty then
+    begin
+      F_fornecedorId  := Qry.FieldByName('fornecedorId').AsInteger;
+      F_nomeFantasia  := Qry.FieldByName('nomeFantasia').AsString;
+      F_razaoSocial   := Qry.FieldByName('razaoSocial').AsString;
+      F_cnpj          := Qry.FieldByName('cnpj').AsString;
+      F_telefone      := Qry.FieldByName('telefone').AsString;
+      F_email         := Qry.FieldByName('email').AsString;
+      Result := True;
+    end;
+  finally
+    Qry.Free;
+  end;
+end;
+
+end.

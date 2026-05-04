@@ -3649,7 +3649,7 @@ object frmLogin: TfrmLogin
       AlignWithMargins = True
       Left = 4
       Top = 4
-      Width = 295
+      Width = 51
       Height = 18
       Align = alTop
       Alignment = taCenter
@@ -3660,7 +3660,6 @@ object frmLogin: TfrmLogin
       Font.Name = 'Arial'
       Font.Style = [fsBold, fsItalic, fsUnderline]
       ParentFont = False
-      ExplicitWidth = 51
     end
     object lblUsuario: TLabel
       Left = 40

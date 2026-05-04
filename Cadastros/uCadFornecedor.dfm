@@ -1,6 +1,7 @@
 inherited frmCadFornecedor: TfrmCadFornecedor
   Caption = 'Cadastro de Fornecedor'
   Position = poScreenCenter
+  ExplicitTop = -67
   PixelsPerInch = 96
   TextHeight = 13
   inherited pnlFundo: TPanel

@@ -207,6 +207,11 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="Classes\cCadFornecedor.pas"/>
+        <DCCReference Include="Classes\cCadStatusFuncao.pas"/>
+        <DCCReference Include="Cadastros\uCadStatusFuncao.pas">
+            <Form>frmCadStatusFuncao</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcItem Include="Images\usuarioPadrao.jpg">
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>AVATAR_PADARAO</ResourceId>
@@ -263,13 +268,13 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Images\azul.bmp" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="Images\amarela.bmp" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Images\amarela.bmp" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="Images\azul.bmp" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>

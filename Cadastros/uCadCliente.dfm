@@ -5,6 +5,7 @@ inherited frmCadCliente: TfrmCadCliente
   TextHeight = 13
   inherited pnlFundo: TPanel
     inherited pnlRodape: TPanel
+      ExplicitTop = 407
       inherited dbnvgrNavigator: TDBNavigator
         Hints.Strings = ()
       end
@@ -15,6 +16,10 @@ inherited frmCadCliente: TfrmCadCliente
     end
     inherited pgcPrincipal: TPageControl
       inherited tsListagem: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
         inherited pnlListagemTopo: TPanel
           inherited maskPesquisar: TMaskEdit
             Width = 225
@@ -378,6 +383,10 @@ inherited frmCadCliente: TfrmCadCliente
         end
       end
       inherited tsManutencao: TTabSheet
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
         object lblCPFCNPJ: TLabel
           Left = 280
           Top = 139
@@ -957,7 +966,6 @@ inherited frmCadCliente: TfrmCadCliente
     Top = 0
   end
   inherited FDQuery1: TFDQuery
-    Active = True
     SQL.Strings = (
       'SELECT '
       '    cl.clienteId, '

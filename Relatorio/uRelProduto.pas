@@ -38,7 +38,7 @@ type
     QryProdutosprodutoId: TFDAutoIncField;
     QryProdutosnome: TStringField;
     QryProdutosvalor: TFMTBCDField;
-    QryProdutosquantidade: TIntegerField;
+    QryProdutosquantidade: TFMTBCDField;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private

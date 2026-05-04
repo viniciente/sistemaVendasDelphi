@@ -254,13 +254,14 @@ object frmRelProduto: TfrmRelProduto
     object QryProdutosvalor: TFMTBCDField
       FieldName = 'valor'
       Origin = 'valor'
-      DisplayFormat = 'R$##,##0.00'
       Precision = 18
       Size = 5
     end
-    object QryProdutosquantidade: TIntegerField
+    object QryProdutosquantidade: TFMTBCDField
       FieldName = 'quantidade'
       Origin = 'quantidade'
+      Precision = 18
+      Size = 5
     end
   end
   object dtsProduto: TDataSource

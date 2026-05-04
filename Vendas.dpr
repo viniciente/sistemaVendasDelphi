@@ -50,7 +50,9 @@ uses
   uConProdutos in 'Consultas\uConProdutos.pas' {frmConProdutos},
   uConClientes in 'Consultas\uConClientes.pas' {frmConClientes},
   uCadFornecedor in 'Cadastros\uCadFornecedor.pas' {frmCadFornecedor},
-  cCadFornecedor in 'Classes\cCadFornecedor.pas';
+  cCadFornecedor in 'Classes\cCadFornecedor.pas',
+  cCadStatusFuncao in 'Classes\cCadStatusFuncao.pas',
+  uCadStatusFuncao in 'Cadastros\uCadStatusFuncao.pas' {frmCadStatusFuncao};
 
 {$R *.res}
 
@@ -60,6 +62,5 @@ begin
   Application.Title := 'Cyan Night';
   Application.CreateForm(TdtmConexao, dtmConexao);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
-  Application.CreateForm(TfrmCadFornecedor, frmCadFornecedor);
   Application.Run;
 end.

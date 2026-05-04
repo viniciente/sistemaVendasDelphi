@@ -81,18 +81,50 @@ begin
   end;
 end;
 
+function TFornecedor.Inserir: Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  Qry := TFDQuery.Create(nil);
+  try
+    Qry.Connection := FdConexao;
+    Qry.SQL.Text := 'INSERT INTO fornecedor (nomeFantasia, razaoSocial, cnpj, telefone, email) ' +
+                    'VALUES (:nome, :razao, :cnpj, :telefone, :email)'; // <-- Corrigido para :telefone
+
+    // Parâmetros preenchidos antes do Try
+    Qry.ParamByName('nome').AsString     := F_nomeFantasia;
+    Qry.ParamByName('razao').AsString    := F_razaoSocial;
+    Qry.ParamByName('cnpj').AsString     := F_cnpj;
+    Qry.ParamByName('telefone').AsString := F_telefone; // <-- Agora os nomes batem!
+    Qry.ParamByName('email').AsString    := F_email;
+
+    try
+      FdConexao.StartTransaction;
+      Qry.ExecSQL;
+      FdConexao.Commit;
+      Result := True;
+    except
+      on E: Exception do
+      begin
+        FdConexao.Rollback;
+        ShowMessage('Erro ao inserir fornecedor: ' + E.Message);
+        raise;
+      end;
+    end;
+  finally
+    Qry.Free;
+  end;
+end;
+
 function TFornecedor.Atualizar: Boolean;
 var
   qry: TFDQuery;
 begin
   Result := False;
-  // Usamos um bloco try..finally para garantir que o qry seja liberado da memória
   qry := TFDQuery.Create(nil);
   try
-    // 1. Vincule a Query à sua conexão (ajuste o nome da sua conexão global se necessário)
-    Qry.Connection := FdConexao;
+    qry.Connection := FdConexao;
 
-    // 2. Monte o SQL de Update utilizando parâmetros (:)
     qry.SQL.Add('UPDATE fornecedor SET ');
     qry.SQL.Add('  nomeFantasia = :nomeFantasia, ');
     qry.SQL.Add('  razaoSocial = :razaoSocial, ');
@@ -106,46 +138,22 @@ begin
     qry.ParamByName('cnpj').AsString         := Self.cnpj;
     qry.ParamByName('telefone').AsString     := Self.telefone;
     qry.ParamByName('email').AsString        := Self.email;
-    qry.ParamByName('fornecedorId').AsInteger          := Self.codigo;
+    qry.ParamByName('fornecedorId').AsInteger:= Self.codigo;
 
     try
+      FdConexao.StartTransaction; // <-- Transação adicionada!
       qry.ExecSQL;
+      FdConexao.Commit;           // <-- Commit adicionado!
       Result := True;
     except
-        raise Exception.Create('Erro ao atualizar fornecedor');
+      on E: Exception do
+      begin
+        FdConexao.Rollback;
+        ShowMessage('Erro ao atualizar fornecedor: ' + E.Message);
+      end;
     end;
   finally
     qry.Free;
-  end;
-end;
-
-function TFornecedor.Inserir: Boolean;
-var Qry: TFDQuery;
-begin
-  Result := False;
-  Qry := TFDQuery.Create(nil);
-  try
-    Qry.Connection := FdConexao;
-    Qry.SQL.Text := 'INSERT INTO fornecedor (nomeFantasia, razaoSocial, cnpj, telefone, email) ' +
-                    'VALUES (:nome, :razao, :cnpj, :tel, :email)';
-
-    Qry.ParamByName('nome').AsString  := F_nomeFantasia;
-    Qry.ParamByName('razao').AsString := F_razaoSocial;
-    Qry.ParamByName('cnpj').AsString  := F_cnpj;
-    Qry.ParamByName('telefone').AsString   := F_telefone;
-    Qry.ParamByName('email').AsString := F_email;
-
-    try
-      FdConexao.StartTransaction;
-      Qry.ExecSQL;
-      FdConexao.Commit;
-      Result := True;
-    except
-      FdConexao.Rollback;
-      raise; // Repassa o erro para o usuário ver
-    end;
-  finally
-    Qry.Free;
   end;
 end;
 

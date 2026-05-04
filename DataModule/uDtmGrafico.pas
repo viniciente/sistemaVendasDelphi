@@ -13,14 +13,14 @@ type
     qryVendaPorCliente: TFDQuery;
     qryVendaPorClienteLabel: TStringField;
     qryVendaPorClienteValue: TFMTBCDField;
-    qryProdutoEstoqueLabel: TStringField;
-    qryProdutoEstoqueValue: TIntegerField;
     qry10ProdutosMaisVendidos: TFDQuery;
     qry10ProdutosMaisVendidosLabel: TStringField;
     qry10ProdutosMaisVendidosValue: TFMTBCDField;
     qryVendaUltimaSemana: TFDQuery;
     qryVendaUltimaSemanaLabel: TSQLTimeStampField;
     qryVendaUltimaSemanaValue: TFMTBCDField;
+    qryProdutoEstoqueLabel: TStringField;
+    qryProdutoEstoqueValue: TFMTBCDField;
   private
     { Private declarations }
   public

@@ -50,24 +50,63 @@ end;
 class function TUsuarioLogado.TenhoAcesso(aUsuarioId: Integer; aChave: String; aConexao: TFDConnection): Boolean;
 var Qry: TFDQuery;
 begin
+  Result := False;
   try
-    Qry:=TFDQuery.Create(nil);
-    Qry.Connection:=aConexao;
-    Qry.SQL.Clear;
-    Qry.SQL.Add('SELECT usuarioId '+
-                '  FROM usuariosAcaoAcesso '+
-                ' WHERE usuarioId=:usuarioId '+
-                '   AND acaoAcessoId=(SELECT TOP 1 acaoAcessoId FROM acaoAcesso WHERE chave=:chave)'+
-                '   AND ativo=1');
-    Qry.ParamByName('usuarioId').AsInteger  :=aUsuarioId;
-    Qry.ParamByName('chave').AsString       :=aChave;
+    Qry := TFDQuery.Create(nil);
+    Qry.Connection := aConexao;
 
+    // Verifica permissão individual do usuário
+    Qry.SQL.Text :=
+      'SELECT uaa.ativo ' +
+      'FROM usuariosAcaoAcesso uaa ' +
+      'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = uaa.acaoAcessoId ' +
+      'WHERE uaa.usuarioId = :usuarioId ' +
+      '  AND aa.chave = :chave';
+    Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+    Qry.ParamByName('chave').AsString      := aChave;
     Qry.Open;
-    result:=not Qry.IsEmpty;
+
+    if not Qry.IsEmpty then
+    begin
+      Result := Qry.FieldByName('ativo').AsBoolean;
+
+      // Bloqueado individualmente — verifica se o PERFIL libera
+      if not Result then
+      begin
+        Qry.Close;
+        Qry.SQL.Text :=
+          'SELECT saa.ativo ' +
+          'FROM statusAcaoAcesso saa ' +
+          'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId ' +
+          'INNER JOIN usuarios u ON u.statusId = saa.usuarioId ' + // statusId do usuario liga ao perfil
+          'WHERE u.usuarioId = :usuarioId ' +
+          '  AND aa.chave = :chave';
+        Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+        Qry.ParamByName('chave').AsString      := aChave;
+        Qry.Open;
+        if not Qry.IsEmpty then
+          Result := Qry.FieldByName('ativo').AsBoolean;
+      end;
+    end
+    else
+    begin
+      Qry.Close;
+      Qry.SQL.Text :=
+        'SELECT saa.ativo ' +
+        'FROM statusAcaoAcesso saa ' +
+        'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId ' +
+        'INNER JOIN usuarios u ON u.statusId = saa.usuarioId ' +
+        'WHERE u.usuarioId = :usuarioId ' +
+        '  AND aa.chave = :chave';
+      Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+      Qry.ParamByName('chave').AsString      := aChave;
+      Qry.Open;
+      if not Qry.IsEmpty then
+        Result := Qry.FieldByName('ativo').AsBoolean;
+    end;
 
   finally
-    if Assigned(Qry) then
-       FreeAndNil(Qry);
+    FreeAndNil(Qry);
   end;
 end;
 
