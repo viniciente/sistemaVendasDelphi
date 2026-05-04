@@ -76,6 +76,7 @@ type
     procedure btnPesquisarClientesClick(Sender: TObject);
     procedure lkpCategoriaClick(Sender: TObject);
     procedure imgProdutoClick(Sender: TObject);
+    procedure lkpCategoriaExit(Sender: TObject);
   private
     { Private declarations }
     FCarregando: Boolean;
@@ -254,6 +255,10 @@ procedure TfrmCadProduto.btnIncluirCategoriaClick(Sender: TObject);
 begin
   inherited;
   TFuncao.CriarForm(TfrmCadCategorias, oUsuarioLogado, dtmConexao.FDConexao);
+
+  QryCategoria.Close;
+  QryCategoria.Open;
+
   FDQuery1.Refresh;
 end;
 
@@ -275,6 +280,15 @@ end;
 procedure TfrmCadProduto.lkpCategoriaClick(Sender: TObject);
 begin
   AjustarInterfacePorCategoria;
+
+  QryCategoria.Close;
+  QryCategoria.Open;
+end;
+
+procedure TfrmCadProduto.lkpCategoriaExit(Sender: TObject);
+begin
+  inherited;
+  QryCategoria.Close;
 end;
 
 {$ENDREGION}
@@ -367,11 +381,14 @@ begin
   dsListagemDataChange(dsListagem, nil);
   AjustarInterfacePorCategoria;
 end;
+
 procedure TfrmCadProduto.FormActivate(Sender: TObject);
 begin
-  inherited;
-  QryCategoria.Open;
-  QryFornecedor.Open;
+if QryCategoria.Active then
+  begin
+    QryCategoria.Close;
+    QryCategoria.Open;
+  end;
 end;
 
 procedure TfrmCadProduto.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -403,6 +420,8 @@ begin
 
   //força a execução para o registro que já está selecionado
   dsListagemDataChange(dsListagem, nil);
+
+
 end;
 
 procedure TfrmCadProduto.AjustarInterfacePorCategoria;

@@ -169,8 +169,8 @@ begin
   FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Ativo'') INSERT INTO statusClientes (descricao) VALUES (''Ativo'')');
   FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Bloqueado'') INSERT INTO statusClientes (descricao) VALUES (''Bloqueado'')');
   FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Atenção'') INSERT INTO statusClientes (descricao) VALUES (''Atenção'')');
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Prospecto'') INSERT INTO statusClientes (descricao) VALUES (''Prospecto'')');
   FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Inativo'') INSERT INTO statusClientes (descricao) VALUES (''Inativo'')');
+  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Prospecto'') INSERT INTO statusClientes (descricao) VALUES (''Prospecto'')');
 end;
 
 procedure TAtualizacaoTabelaMSSQL.TipoPessoa;

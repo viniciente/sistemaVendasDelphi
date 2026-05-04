@@ -43,7 +43,7 @@ end;
 
 destructor TUsuarioLogado.Destroy;
 begin
-  F_foto.Free; // Liberar a memória
+  F_foto.Free;
   inherited;
 end;
 
@@ -78,7 +78,7 @@ begin
           'SELECT saa.ativo ' +
           'FROM statusAcaoAcesso saa ' +
           'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId ' +
-          'INNER JOIN usuarios u ON u.statusId = saa.usuarioId ' + // statusId do usuario liga ao perfil
+          'INNER JOIN usuarios u ON u.statusId = saa.statusId ' +
           'WHERE u.usuarioId = :usuarioId ' +
           '  AND aa.chave = :chave';
         Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
@@ -95,7 +95,7 @@ begin
         'SELECT saa.ativo ' +
         'FROM statusAcaoAcesso saa ' +
         'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId ' +
-        'INNER JOIN usuarios u ON u.statusId = saa.usuarioId ' +
+        'INNER JOIN usuarios u ON u.statusId = saa.statusId ' +
         'WHERE u.usuarioId = :usuarioId ' +
         '  AND aa.chave = :chave';
       Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;

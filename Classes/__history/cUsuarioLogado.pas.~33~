@@ -1,0 +1,114 @@
+unit cUsuarioLogado;
+
+interface
+
+uses System.Classes, Vcl.Controls, Vcl.ExtCtrls, Vcl.Dialogs,
+     FireDAC.Stan.Intf, FireDAC.Stan.Option,
+      FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf,
+      FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
+      FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB,
+      FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef,
+      System.SysUtils, Vcl.Imaging.jpeg, Vcl.Graphics, System.Variants;
+      // lista de Units
+
+type
+  TUsuarioLogado = class
+  private
+    F_usuarioId:Integer;
+    F_nome:string;
+    F_senha: string;
+    F_foto: TBitmap;
+    F_statusId :Integer;
+    fdConexao: TFDConnection;
+
+  public
+  class function TenhoAcesso(aUsuarioId: Integer; aChave: String; aConexao:TFDConnection):Boolean; static;
+  constructor Create(aConexao: TFDConnection);
+  destructor Destroy; override;
+  published
+    property codigo        :Integer    read F_usuarioId      write F_usuarioId;
+    property nome          :string     read F_nome           write F_nome;
+    property senha         :string     read F_senha          write F_senha;
+    property foto          :TBitmap    read F_foto;
+    property statusId      :Integer    read F_statusId       write F_statusId;
+  end;
+
+implementation
+
+constructor TUsuarioLogado.Create(aConexao: TFDConnection);
+begin
+  fdConexao := aConexao;
+  F_foto := TBitmap.Create;
+end;
+
+destructor TUsuarioLogado.Destroy;
+begin
+  F_foto.Free; // Liberar a memória
+  inherited;
+end;
+
+class function TUsuarioLogado.TenhoAcesso(aUsuarioId: Integer; aChave: String; aConexao: TFDConnection): Boolean;
+var Qry: TFDQuery;
+begin
+  Result := False;
+  try
+    Qry := TFDQuery.Create(nil);
+    Qry.Connection := aConexao;
+
+    // Verifica permissão individual do usuário
+    Qry.SQL.Text :=
+      'SELECT uaa.ativo ' +
+      'FROM usuariosAcaoAcesso uaa ' +
+      'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = uaa.acaoAcessoId ' +
+      'WHERE uaa.usuarioId = :usuarioId ' +
+      '  AND aa.chave = :chave';
+    Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+    Qry.ParamByName('chave').AsString      := aChave;
+    Qry.Open;
+
+    if not Qry.IsEmpty then
+    begin
+      Result := Qry.FieldByName('ativo').AsBoolean;
+
+      // Bloqueado individualmente — verifica se o PERFIL libera
+      if not Result then
+      begin
+        Qry.Close;
+        Qry.SQL.Text :=
+          'SELECT saa.ativo ' +
+          'FROM statusAcaoAcesso saa ' +
+          'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId ' +
+          'INNER JOIN usuarios u ON u.statusId = saa.statusId ' + // <--- CORRIGIDO AQUI
+          'WHERE u.usuarioId = :usuarioId ' +
+          '  AND aa.chave = :chave';
+        Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+        Qry.ParamByName('chave').AsString      := aChave;
+        Qry.Open;
+        if not Qry.IsEmpty then
+          Result := Qry.FieldByName('ativo').AsBoolean;
+      end;
+    end
+    else
+    begin
+      Qry.Close;
+      Qry.SQL.Text :=
+        'SELECT saa.ativo ' +
+        'FROM statusAcaoAcesso saa ' +
+        'INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId ' +
+        'INNER JOIN usuarios u ON u.statusId = saa.statusId ' + // <--- CORRIGIDO AQUI
+        'WHERE u.usuarioId = :usuarioId ' +
+        '  AND aa.chave = :chave';
+      Qry.ParamByName('usuarioId').AsInteger := aUsuarioId;
+      Qry.ParamByName('chave').AsString      := aChave;
+      Qry.Open;
+      if not Qry.IsEmpty then
+        Result := Qry.FieldByName('ativo').AsBoolean;
+    end;
+
+  finally
+    FreeAndNil(Qry);
+  end;
+end;
+
+end.
+

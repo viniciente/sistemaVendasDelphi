@@ -166,7 +166,7 @@ begin
   oUsuario.foto.Assign(imgImagem.Picture.Graphic);
 
   if edtSenha.Visible and (edtSenha.Text <> '') then
-    oUsuario.senha := Criptografar(edtSenha.Text);
+    oUsuario.senha := edtSenha.Text;
   // Se não, oUsuario.senha já tem o hash correto vindo do Selecionar
 
   inherited;

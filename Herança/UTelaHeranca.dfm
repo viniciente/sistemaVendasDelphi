@@ -238,6 +238,7 @@ object frmTelaHeranca: TfrmTelaHeranca
         Width = 75
         Height = 25
         Cursor = crHandPoint
+        Cancel = True
         Caption = '&FECHAR'
         Glyph.Data = {
           36030000424D3603000000000000360000002800000010000000100000000100

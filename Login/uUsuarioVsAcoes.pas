@@ -22,11 +22,11 @@ type
     dtsUsuario: TDataSource;
     QryUsuariousuarioID: TFDAutoIncField;
     QryUsuarioNome: TStringField;
+    btnFechar: TBitBtn;
     QryAcoesusuarioId: TIntegerField;
     QryAcoesacaoAcessoId: TIntegerField;
     QryAcoesdescricao: TStringField;
     QryAcoesativo: TBooleanField;
-    btnFechar: TBitBtn;
     procedure btnFecharClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure grdAcoesDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
@@ -109,16 +109,16 @@ begin
     vNovoAtivo := not QryAcoes.FieldByName('ativo').AsBoolean;
     vChave := QryAcoes.FieldByName('descricao').AsString;
 
-    // Colaborador (statusId=3): nao pode reativar acoes bloqueadas automaticamente
-    if (vStatusUsuario = 3) and vNovoAtivo then
-    begin
-      if (Pos('APAGAR', UpperCase(vChave)) > 0) or (Pos('USUARIOVSAOES', UpperCase(vChave)) > 0) then
-      begin
-        MessageDlg('Esta acao é restrita para o perfil Colaborador e nao pode ser liberada.',
-          mtWarning, [mbOK], 0);
-        Exit;
-      end;
-    end;
+//    // Colaborador (statusId=3): nao pode reativar acoes bloqueadas automaticamente
+//    if (vStatusUsuario = 3) and vNovoAtivo then
+//    begin
+//      if (Pos('APAGAR', UpperCase(vChave)) > 0) or (Pos('USUARIOVSAOES', UpperCase(vChave)) > 0) then
+//      begin
+//        MessageDlg('Esta acao é restrita para o perfil Colaborador e nao pode ser liberada.',
+//          mtWarning, [mbOK], 0);
+//        Exit;
+//      end;
+//    end;
 
     Qry:=TFDQuery.Create(nil);
     Qry.Connection:=dtmConexao.FDConexao;
@@ -223,4 +223,4 @@ begin
 end;
 
 end.
-
+

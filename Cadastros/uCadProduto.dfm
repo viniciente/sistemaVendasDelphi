@@ -61,43 +61,36 @@ inherited frmCadProduto: TfrmCadProduto
             item
               Expanded = False
               FieldName = 'nome'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'descricao'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'quantidade'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'valor'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'categoriasId'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'categorias'
-              Width = 64
               Visible = True
             end
             item
               Expanded = False
               FieldName = 'fornecedor'
-              Width = 64
               Visible = True
             end>
         end
@@ -258,6 +251,7 @@ inherited frmCadProduto: TfrmCadProduto
           ListSource = dtsCategoria
           TabOrder = 4
           OnClick = lkpCategoriaClick
+          OnExit = lkpCategoriaExit
         end
         object edtValor: TCurrencyEdit
           Left = 16
@@ -311,6 +305,7 @@ inherited frmCadProduto: TfrmCadProduto
     end
   end
   object QryCategoria: TFDQuery [1]
+    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'Select categoriasId, descricao from categorias')
@@ -354,6 +349,7 @@ inherited frmCadProduto: TfrmCadProduto
     Top = 56
   end
   inherited FDQuery1: TFDQuery
+    Active = True
     AfterScroll = FDQuery1AfterScroll
     SQL.Strings = (
       'SELECT '
@@ -397,6 +393,7 @@ inherited frmCadProduto: TfrmCadProduto
     object FDQuery1valor: TFMTBCDField
       FieldName = 'valor'
       Origin = 'valor'
+      currency = True
       Precision = 18
       Size = 5
     end
@@ -422,6 +419,7 @@ inherited frmCadProduto: TfrmCadProduto
     end
   end
   object QryFornecedor: TFDQuery
+    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'SELECT fornecedorId,'

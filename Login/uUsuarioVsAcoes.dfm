@@ -193,7 +193,6 @@ object frmUsuarioVsAcoes: TfrmUsuarioVsAcoes
         Value = Null
       end>
     object QryAcoesusuarioId: TIntegerField
-      DisplayLabel = 'Codigo'
       FieldName = 'usuarioId'
       Origin = 'usuarioId'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -206,10 +205,8 @@ object frmUsuarioVsAcoes: TfrmUsuarioVsAcoes
       Required = True
     end
     object QryAcoesdescricao: TStringField
-      DisplayLabel = 'Descri'#231#227'o'
       FieldName = 'descricao'
       Origin = 'descricao'
-      Required = True
       Size = 100
     end
     object QryAcoesativo: TBooleanField

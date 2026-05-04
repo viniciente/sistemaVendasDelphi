@@ -290,6 +290,10 @@ begin
 
   TFuncao.CriarForm(TfrmCadCliente, oUsuarioLogado, dtmConexao.FDConexao);
   EstadoDoCadastro := vEstadoAnterior;
+
+  dtmVendas.QryCliente.Close;
+  dtmVendas.QryCliente.Open;
+
   FDQuery1.Refresh;
   ControlarBotoes;
 
