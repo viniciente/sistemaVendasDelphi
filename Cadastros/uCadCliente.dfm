@@ -652,7 +652,6 @@ inherited frmCadCliente: TfrmCadCliente
     Left = 620
   end
   object qryPessoa: TFDQuery [3]
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'SELECT pessoaId,'

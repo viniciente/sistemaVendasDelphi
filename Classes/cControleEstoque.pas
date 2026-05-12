@@ -57,7 +57,7 @@ begin
     Qry.ParamByName('pId').AsInteger := ProdutoId;
     Qry.Open;
 
-    vEhServico := (not Qry.IsEmpty) and (Qry.FieldByName('categoriasId').AsInteger = 46);
+    vEhServico := (not Qry.IsEmpty) and (Qry.FieldByName('categoriasId').AsInteger = 1);
     Qry.Close;
 
     // Serviço não tem estoque — sai sem fazer nada
@@ -97,7 +97,7 @@ begin
     Qry.ParamByName('pId').AsInteger := ProdutoId;
     Qry.Open;
 
-    vEhServico := (not Qry.IsEmpty) and (Qry.FieldByName('categoriasId').AsInteger = 46);
+    vEhServico := (not Qry.IsEmpty) and (Qry.FieldByName('categoriasId').AsInteger = 1);
     Qry.Close;
 
     if vEhServico then

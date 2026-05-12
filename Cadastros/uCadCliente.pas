@@ -498,6 +498,7 @@ begin
   FDQuery1.Connection := dtmConexao.FDConexao;
   oCliente:=TCliente.Create(dtmConexao.FdConexao);
   IndiceAtual:= 'nome';
+
 end;
 
 procedure TfrmCadCliente.FormShow(Sender: TObject);

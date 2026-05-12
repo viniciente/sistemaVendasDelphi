@@ -65,6 +65,7 @@ type
     procedure btnIncluirClientesClick(Sender: TObject);
     procedure dbgrdListagemDrawColumnCell(Sender: TObject; const Rect: TRect; DataCol: Integer; Column: TColumn;
       State: TGridDrawState);
+    procedure btnGravarClick(Sender: TObject);
 
   private
     { Private declarations }
@@ -282,6 +283,12 @@ begin
   LimparCds;
 end;
 
+procedure TfrmProVendas.btnGravarClick(Sender: TObject);
+begin
+  inherited;
+  pgcPrincipal.ActivePage := tsListagem;
+end;
+
 procedure TfrmProVendas.btnIncluirClientesClick(Sender: TObject);
 var
   vEstadoAnterior: TEstadoDoCadastro;
@@ -329,6 +336,8 @@ begin
 
   finally
     frmConClientes.Release;
+    dtmVendas.QryCliente.Close;
+    dtmVendas.QryCliente.Open;
   end;
 end;
 
@@ -557,6 +566,9 @@ begin
     dbGridItensVendas.Columns[i].Title.Font.Style := [fsBold]
   end;
   CentralizarColunas;
+
+  dtmVendas.QryProdutos.Close;
+  dtmVendas.QryProdutos.Open;
 end;
 
 procedure TfrmProVendas.dsListagemStateChange(Sender: TObject);

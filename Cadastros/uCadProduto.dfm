@@ -305,7 +305,6 @@ inherited frmCadProduto: TfrmCadProduto
     end
   end
   object QryCategoria: TFDQuery [1]
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'Select categoriasId, descricao from categorias')
@@ -349,7 +348,6 @@ inherited frmCadProduto: TfrmCadProduto
     Top = 56
   end
   inherited FDQuery1: TFDQuery
-    Active = True
     AfterScroll = FDQuery1AfterScroll
     SQL.Strings = (
       'SELECT '
@@ -419,7 +417,6 @@ inherited frmCadProduto: TfrmCadProduto
     end
   end
   object QryFornecedor: TFDQuery
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'SELECT fornecedorId,'

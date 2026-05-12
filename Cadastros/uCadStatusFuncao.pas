@@ -1,17 +1,16 @@
-unit uCadStatusFuncao;
+﻿unit uCadStatusFuncao;
 
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, UTelaHeranca,
-  Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Param,
-  FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  UTelaHeranca, Data.DB, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Param, FireDAC.Stan.Error, FireDAC.DatS, FireDAC.Phys.Intf,
   FireDAC.DApt.Intf, FireDAC.Stan.Async, FireDAC.DApt,
   FireDAC.Comp.DataSet, FireDAC.Comp.Client, Vcl.Grids,
   Vcl.DBGrids, Vcl.StdCtrls, Vcl.Mask, Vcl.ComCtrls, Vcl.Buttons,
   Vcl.DBCtrls, Vcl.ExtCtrls, cCadStatusFuncao, uEnum, uDtmnConexao;
-
 type
   TfrmCadStatusFuncao = class(TfrmTelaHeranca)
     pnlTop: TPanel;
@@ -25,10 +24,6 @@ type
     FDQuery1descricao: TStringField;
     QryAcoes: TFDQuery;
     dtsAcoes: TDataSource;
-    QryAcoesusuarioId: TIntegerField;
-    QryAcoesacaoAcessoId: TIntegerField;
-    QryAcoesdescricao: TStringField;
-    QryAcoesativo: TBooleanField;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure btnNovoClick(Sender: TObject);
@@ -37,14 +32,15 @@ type
     procedure grdAcoesDrawColumnCell(Sender: TObject; const Rect: TRect;
       DataCol: Integer; Column: TColumn; State: TGridDrawState);
     procedure dsListagemStateChange(Sender: TObject);
+    procedure dbgrdListagemCellClick(Column: TColumn);
   private
-    { Private declarations }
     oStatusFuncao: TStatusFuncao;
+    FModoNovo: Boolean; // TRUE = novo registro, ações ainda não salvas
     function Gravar(EstadoDoCadastro: TEstadoDoCadastro): Boolean; override;
     function Apagar: Boolean; override;
     procedure CarregarAcoes;
+    procedure CarregarTodasAcoes; // para modo Novo
   public
-    { Public declarations }
   end;
 
 var
@@ -56,6 +52,9 @@ implementation
 
 uses cUsuarioLogado;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// APAGAR
+// ─────────────────────────────────────────────────────────────────────────────
 function TfrmCadStatusFuncao.Apagar: Boolean;
 begin
   Result := False;
@@ -63,36 +62,31 @@ begin
     Result := oStatusFuncao.Apagar;
 end;
 
-function TfrmCadStatusFuncao.Gravar(EstadoDoCadastro: TEstadoDoCadastro): Boolean;
+// ─────────────────────────────────────────────────────────────────────────────
+// CARREGAR TODAS AS AÇÕES — modo Novo (mostra tudo como ativo=1, sem statusId)
+// ─────────────────────────────────────────────────────────────────────────────
+procedure TfrmCadStatusFuncao.CarregarTodasAcoes;
 begin
-  Result := False;
+  QryAcoes.Close;
 
-  if Trim(edtDescricao.Text) = '' then
-  begin
-    MessageDlg('O nome do perfil � obrigat�rio.', mtWarning, [mbOK], 0);
-    edtDescricao.SetFocus;
-    Exit;
-  end;
+  QryAcoes.SQL.Clear;
+  QryAcoes.SQL.Add('SELECT 0 AS statusId,');
+  QryAcoes.SQL.Add('       acaoAcessoId,');
+  QryAcoes.SQL.Add('       chave AS descricao,');
+  QryAcoes.SQL.Add('       CAST(1 AS BIT) AS ativo');
+  QryAcoes.SQL.Add('FROM acaoAcesso');
+  QryAcoes.SQL.Add('ORDER BY chave');
 
-  oStatusFuncao.statusId  := StrToIntDef(edtStatusId.Text, 0);
-  oStatusFuncao.descricao := Trim(edtDescricao.Text);
+  QryAcoes.Open;
 
-  if oStatusFuncao.DescricaoExiste(oStatusFuncao.descricao) then
-  begin
-    MessageDlg('J� existe um perfil com esse nome.', mtWarning, [mbOK], 0);
-    edtDescricao.SetFocus;
-    Exit;
-  end;
+  QryAcoes.CachedUpdates := True;
 
-  if EstadoDoCadastro = ecInserir then
-    Result := oStatusFuncao.Inserir
-  else if EstadoDoCadastro = ecAlterar then
-    Result := oStatusFuncao.Atualizar;
-
-  if Result then
-    CarregarAcoes;
+  QryAcoes.FieldByName('ativo').ReadOnly := False;
 end;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CARREGAR AÇÕES — modo Alterar/Consulta (usa statusAcaoAcesso)
+// ─────────────────────────────────────────────────────────────────────────────
 procedure TfrmCadStatusFuncao.CarregarAcoes;
 var
   vId: Integer;
@@ -102,56 +96,171 @@ begin
   if FDQuery1.FieldByName('statusId').IsNull then Exit;
 
   vId := FDQuery1.FieldByName('statusId').AsInteger;
-
   if vId <= 0 then Exit;
 
   QryAcoes.Close;
-  QryAcoes.ParamByName('statusId').AsInteger := vId;
+  // Restaura o SQL original com parâmetro (pode ter sido trocado pelo CarregarTodasAcoes)
+  QryAcoes.SQL.Clear;
+  QryAcoes.SQL.Add('SELECT saa.statusId,');
+  QryAcoes.SQL.Add('       saa.acaoAcessoId,');
+  QryAcoes.SQL.Add('       aa.chave AS descricao,');
+  QryAcoes.SQL.Add('       saa.ativo');
+  QryAcoes.SQL.Add('FROM statusAcaoAcesso saa');
+  QryAcoes.SQL.Add('INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId');
+  QryAcoes.SQL.Add('WHERE saa.statusId = :statusId');
+  QryAcoes.SQL.Add('ORDER BY aa.chave');
 
+  QryAcoes.ParamByName('statusId').AsInteger := vId;
   try
     QryAcoes.Open;
   except
     on E: Exception do
-    begin
-      ShowMessage('Erro ao carregar a��es: ' + E.Message);
-      Exit;
-    end;
+      ShowMessage('Erro ao carregar ações: ' + E.Message);
   end;
 end;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// GRAVAR
+// ─────────────────────────────────────────────────────────────────────────────
+function TfrmCadStatusFuncao.Gravar(EstadoDoCadastro: TEstadoDoCadastro): Boolean;
+var
+  Qry: TFDQuery;
+  vNovoId: Integer;
+begin
+  Result := False;
+
+  if Trim(edtDescricao.Text) = '' then
+  begin
+    MessageDlg('O nome da função é obrigatório.', mtWarning, [mbOK], 0);
+    edtDescricao.SetFocus;
+    Exit;
+  end;
+
+  oStatusFuncao.statusId  := StrToIntDef(edtStatusId.Text, 0);
+  oStatusFuncao.descricao := Trim(edtDescricao.Text);
+
+  if (EstadoDoCadastro = ecInserir) and
+     oStatusFuncao.DescricaoExiste(oStatusFuncao.descricao) then
+  begin
+    MessageDlg('Já existe uma função com esse nome.', mtWarning, [mbOK], 0);
+    edtDescricao.SetFocus;
+    Exit;
+  end;
+
+  if EstadoDoCadastro = ecInserir then
+  begin
+    Result := oStatusFuncao.Inserir;
+
+    if Result then
+    begin
+      vNovoId := oStatusFuncao.statusId;
+
+      // Salva em statusAcaoAcesso o estado atual da grid (que o usuário configurou)
+      Qry := TFDQuery.Create(nil);
+      try
+        Qry.Connection := dtmConexao.FDConexao;
+
+        // Percorre a grid e salva cada ação com o ativo que o usuário definiu
+        QryAcoes.First;
+        while not QryAcoes.Eof do
+        begin
+          Qry.SQL.Text :=
+            'INSERT INTO statusAcaoAcesso (statusId, acaoAcessoId, ativo) ' +
+            'VALUES (:statusId, :acaoId, :ativo)';
+          Qry.ParamByName('statusId').AsInteger := vNovoId;
+          Qry.ParamByName('acaoId').AsInteger   := QryAcoes.FieldByName('acaoAcessoId').AsInteger;
+          Qry.ParamByName('ativo').AsBoolean    := QryAcoes.FieldByName('ativo').AsBoolean;
+          try
+            dtmConexao.FDConexao.StartTransaction;
+            Qry.ExecSQL;
+            dtmConexao.FDConexao.Commit;
+          except
+            dtmConexao.FDConexao.Rollback;
+            raise;
+          end;
+          QryAcoes.Next;
+        end;
+
+      finally
+        FreeAndNil(Qry);
+      end;
+
+      FModoNovo := False;
+    end;
+  end
+  else if EstadoDoCadastro = ecAlterar then
+    Result := oStatusFuncao.Atualizar;
+
+  if Result then
+    CarregarAcoes;
+end;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DUPLO CLIQUE NA GRID
+// — Modo Novo: alterna direto no dataset em memória (ainda não salvo)
+// — Modo Alterar: alterna em statusAcaoAcesso no banco
+// ─────────────────────────────────────────────────────────────────────────────
 procedure TfrmCadStatusFuncao.grdAcoesDblClick(Sender: TObject);
 var
   Qry: TFDQuery;
   bmAtual: TBookmark;
+  vNovoAtivo: Boolean;
 begin
   if QryAcoes.IsEmpty then Exit;
 
-  bmAtual := QryAcoes.GetBookmark;
-  Qry := TFDQuery.Create(nil);
+  vNovoAtivo := not QryAcoes.FieldByName('ativo').AsBoolean;
+  bmAtual    := QryAcoes.GetBookmark;
+
   try
-    Qry.Connection := dtmConexao.FDConexao;
-    Qry.SQL.Text :=
-      'UPDATE usuariosAcaoAcesso SET ativo = :ativo ' +
-      'WHERE usuarioId = :statusId AND acaoAcessoId = :acaoId';
-    Qry.ParamByName('ativo').AsBoolean    := not QryAcoes.FieldByName('ativo').AsBoolean;
-    Qry.ParamByName('statusId').AsInteger := QryAcoes.FieldByName('usuarioId').AsInteger;
-    Qry.ParamByName('acaoId').AsInteger   := QryAcoes.FieldByName('acaoAcessoId').AsInteger;
-    try
-      dtmConexao.FDConexao.StartTransaction;
-      Qry.ExecSQL;
-      dtmConexao.FDConexao.Commit;
-    except
-      dtmConexao.FDConexao.Rollback;
+    if FModoNovo then
+    begin
+      // Modo Novo: edita em memória sem ir ao banco
+      QryAcoes.Edit;
+      QryAcoes.FieldByName('ativo').AsBoolean := vNovoAtivo;
+      QryAcoes.Post;
+    end
+    else
+    begin
+      // Modo Alterar/Consulta: persiste no banco
+      Qry := TFDQuery.Create(nil);
+      try
+        Qry.Connection := dtmConexao.FDConexao;
+        Qry.SQL.Text :=
+          'UPDATE statusAcaoAcesso SET ativo = :ativo ' +
+          'WHERE statusId = :statusId AND acaoAcessoId = :acaoId';
+        Qry.ParamByName('ativo').AsBoolean    := vNovoAtivo;
+        Qry.ParamByName('statusId').AsInteger := QryAcoes.FieldByName('statusId').AsInteger;
+        Qry.ParamByName('acaoId').AsInteger   := QryAcoes.FieldByName('acaoAcessoId').AsInteger;
+        try
+          dtmConexao.FDConexao.StartTransaction;
+          Qry.ExecSQL;
+          dtmConexao.FDConexao.Commit;
+        except
+          dtmConexao.FDConexao.Rollback;
+        end;
+      finally
+        FreeAndNil(Qry);
+        CarregarAcoes;
+      end;
     end;
   finally
-    FreeAndNil(Qry);
-    CarregarAcoes;
     if QryAcoes.BookmarkValid(bmAtual) then
       QryAcoes.GotoBookmark(bmAtual);
     QryAcoes.FreeBookmark(bmAtual);
   end;
 end;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// NAVEGAÇÃO NO GRID DA LISTAGEM
+// ─────────────────────────────────────────────────────────────────────────────
+procedure TfrmCadStatusFuncao.dbgrdListagemCellClick(Column: TColumn);
+begin
+  CarregarAcoes;
+end;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DRAW CELL
+// ─────────────────────────────────────────────────────────────────────────────
 procedure TfrmCadStatusFuncao.grdAcoesDrawColumnCell(Sender: TObject;
   const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
 begin
@@ -162,8 +271,7 @@ begin
   end
   else if not (gdSelected in State) then
   begin
-    if (TDBGrid(Sender).DataSource.DataSet.RecNo > 0) and
-   Odd(TDBGrid(Sender).DataSource.DataSet.RecNo) then
+    if Odd(TDBGrid(Sender).DataSource.DataSet.RecNo) then
       TDBGrid(Sender).Canvas.Brush.Color := $00F2F2F2
     else
       TDBGrid(Sender).Canvas.Brush.Color := $00E1E1E1;
@@ -185,20 +293,28 @@ begin
   ControlarBotoes;
 end;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// BTN NOVO — carrega TODAS as ações para configurar antes de salvar
+// ─────────────────────────────────────────────────────────────────────────────
 procedure TfrmCadStatusFuncao.btnNovoClick(Sender: TObject);
 begin
   inherited;
+  FModoNovo := True;
   pgcPrincipal.ActivePage := tsManutencao;
-  QryAcoes.Close;
+  CarregarTodasAcoes; // mostra todas as ações já para o usuário configurar
   edtDescricao.SetFocus;
 end;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// BTN ALTERAR
+// ─────────────────────────────────────────────────────────────────────────────
 procedure TfrmCadStatusFuncao.btnAlterarClick(Sender: TObject);
 begin
   if oStatusFuncao.Selecionar(FDQuery1.FieldByName('statusId').AsInteger) then
   begin
     edtStatusId.Text  := IntToStr(oStatusFuncao.statusId);
     edtDescricao.Text := oStatusFuncao.descricao;
+    FModoNovo := False;
     inherited;
     CarregarAcoes;
   end
@@ -209,38 +325,26 @@ begin
   end;
 end;
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FORM CREATE
+// ─────────────────────────────────────────────────────────────────────────────
 procedure TfrmCadStatusFuncao.FormCreate(Sender: TObject);
 begin
-  // Define o SQL ANTES do inherited � o inherited abre a query no FormShow
   FDQuery1.SQL.Clear;
   FDQuery1.SQL.Add('SELECT statusId, descricao');
   FDQuery1.SQL.Add('FROM statusUsuario');
   FDQuery1.SQL.Add('ORDER BY descricao');
 
-  QryAcoes.SQL.Clear;
-  QryAcoes.SQL.Add('SELECT saa.usuarioId,');
-  QryAcoes.SQL.Add('       saa.acaoAcessoId,');
-  QryAcoes.SQL.Add('       aa.chave AS descricao,');
-  QryAcoes.SQL.Add('       saa.ativo');
-  QryAcoes.SQL.Add('FROM statusAcaoAcesso saa');
-  QryAcoes.SQL.Add('INNER JOIN acaoAcesso aa ON aa.acaoAcessoId = saa.acaoAcessoId');
-  QryAcoes.SQL.Add('WHERE saa.usuarioId = :statusId');
-  QryAcoes.SQL.Add('ORDER BY aa.chave');
-
-  inherited; // ? herdado por �LTIMO � ele abre o FDQuery1 no FormShow
+  inherited;
 
   oStatusFuncao := TStatusFuncao.Create(dtmConexao.FDConexao);
   IndiceAtual   := 'descricao';
+  FModoNovo     := False;
 
   if grdAcoes.Columns.Count > 0 then
   begin
     grdAcoes.Columns[0].Title.Font.Color := clWhite;
     grdAcoes.Columns[0].Title.Font.Style := [fsBold];
-    if grdAcoes.Columns.Count > 1 then
-    begin
-      grdAcoes.Columns[1].Title.Font.Color := clWhite;
-      grdAcoes.Columns[1].Title.Font.Style := [fsBold];
-    end;
   end;
 end;
 

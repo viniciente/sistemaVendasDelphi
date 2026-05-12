@@ -191,6 +191,9 @@ begin
   inherited;
   oUsuario:=TUsuario.Create(dtmConexao.FdConexao);
   IndiceAtual:='nome';
+
+  FDQryStatusUsuario.Close;
+  FDQryStatusUsuario.Open;
 end;
 
 end.

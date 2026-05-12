@@ -280,15 +280,11 @@ end;
 procedure TfrmCadProduto.lkpCategoriaClick(Sender: TObject);
 begin
   AjustarInterfacePorCategoria;
-
-  QryCategoria.Close;
-  QryCategoria.Open;
 end;
 
 procedure TfrmCadProduto.lkpCategoriaExit(Sender: TObject);
 begin
   inherited;
-  QryCategoria.Close;
 end;
 
 {$ENDREGION}
@@ -406,6 +402,12 @@ begin
   inherited;
   oProduto := TProduto.Create(dtmConexao.FDConexao);
   IndiceAtual := 'nome';
+
+  QryCategoria.Close;
+  QryCategoria.Open;
+
+  QryFornecedor.Close;
+  QryFornecedor.Open;
 end;
 
 procedure TfrmCadProduto.FormShow(Sender: TObject);
