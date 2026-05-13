@@ -9,12 +9,14 @@ uses
   FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.VCLUI.Wait, Data.DB,
   FireDAC.Comp.Client, FireDAC.Phys.MSSQL, FireDAC.Phys.MSSQLDef, FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf,
-  FireDAC.DApt, FireDAC.Comp.DataSet;
+  FireDAC.DApt, FireDAC.Comp.DataSet, System.IniFiles;
 
 type
   TdtmConexao = class(TDataModule)
     FDConexao: TFDConnection;
+    procedure DataModuleCreate(Sender: TObject);
   private
+    procedure ConfigurarConexaoDinamicamente;
     { Private declarations }
   public
     { Public declarations }
@@ -28,5 +30,43 @@ implementation
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
+
+procedure TdtmConexao.ConfigurarConexaoDinamicamente;
+var
+  LIni: TIniFile;
+  CaminhoArquivo: string;
+begin
+  // Define o caminho: mesma pasta do executável + nome config.ini
+  CaminhoArquivo := ExtractFilePath(ParamStr(0)) + 'config.ini';
+
+  LIni := TIniFile.Create(CaminhoArquivo);
+  try
+    // Se o arquivo NÃO existir, vamos escrever os valores padrão de Vendas nele
+    if not FileExists(CaminhoArquivo) then
+    begin
+      LIni.WriteString('BANCO', 'Driver', 'MSSQL');
+      LIni.WriteString('BANCO', 'Servidor', 'DC-TR-06-VM\SERVERCURSO');
+      LIni.WriteString('BANCO', 'NomeBanco', 'Vendas');
+      LIni.WriteString('BANCO', 'AutenticacaoWindows', 'Yes');
+      LIni.WriteString('BANCO', 'Usuario', 'DOMTEC\devmv');
+    end;
+
+    // Agora lemos do arquivo e passamos exatamente para as propriedades do FireDAC
+    FDConexao.Params.Values['DriverID']  := LIni.ReadString('BANCO', 'Driver', 'MSSQL');
+    FDConexao.Params.Values['Server']    := LIni.ReadString('BANCO', 'Servidor', 'DC-TR-06-VM\SERVERCURSO');
+    FDConexao.Params.Values['Database']  := LIni.ReadString('BANCO', 'NomeBanco', 'Vendas');
+    FDConexao.Params.Values['OSAuthent'] := LIni.ReadString('BANCO', 'AutenticacaoWindows', 'Yes');
+    FDConexao.Params.Values['User_Name'] := LIni.ReadString('BANCO', 'Usuario', 'DOMTEC\devmv');
+
+    FDConexao.LoginPrompt := False;
+  finally
+    LIni.Free;
+  end;
+end;
+
+procedure TdtmConexao.DataModuleCreate(Sender: TObject);
+begin
+  ConfigurarConexaoDinamicamente;
+end;
 
 end.

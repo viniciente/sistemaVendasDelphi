@@ -1,5 +1,6 @@
 object dtmConexao: TdtmConexao
   OldCreateOrder = False
+  OnCreate = DataModuleCreate
   Height = 484
   Width = 666
   object fdConexao: TFDConnection
@@ -9,6 +10,7 @@ object dtmConexao: TdtmConexao
       'OSAuthent=Yes'
       'User_Name=DOMTEC\devmv'
       'DriverID=MSSQL')
+    Connected = True
     LoginPrompt = False
     Left = 168
     Top = 104

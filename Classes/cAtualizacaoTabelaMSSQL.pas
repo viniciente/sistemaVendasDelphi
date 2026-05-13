@@ -17,22 +17,14 @@ type
     function TabelaExiste(Nome: String): Boolean;
     function ColunaExiste(Tabela, Coluna: String): Boolean;
 
-    procedure Categorias;
-    procedure TipoPessoa;
-    procedure StatusClientes;
-    procedure StatusUsuario;
-    procedure Fornecedor;
-    procedure Clientes;
-    procedure Produtos;
-    procedure Usuarios;
-    procedure AcaoAcesso;
-    procedure UsuariosAcaoAcesso;
-    procedure StatusAcaoAcesso;
-    procedure Vendas;
-    procedure VendasItens;
+    procedure CriarTabelas;
+    procedure InserirDadosPadrao;
+    procedure AtualizarEstrutura;
 
   public
     constructor Create(aConexao: TFDConnection);
+
+    procedure Executar;
   end;
 
 implementation
@@ -43,90 +35,36 @@ uses uCadUsuario, cCadUsuario;
 
 {$REGION 'CONSTRUCTOR'}
 
-constructor TAtualizacaoTabelaMSSQL.Create(aConexao: TFDConnection);
+constructor TAtualizacaoTabelaMSSQL.Create(
+  aConexao: TFDConnection
+);
 begin
   FdConexao := aConexao;
+end;
 
-  // TABELAS DE DOMÍNIO (Não possuem FKs para outras tabelas primárias)
-  Categorias;
-  TipoPessoa;
-  StatusClientes;
-  StatusUsuario;
-  Fornecedor;
-  AcaoAcesso;
+procedure TAtualizacaoTabelaMSSQL.Executar;
+begin
+  CriarTabelas;
 
-  // TABELAS PRINCIPAIS E RELACIONAMENTOS (Possuem FKs)
-  Clientes;
-  Produtos;
-  Usuarios;
+  AtualizarEstrutura;
 
-  StatusAcaoAcesso;
-  UsuariosAcaoAcesso;
-
-  Vendas;
-  VendasItens;
+  InserirDadosPadrao;
 end;
 
 {$ENDREGION}
 
-{$REGION 'TABELAEXISTE & COLUNAEXISTE'}
-
-function TAtualizacaoTabelaMSSQL.TabelaExiste(Nome: String): Boolean;
-var Q: TFDQuery;
+function TAtualizacaoTabelaMSSQL.TabelaExiste(Nome: String): Boolean; var Q: TFDQuery;
 begin
-  Q := TFDQuery.Create(nil);
-  try
-    Q.Connection := FdConexao;
-    Q.SQL.Text := 'SELECT OBJECT_ID(:NOME)';
-    Q.ParamByName('NOME').AsString := Nome;
-    Q.Open;
-    Result := not Q.Fields[0].IsNull;
-  finally
-    Q.Free;
-  end;
-end;
+Q := TFDQuery.Create(nil);
+try
+Q.Connection := FdConexao; Q.SQL.Text := 'SELECT OBJECT_ID(:NOME)'; Q.ParamByName('NOME').AsString := Nome; Q.Open; Result := not Q.Fields[0].IsNull; finally Q.Free; end; end; function TAtualizacaoTabelaMSSQL.ColunaExiste(Tabela, Coluna: String): Boolean; var Q: TFDQuery; begin Q := TFDQuery.Create(nil); try Q.Connection := FdConexao; Q.SQL.Text := 'SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS '+ 'WHERE TABLE_NAME = :T AND COLUMN_NAME = :C'; Q.ParamByName('T').AsString := Tabela; Q.ParamByName('C').AsString := Coluna; Q.Open; Result := not Q.IsEmpty; finally Q.Free; end; end;
 
-function TAtualizacaoTabelaMSSQL.ColunaExiste(Tabela, Coluna: String): Boolean;
-var Q: TFDQuery;
+procedure TAtualizacaoTabelaMSSQL.CriarTabelas;
 begin
-  Q := TFDQuery.Create(nil);
-  try
-    Q.Connection := FdConexao;
-    Q.SQL.Text :=
-      'SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS '+
-      'WHERE TABLE_NAME = :T AND COLUMN_NAME = :C';
-    Q.ParamByName('T').AsString := Tabela;
-    Q.ParamByName('C').AsString := Coluna;
-    Q.Open;
-    Result := not Q.IsEmpty;
-  finally
-    Q.Free;
-  end;
-end;
 
-{$ENDREGION}
-
-{$REGION 'CRIAÇÃO TABELAS'}
-
-procedure TAtualizacaoTabelaMSSQL.Fornecedor;
-begin
-  if not TabelaExiste('fornecedor') then
-  begin
-    FdConexao.ExecSQL(
-    'CREATE TABLE fornecedor ('+
-      ' fornecedorId INT IDENTITY PRIMARY KEY, '+
-      ' nomeFantasia VARCHAR(100) NOT NULL, '+
-      ' razaoSocial VARCHAR(100) NULL, '+
-      ' cnpj VARCHAR(20) NULL, '+
-      ' telefone VARCHAR(20) NULL, '+
-      ' email VARCHAR(100) NULL )'
-    );
-  end;
-end;
-
-procedure TAtualizacaoTabelaMSSQL.Categorias;
-var Q: TFDQuery;
-begin
+  // =========================================================
+  // CATEGORIAS
+  // =========================================================
   if not TabelaExiste('categorias') then
   begin
     FdConexao.ExecSQL(
@@ -136,45 +74,9 @@ begin
     );
   end;
 
-  Q := TFDQuery.Create(nil);
-  try
-    Q.Connection := FdConexao;
-    Q.SQL.Text := 'SELECT 1 FROM categorias WHERE descricao = :desc';
-    Q.ParamByName('desc').AsString := 'Serviços';
-    Q.Open;
-
-    if Q.IsEmpty then
-    begin
-      FdConexao.ExecSQL(
-        'INSERT INTO categorias (descricao) VALUES (:desc)',
-        ['Serviços']
-      );
-    end;
-  finally
-    Q.Free;
-  end;
-end;
-
-procedure TAtualizacaoTabelaMSSQL.StatusClientes;
-begin
-  if not TabelaExiste('statusClientes') then
-  begin
-    FdConexao.ExecSQL(
-      'CREATE TABLE statusClientes ('+
-      ' statusId INT IDENTITY PRIMARY KEY, '+
-      ' descricao VARCHAR(20) NOT NULL)'
-    );
-  end;
-
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Ativo'') INSERT INTO statusClientes (descricao) VALUES (''Ativo'')');
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Bloqueado'') INSERT INTO statusClientes (descricao) VALUES (''Bloqueado'')');
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Atenção'') INSERT INTO statusClientes (descricao) VALUES (''Atenção'')');
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Inativo'') INSERT INTO statusClientes (descricao) VALUES (''Inativo'')');
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Prospecto'') INSERT INTO statusClientes (descricao) VALUES (''Prospecto'')');
-end;
-
-procedure TAtualizacaoTabelaMSSQL.TipoPessoa;
-begin
+  // =========================================================
+  // TIPO PESSOA
+  // =========================================================
   if not TabelaExiste('tipoPessoa') then
   begin
     FdConexao.ExecSQL(
@@ -184,53 +86,62 @@ begin
     );
   end;
 
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM tipoPessoa WHERE descricao = ''Física'') INSERT INTO tipoPessoa (descricao) VALUES (''Física'')');
-  FdConexao.ExecSQL('IF NOT EXISTS (SELECT 1 FROM tipoPessoa WHERE descricao = ''Jurídica'') INSERT INTO tipoPessoa (descricao) VALUES (''Jurídica'')');
-end;
+  // =========================================================
+  // STATUS CLIENTES
+  // =========================================================
+  if not TabelaExiste('statusClientes') then
+  begin
+    FdConexao.ExecSQL(
+      'CREATE TABLE statusClientes ('+
+      ' statusId INT IDENTITY PRIMARY KEY, '+
+      ' descricao VARCHAR(20) NOT NULL )'
+    );
+  end;
 
-procedure TAtualizacaoTabelaMSSQL.StatusUsuario;
-var Q: TFDQuery;
-begin
+  // =========================================================
+  // STATUS USUARIO
+  // =========================================================
   if not TabelaExiste('statusUsuario') then
   begin
     FdConexao.ExecSQL(
       'CREATE TABLE statusUsuario ('+
       ' statusId INT IDENTITY PRIMARY KEY, '+
-      ' descricao VARCHAR(50) NOT NULL)'
+      ' descricao VARCHAR(50) NOT NULL )'
     );
   end;
 
-  Q := TFDQuery.Create(nil);
-  try
-    Q.Connection := FdConexao;
-    Q.SQL.Text := 'SELECT 1 FROM statusUsuario WHERE descricao = :desc';
-    Q.ParamByName('desc').AsString := 'ADMIN';
-    Q.Open;
-
-    if Q.IsEmpty then
-    begin
-      FdConexao.ExecSQL('INSERT INTO statusUsuario (descricao) VALUES (:desc)', ['ADMIN']);
-    end;
-  finally
-    Q.Free;
+  // =========================================================
+  // FORNECEDOR
+  // =========================================================
+  if not TabelaExiste('fornecedor') then
+  begin
+    FdConexao.ExecSQL(
+      'CREATE TABLE fornecedor ('+
+      ' fornecedorId INT IDENTITY PRIMARY KEY, '+
+      ' nomeFantasia VARCHAR(100) NOT NULL, '+
+      ' razaoSocial VARCHAR(100) NULL, '+
+      ' cnpj VARCHAR(20) NULL, '+
+      ' telefone VARCHAR(20) NULL, '+
+      ' email VARCHAR(100) NULL )'
+    );
   end;
-end;
 
-procedure TAtualizacaoTabelaMSSQL.AcaoAcesso;
-begin
+  // =========================================================
+  // ACAO ACESSO
+  // =========================================================
   if not TabelaExiste('acaoAcesso') then
   begin
     FdConexao.ExecSQL(
       'CREATE TABLE acaoAcesso ('+
       ' acaoAcessoId INT IDENTITY PRIMARY KEY, '+
       ' descricao VARCHAR(100), '+
-      ' chave VARCHAR(60) UNIQUE)'
+      ' chave VARCHAR(60) UNIQUE )'
     );
   end;
-end;
 
-procedure TAtualizacaoTabelaMSSQL.Clientes;
-begin
+  // =========================================================
+  // CLIENTES
+  // =========================================================
   if not TabelaExiste('clientes') then
   begin
     FdConexao.ExecSQL(
@@ -238,7 +149,7 @@ begin
       ' clienteId INT IDENTITY PRIMARY KEY, '+
       ' nome VARCHAR(60), '+
       ' endereco VARCHAR(60), '+
-      ' numero VARCHAR(20), '+    // ADDED
+      ' numero VARCHAR(20), '+
       ' cidade VARCHAR(50), '+
       ' bairro VARCHAR(40), '+
       ' estado VARCHAR(2), '+
@@ -246,25 +157,17 @@ begin
       ' telefone VARCHAR(14), '+
       ' email VARCHAR(100), '+
       ' dataNascimento DATETIME, '+
-      ' cpf_cnpj VARCHAR(20), '+  // ADDED
-      ' pessoaId INT, '+          // ADDED
+      ' cpf_cnpj VARCHAR(20), '+
+      ' pessoaId INT, '+
       ' statusId INT, '+
-      ' FOREIGN KEY (pessoaId) REFERENCES tipoPessoa(pessoaId), '+ // FK ADDED
+      ' FOREIGN KEY (pessoaId) REFERENCES tipoPessoa(pessoaId), '+
       ' FOREIGN KEY (statusId) REFERENCES statusClientes(statusId) )'
     );
-  end
-  else
-  begin
-    // Tratamento caso a tabela exista mas falte algo (pode jogar na sua classe cAtualizacaoCamposMSSQL futuramente)
-    if not ColunaExiste('clientes', 'cpf_cnpj') then
-      FdConexao.ExecSQL('ALTER TABLE clientes ADD cpf_cnpj VARCHAR(20)');
-    if not ColunaExiste('clientes', 'numero') then
-      FdConexao.ExecSQL('ALTER TABLE clientes ADD numero VARCHAR(20)');
   end;
-end;
 
-procedure TAtualizacaoTabelaMSSQL.Produtos;
-begin
+  // =========================================================
+  // PRODUTOS
+  // =========================================================
   if not TabelaExiste('produtos') then
   begin
     FdConexao.ExecSQL(
@@ -273,85 +176,53 @@ begin
       ' nome VARCHAR(60), '+
       ' descricao VARCHAR(255), '+
       ' valor DECIMAL(18,5), '+
-      ' quantidade DECIMAL(18,5), '+ // CORRIGIDO PARA DECIMAL
+      ' quantidade DECIMAL(18,5), '+
       ' categoriasId INT, '+
       ' fornecedorId INT, '+
       ' foto VARBINARY(MAX), '+
       ' FOREIGN KEY (categoriasId) REFERENCES categorias(categoriasId), '+
-      ' FOREIGN KEY (fornecedorId) REFERENCES fornecedor(fornecedorId))'
+      ' FOREIGN KEY (fornecedorId) REFERENCES fornecedor(fornecedorId) )'
     );
   end;
-end;
 
-procedure TAtualizacaoTabelaMSSQL.Usuarios;
-var
-  Q: TFDQuery;
-  StatusId: Integer;
-begin
+  // =========================================================
+  // USUARIOS
+  // =========================================================
   if not TabelaExiste('usuarios') then
   begin
     FdConexao.ExecSQL(
       'CREATE TABLE usuarios ('+
       ' usuarioId INT IDENTITY PRIMARY KEY, '+
       ' nome VARCHAR(50) NOT NULL, '+
-      ' senha VARCHAR(255) NOT NULL, '+ // Aumentado para hash
+      ' senha VARCHAR(255) NOT NULL, '+
       ' foto VARBINARY(MAX) NULL, '+
       ' statusId INT NULL, '+
       ' FOREIGN KEY (statusId) REFERENCES statusUsuario(statusId) )'
     );
   end;
 
-  Q := TFDQuery.Create(nil);
-  try
-    Q.Connection := FdConexao;
-    Q.SQL.Text := 'SELECT statusId FROM statusUsuario WHERE descricao = :desc';
-    Q.ParamByName('desc').AsString := 'ADMIN';
-    Q.Open;
-
-    if not Q.IsEmpty then
-      StatusId := Q.FieldByName('statusId').AsInteger
-    else
-      StatusId := 1;
-
-    Q.Close;
-    Q.SQL.Text := 'SELECT 1 FROM usuarios WHERE nome = :nome';
-    Q.ParamByName('nome').AsString := 'ADMIN';
-    Q.Open;
-
-    if Q.IsEmpty then
-    begin
-      FdConexao.ExecSQL(
-        'INSERT INTO usuarios (nome, senha, statusId) VALUES (:n, :s, :st)',
-        ['ADMIN', '987', StatusId]
-      );
-    end;
-  finally
-    Q.Free;
-  end;
-end;
-
-procedure TAtualizacaoTabelaMSSQL.StatusAcaoAcesso;
-begin
+  // =========================================================
+  // STATUS ACAO ACESSO
+  // =========================================================
   if not TabelaExiste('statusAcaoAcesso') then
   begin
     FdConexao.ExecSQL(
-    ' CREATE TABLE statusAcaoAcesso (  '+
-    ' statusId      INT  NOT NULL,       '+ // MUDADO DE usuarioId PARA statusId
-    ' acaoAcessoId  INT  NOT NULL,         '+
-    ' ativo         BIT  NOT NULL DEFAULT 1, '+
-    ' CONSTRAINT PK_statusAcaoAcesso           '+
-    ' PRIMARY KEY (statusId, acaoAcessoId),      '+
-    ' CONSTRAINT FK_statusAcaoAcesso_status    '+
-    ' FOREIGN KEY (statusId) REFERENCES statusUsuario(statusId), '+
-    ' CONSTRAINT FK_statusAcaoAcesso_acao                        '+
-    ' FOREIGN KEY (acaoAcessoId) REFERENCES acaoAcesso(acaoAcessoId) '+
-    ' ); '
+      'CREATE TABLE statusAcaoAcesso ('+
+      ' statusId INT NOT NULL, '+
+      ' acaoAcessoId INT NOT NULL, '+
+      ' ativo BIT NOT NULL DEFAULT 1, '+
+      ' CONSTRAINT PK_statusAcaoAcesso '+
+      ' PRIMARY KEY (statusId, acaoAcessoId), '+
+      ' CONSTRAINT FK_statusAcaoAcesso_status '+
+      ' FOREIGN KEY (statusId) REFERENCES statusUsuario(statusId), '+
+      ' CONSTRAINT FK_statusAcaoAcesso_acao '+
+      ' FOREIGN KEY (acaoAcessoId) REFERENCES acaoAcesso(acaoAcessoId) )'
     );
   end;
-end;
 
-procedure TAtualizacaoTabelaMSSQL.UsuariosAcaoAcesso;
-begin
+  // =========================================================
+  // USUARIOS ACAO ACESSO
+  // =========================================================
   if not TabelaExiste('usuariosAcaoAcesso') then
   begin
     FdConexao.ExecSQL(
@@ -360,34 +231,33 @@ begin
       ' acaoAcessoId INT NOT NULL, '+
       ' ativo BIT NOT NULL DEFAULT 1, '+
       ' PRIMARY KEY (usuarioId, acaoAcessoId), '+
-      '   CONSTRAINT FK_UsuarioAcaoAcessoUsuario '+
-      '   FOREIGN KEY (usuarioId) REFERENCES usuarios(usuarioId), '+
-      '   CONSTRAINT FK_UsuarioAcaoAcessoAcaoAcesso '+
-      '   FOREIGN KEY (acaoAcessoId) REFERENCES acaoAcesso(acaoAcessoId) '+
-      ' ) '
+      ' CONSTRAINT FK_UsuarioAcaoAcessoUsuario '+
+      ' FOREIGN KEY (usuarioId) REFERENCES usuarios(usuarioId), '+
+      ' CONSTRAINT FK_UsuarioAcaoAcessoAcaoAcesso '+
+      ' FOREIGN KEY (acaoAcessoId) REFERENCES acaoAcesso(acaoAcessoId) )'
     );
   end;
-end;
 
-procedure TAtualizacaoTabelaMSSQL.Vendas;
-begin
+  // =========================================================
+  // VENDAS
+  // =========================================================
   if not TabelaExiste('vendas') then
   begin
     FdConexao.ExecSQL(
       'CREATE TABLE vendas ('+
       ' vendaId INT IDENTITY PRIMARY KEY, '+
       ' clienteId INT NOT NULL, '+
-      ' usuarioId INT NULL, '+    // Adicionado para suportar seu dashboard
+      ' usuarioId INT NULL, '+
       ' dataVenda DATETIME NULL DEFAULT GETDATE(), '+
       ' totalVenda DECIMAL(18,5) NULL, '+
       ' FOREIGN KEY (clienteId) REFERENCES clientes(clienteId), '+
-      ' FOREIGN KEY (usuarioId) REFERENCES usuarios(usuarioId))'
+      ' FOREIGN KEY (usuarioId) REFERENCES usuarios(usuarioId) )'
     );
   end;
-end;
 
-procedure TAtualizacaoTabelaMSSQL.VendasItens;
-begin
+  // =========================================================
+  // VENDAS ITENS
+  // =========================================================
   if not TabelaExiste('vendasItens') then
   begin
     FdConexao.ExecSQL(
@@ -399,9 +269,49 @@ begin
       ' totalProduto DECIMAL(18,5) NULL, '+
       ' PRIMARY KEY (vendaId, produtoId), '+
       ' FOREIGN KEY (vendaId) REFERENCES vendas(vendaId), '+
-      ' FOREIGN KEY (produtoId) REFERENCES produtos(produtoId))'
+      ' FOREIGN KEY (produtoId) REFERENCES produtos(produtoId) )'
     );
   end;
+
+end;
+
+procedure TAtualizacaoTabelaMSSQL.AtualizarEstrutura;
+begin
+
+  if not ColunaExiste('clientes', 'cpf_cnpj') then
+  begin
+    FdConexao.ExecSQL(
+      'ALTER TABLE clientes ADD cpf_cnpj VARCHAR(20)'
+    );
+  end;
+
+  if not ColunaExiste('clientes', 'numero') then
+  begin
+    FdConexao.ExecSQL(
+      'ALTER TABLE clientes ADD numero VARCHAR(20)'
+    );
+  end;
+
+end;
+
+procedure TAtualizacaoTabelaMSSQL.InserirDadosPadrao;
+begin
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM tipoPessoa WHERE descricao = ''Física'') '+
+    'INSERT INTO tipoPessoa (descricao) VALUES (''Física'')'
+  );
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM tipoPessoa WHERE descricao = ''Jurídica'') '+
+    'INSERT INTO tipoPessoa (descricao) VALUES (''Jurídica'')'
+  );
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Ativo'') '+
+    'INSERT INTO statusClientes (descricao) VALUES (''Ativo'')'
+  );
+
 end;
 
 {$ENDREGION}

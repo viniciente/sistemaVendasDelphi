@@ -20,11 +20,12 @@ inherited frmProVendas: TfrmProVendas
       end
     end
     inherited pgcPrincipal: TPageControl
+      ActivePage = tsManutencao
       inherited tsListagem: TTabSheet
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
         inherited dbgrdListagem: TDBGrid
           DataSource = dsListagem
           Columns = <
@@ -56,10 +57,10 @@ inherited frmProVendas: TfrmProVendas
         end
       end
       inherited tsManutencao: TTabSheet
-        ExplicitLeft = 0
-        ExplicitTop = 0
-        ExplicitWidth = 0
-        ExplicitHeight = 0
+        ExplicitLeft = 4
+        ExplicitTop = 24
+        ExplicitWidth = 740
+        ExplicitHeight = 373
         object lblCliente: TLabel
           Left = 183
           Top = 21

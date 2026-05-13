@@ -1,50 +1,74 @@
 ﻿[Closed Files]
-File_0=TSourceModule,'C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.dfm',0,1,1,1,1,0,0,,
-File_1=TSourceModule,'C:\ProjetoDelphi\Login\uUsuarioVsAcoes.dfm',0,1,1,1,1,0,0,,
-File_2=TSourceModule,'C:\ProjetoDelphi\Cadastros\uCadUsuario.pas',0,1,189,13,200,0,0,{{99,0}
-File_3=TSourceModule,'C:\ProjetoDelphi\Classes\cCadUsuario.pas',0,1,43,26,386,0,0,{{43,0}
-File_4=TSourceModule,'C:\ProjetoDelphi\Classes\cAtualizacaoBancoDeDados.pas',0,1,67,70,12,0,0,,{1
-File_5=TSourceModule,'C:\ProjetoDelphi\Classes\cAtualizacaoCamposMSSQL.pas',0,1,67,1,1,0,0,,
-File_6=TSourceModule,'c:\program files (x86)\embarcadero\studio\19.0\source\data\vclctrls\Vcl.DBCtrls.pas',0,1,1351,1,1382,0,0,,
-File_7=TSourceModule,'C:\ProjetoDelphi\Herança\uEnum.pas',0,1,1,22,10,0,0,,
-File_8=TSourceModule,'c:\program files (x86)\embarcadero\studio\19.0\source\data\firedac\FireDAC.Comp.Client.pas',0,1,600,1,616,0,0,,
-File_9=TSourceModule,'C:\ProjetoDelphi\Classes\cCadProduto.pas',0,1,224,35,239,0,0,{{48,0}
-File_10=TSourceModule,'C:\ProjetoDelphi\Relatorio\uRelProduto.pas',0,1,1,5,13,0,0,,
+File_0=TSourceModule,'C:\ProjetoDelphi\Classes\cConfigBanco.pas',0,1,85,5,121,0,0,,
+File_1=TSourceModule,'C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.pas',0,1,79,83,62,0,0,,
+File_2=TSourceModule,'C:\ProjetoDelphi\Classes\cCadStatusFuncao.pas',0,1,99,84,107,0,0,,
+File_3=TSourceModule,'C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.dfm',0,1,1,1,1,0,0,,
+File_4=TSourceModule,'C:\ProjetoDelphi\Login\uUsuarioVsAcoes.dfm',0,1,1,1,1,0,0,,
+File_5=TSourceModule,'c:\program files (x86)\embarcadero\studio\19.0\source\data\vclctrls\Vcl.DBCtrls.pas',0,1,1351,1,1382,0,0,,
+File_6=TSourceModule,'C:\ProjetoDelphi\Herança\uEnum.pas',0,1,1,22,10,0,0,,
+File_7=TSourceModule,'c:\program files (x86)\embarcadero\studio\19.0\source\data\firedac\FireDAC.Comp.Client.pas',0,1,600,1,616,0,0,,
+File_8=TSourceModule,'C:\ProjetoDelphi\Classes\cCadProduto.pas',0,1,224,35,239,0,0,{{48,0}
+File_9=TSourceModule,'C:\ProjetoDelphi\Relatorio\uRelProduto.pas',0,1,1,5,13,0,0,,
 
 [Modules]
-Module0=C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.pas
-Module1=C:\ProjetoDelphi\Login\uUsuarioVsAcoes.pas
-Module2=C:\ProjetoDelphi\Herança\uFuncaoCriptografia.pas
-Module3=C:\ProjetoDelphi\Classes\cAtualizacaoTabelaMSSQL.pas
-Module4=C:\ProjetoDelphi\Processo\uProVendas.pas
-Module5=C:\ProjetoDelphi\DataModule\uDtmVenda.pas
-Module6=C:\ProjetoDelphi\Classes\cFuncao.pas
-Module7=C:\ProjetoDelphi\Cadastros\uCadProduto.pas
-Module8=C:\ProjetoDelphi\Cadastros\uCadFornecedor.pas
-Module9=C:\ProjetoDelphi\Cadastros\uCadCategorias.pas
-Module10=C:\ProjetoDelphi\Classes\cCadFornecedor.pas
-Module11=C:\ProjetoDelphi\Classes\cControleEstoque.pas
-Module12=C:\ProjetoDelphi\Cadastros\uCadCliente.pas
-Module13=C:\ProjetoDelphi\Herança\uTelaHerancaConsulta.pas
-Module14=C:\ProjetoDelphi\Consultas\uConCategorias.pas
-Module15=C:\ProjetoDelphi\Consultas\uConClientes.pas
-Module16=C:\ProjetoDelphi\Unit2.pas
-Module17=C:\ProjetoDelphi\Classes\cCadCategoria.pas
-Module18=C:\ProjetoDelphi\Login\uLogin.pas
-Module19=C:\ProjetoDelphi\Classes\cUsuarioLogado.pas
-Count=20
+Module0=C:\ProjetoDelphi\DataModule\uDtmnConexao.pas
+Module1=C:\ProjetoDelphi\Classes\cAtualizacaoTabelaMSSQL.pas
+Module2=C:\ProjetoDelphi\Classes\cAtualizacaoCamposMSSQL.pas
+Module3=C:\ProjetoDelphi\Classes\cAtualizacaoBancoDeDados.pas
+Module4=C:\ProjetoDelphi\Cadastros\uCadUsuario.pas
+Module5=C:\ProjetoDelphi\Unit2.pas
+Module6=C:\ProjetoDelphi\Login\uLogin.pas
+Module7=C:\ProjetoDelphi\Classes\cCadUsuario.pas
+Module8=C:\ProjetoDelphi\Cadastros\uCadProduto.pas
+Module9=C:\ProjetoDelphi\Herança\uFuncaoCriptografia.pas
+Module10=C:\ProjetoDelphi\Login\uUsuarioVsAcoes.pas
+Module11=C:\ProjetoDelphi\Processo\uProVendas.pas
+Module12=C:\ProjetoDelphi\DataModule\uDtmVenda.pas
+Module13=C:\ProjetoDelphi\Classes\cFuncao.pas
+Module14=C:\ProjetoDelphi\Cadastros\uCadFornecedor.pas
+Module15=C:\ProjetoDelphi\Cadastros\uCadCategorias.pas
+Module16=C:\ProjetoDelphi\Classes\cCadFornecedor.pas
+Module17=C:\ProjetoDelphi\Classes\cControleEstoque.pas
+Module18=C:\ProjetoDelphi\Cadastros\uCadCliente.pas
+Module19=C:\ProjetoDelphi\Herança\uTelaHerancaConsulta.pas
+Module20=C:\ProjetoDelphi\Consultas\uConCategorias.pas
+Module21=C:\ProjetoDelphi\Consultas\uConClientes.pas
+Module22=C:\ProjetoDelphi\Classes\cCadCategoria.pas
+Module23=C:\ProjetoDelphi\Classes\cUsuarioLogado.pas
+Count=24
 EditWindowCount=1
 
-[C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.pas]
+[C:\ProjetoDelphi\DataModule\uDtmnConexao.pas]
 ModuleType=TSourceModule
 
-[C:\ProjetoDelphi\Login\uUsuarioVsAcoes.pas]
+[C:\ProjetoDelphi\Classes\cAtualizacaoTabelaMSSQL.pas]
+ModuleType=TSourceModule
+
+[C:\ProjetoDelphi\Classes\cAtualizacaoCamposMSSQL.pas]
+ModuleType=TSourceModule
+
+[C:\ProjetoDelphi\Classes\cAtualizacaoBancoDeDados.pas]
+ModuleType=TSourceModule
+
+[C:\ProjetoDelphi\Cadastros\uCadUsuario.pas]
+ModuleType=TSourceModule
+
+[C:\ProjetoDelphi\Unit2.pas]
+ModuleType=TSourceModule
+
+[C:\ProjetoDelphi\Login\uLogin.pas]
+ModuleType=TSourceModule
+
+[C:\ProjetoDelphi\Classes\cCadUsuario.pas]
+ModuleType=TSourceModule
+
+[C:\ProjetoDelphi\Cadastros\uCadProduto.pas]
 ModuleType=TSourceModule
 
 [C:\ProjetoDelphi\Herança\uFuncaoCriptografia.pas]
 ModuleType=TSourceModule
 
-[C:\ProjetoDelphi\Classes\cAtualizacaoTabelaMSSQL.pas]
+[C:\ProjetoDelphi\Login\uUsuarioVsAcoes.pas]
 ModuleType=TSourceModule
 
 [C:\ProjetoDelphi\Processo\uProVendas.pas]
@@ -54,9 +78,6 @@ ModuleType=TSourceModule
 ModuleType=TSourceModule
 
 [C:\ProjetoDelphi\Classes\cFuncao.pas]
-ModuleType=TSourceModule
-
-[C:\ProjetoDelphi\Cadastros\uCadProduto.pas]
 ModuleType=TSourceModule
 
 [C:\ProjetoDelphi\Cadastros\uCadFornecedor.pas]
@@ -83,21 +104,15 @@ ModuleType=TSourceModule
 [C:\ProjetoDelphi\Consultas\uConClientes.pas]
 ModuleType=TSourceModule
 
-[C:\ProjetoDelphi\Unit2.pas]
-ModuleType=TSourceModule
-
 [C:\ProjetoDelphi\Classes\cCadCategoria.pas]
-ModuleType=TSourceModule
-
-[C:\ProjetoDelphi\Login\uLogin.pas]
 ModuleType=TSourceModule
 
 [C:\ProjetoDelphi\Classes\cUsuarioLogado.pas]
 ModuleType=TSourceModule
 
 [EditWindow0]
-ViewCount=20
-CurrentEditView=C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.pas
+ViewCount=24
+CurrentEditView=C:\ProjetoDelphi\DataModule\uDtmnConexao.pas
 View0=0
 View1=1
 View2=2
@@ -118,6 +133,10 @@ View16=16
 View17=17
 View18=18
 View19=19
+View20=20
+View21=21
+View22=22
+View23=23
 PercentageSizes=1
 Create=1
 Visible=1
@@ -137,8 +156,8 @@ TopPanelSize=0
 LeftPanelSize=0
 RightPanelSize=0
 BottomPanelSize=0
-BottomPanelClients=MessageView,DockSite1
-BottomPanelData=000008000102020000000F0000004D65737361676556696577466F726D09000000446F636B53697465311534000000000000022806000000000000FFFFFFFF
+BottomPanelClients=DockSite1
+BottomPanelData=0000080001000100000009000000446F636B53697465314934000000000000000006000000000000FFFFFFFF
 BottomMiddlePanelSize=0
 BottomMiddlePanelClients=DockSite0,GraphDrawingModel
 BottomMiddelPanelData=0000080001020200000009000000446F636B536974653010000000477261706844726177696E67566965779A1D00000000000002F806000000000000FFFFFFFF
@@ -148,13 +167,13 @@ TabDockRightClients=DockSite2=0,DockSite4=1
 [View0]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Unit2.pas
-CursorX=47
-CursorY=237
-TopLine=2
+CursorX=55
+CursorY=86
+TopLine=75
 LeftCol=1
-Elisions={{161,0},{187,11},{'Relatorios'}}
-Bookmarks={1,165,1}
-EditViewName=Borland.FormDesignerView
+Elisions={{154,0},{180,11},{'Relatorios'}}
+Bookmarks={1,158,1}
+EditViewName=C:\ProjetoDelphi\Unit2.pas
 
 [View1]
 CustomEditViewType=TEditView
@@ -191,6 +210,61 @@ EditViewName=C:\ProjetoDelphi\Cadastros\uCadProduto.pas
 
 [View4]
 CustomEditViewType=TEditView
+Module=C:\ProjetoDelphi\Cadastros\uCadUsuario.pas
+CursorX=37
+CursorY=155
+TopLine=157
+LeftCol=1
+Elisions={{91,0},{104,11},{'CARREGAR/LIMPAR IMAGEM'}}
+Bookmarks=
+EditViewName=Borland.FormDesignerView
+
+[View5]
+CustomEditViewType=TEditView
+Module=C:\ProjetoDelphi\DataModule\uDtmnConexao.pas
+CursorX=30
+CursorY=16
+TopLine=7
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=Borland.FormDesignerView
+
+[View6]
+CustomEditViewType=TEditView
+Module=C:\ProjetoDelphi\Classes\cAtualizacaoBancoDeDados.pas
+CursorX=58
+CursorY=26
+TopLine=36
+LeftCol=1
+Elisions=
+Bookmarks={1,30,1}
+EditViewName=C:\ProjetoDelphi\Classes\cAtualizacaoBancoDeDados.pas
+
+[View7]
+CustomEditViewType=TEditView
+Module=C:\ProjetoDelphi\Classes\cAtualizacaoCamposMSSQL.pas
+CursorX=60
+CursorY=49
+TopLine=34
+LeftCol=1
+Elisions=
+Bookmarks=
+EditViewName=C:\ProjetoDelphi\Classes\cAtualizacaoCamposMSSQL.pas
+
+[View8]
+CustomEditViewType=TEditView
+Module=C:\ProjetoDelphi\Classes\cCadUsuario.pas
+CursorX=1
+CursorY=375
+TopLine=364
+LeftCol=1
+Elisions=
+Bookmarks={1,375,1}
+EditViewName=C:\ProjetoDelphi\Classes\cCadUsuario.pas
+
+[View9]
+CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Consultas\uConClientes.pas
 CursorX=127
 CursorY=76
@@ -200,7 +274,7 @@ Elisions=
 Bookmarks=
 EditViewName=Borland.FormDesignerView
 
-[View5]
+[View10]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Consultas\uConCategorias.pas
 CursorX=5
@@ -211,7 +285,7 @@ Elisions=
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Consultas\uConCategorias.pas
 
-[View6]
+[View11]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Herança\uTelaHerancaConsulta.pas
 CursorX=43
@@ -222,7 +296,7 @@ Elisions=
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Herança\uTelaHerancaConsulta.pas
 
-[View7]
+[View12]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Cadastros\uCadFornecedor.pas
 CursorX=45
@@ -233,7 +307,7 @@ Elisions=
 Bookmarks=
 EditViewName=Borland.FormDesignerView
 
-[View8]
+[View13]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Classes\cCadFornecedor.pas
 CursorX=19
@@ -244,7 +318,7 @@ Elisions=
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Classes\cCadFornecedor.pas
 
-[View9]
+[View14]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Classes\cUsuarioLogado.pas
 CursorX=101
@@ -255,7 +329,7 @@ Elisions=
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Classes\cUsuarioLogado.pas
 
-[View10]
+[View15]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Herança\uFuncaoCriptografia.pas
 CursorX=47
@@ -266,18 +340,7 @@ Elisions={{8,0},{11,11},{'Declaração Funções Criptografar e DesCriptografar'
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Herança\uFuncaoCriptografia.pas
 
-[View11]
-CustomEditViewType=TEditView
-Module=C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.pas
-CursorX=68
-CursorY=96
-TopLine=79
-LeftCol=1
-Elisions=
-Bookmarks=
-EditViewName=C:\ProjetoDelphi\Cadastros\uCadStatusFuncao.pas
-
-[View12]
+[View16]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Classes\cFuncao.pas
 CursorX=83
@@ -288,7 +351,7 @@ Elisions={{86,0},{200,11},{'LIMPAR IMAGEM'}}{{288,0},{352,11},{'VALIDAÇÃO CPF/
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Classes\cFuncao.pas
 
-[View13]
+[View17]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Processo\uProVendas.pas
 CursorX=1
@@ -299,7 +362,7 @@ Elisions={{203,0},{259,11},{'METODOS'}}{{423,0},{440,11},{'LIMPAR'}}{{442,0},{45
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Processo\uProVendas.pas
 
-[View14]
+[View18]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Classes\cControleEstoque.pas
 CursorX=59
@@ -310,7 +373,7 @@ Elisions={{32,0},{43,11},{'Constructor and Destructor'}}
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Classes\cControleEstoque.pas
 
-[View15]
+[View19]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Cadastros\uCadCliente.pas
 CursorX=24
@@ -321,18 +384,18 @@ Elisions={{146,0},{234,11},{'Override'}}{{236,0},{292,11},{'BTNS'}}{{294,0},{333
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Cadastros\uCadCliente.pas
 
-[View16]
+[View20]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Classes\cAtualizacaoTabelaMSSQL.pas
-CursorX=73
-CursorY=170
+CursorX=88
+CursorY=40
 TopLine=32
 LeftCol=1
 Elisions={{44,0},{70,11},{'CONSTRUCTOR'}}
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Classes\cAtualizacaoTabelaMSSQL.pas
 
-[View17]
+[View21]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\DataModule\uDtmVenda.pas
 CursorX=1
@@ -343,18 +406,18 @@ Elisions=
 Bookmarks=
 EditViewName=Borland.FormDesignerView
 
-[View18]
+[View22]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Login\uLogin.pas
-CursorX=75
-CursorY=57
-TopLine=67
+CursorX=58
+CursorY=59
+TopLine=45
 LeftCol=1
 Elisions=
 Bookmarks=
 EditViewName=C:\ProjetoDelphi\Login\uLogin.pas
 
-[View19]
+[View23]
 CustomEditViewType=TEditView
 Module=C:\ProjetoDelphi\Login\uUsuarioVsAcoes.pas
 CursorX=1
@@ -444,12 +507,12 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=2002
-Height=8667
+Width=2021
+Height=8222
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=2002
-ClientHeight=8667
+ClientWidth=2021
+ClientHeight=8222
 TBDockHeight=5903
 LRDockWidth=2354
 Dockable=1
@@ -459,17 +522,17 @@ StayOnTop=0
 PercentageSizes=1
 Create=1
 Visible=0
-Docked=1
+Docked=0
 State=0
 Left=0
-Top=0
+Top=8389
 Width=2764
 Height=1417
-MaxLeft=-1
-MaxTop=-1
-ClientWidth=2764
-ClientHeight=1417
-TBDockHeight=1417
+MaxLeft=-10
+MaxTop=-14
+ClientWidth=2646
+ClientHeight=917
+TBDockHeight=1389
 LRDockWidth=2764
 Dockable=1
 StayOnTop=0
@@ -482,12 +545,12 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=2002
-Height=9014
+Width=2021
+Height=8569
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=2002
-ClientHeight=9014
+ClientWidth=2021
+ClientHeight=8569
 TBDockHeight=7153
 LRDockWidth=2002
 Dockable=1
@@ -538,18 +601,23 @@ Visible=0
 Docked=1
 State=0
 Left=0
-Top=0
-Width=1895
-Height=9014
+Top=23
+Width=1914
+Height=8569
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=1895
-ClientHeight=9014
+ClientWidth=1914
+ClientHeight=8569
 TBDockHeight=9014
 LRDockWidth=1895
 Dockable=1
 StayOnTop=0
-SplitPos=111
+SplitPos=112
+
+[PropInspDesignerSelection]
+ArrangeBy=Name
+SelectedItem=Name,AfterCommit
+ExpandedItems=ConnectedStoredUsage=0,FetchOptions=0,FormatOptions=0,"LiveBindings Designer=0",Params=0,ResourceOptions=0,TxOptions=0,UpdateOptions=0
 
 [ClassBrowserTool]
 PercentageSizes=1
@@ -557,8 +625,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=-8
-Top=-8
+Left=-16
+Top=-39
 Width=1846
 Height=3139
 MaxLeft=-1
@@ -616,12 +684,12 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=2002
-Height=8667
+Width=1953
+Height=8125
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=2002
-ClientHeight=8667
+ClientWidth=1953
+ClientHeight=8125
 TBDockHeight=5958
 LRDockWidth=2510
 Dockable=1
@@ -633,8 +701,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=-8
-Top=-8
+Left=-972
+Top=-52
 Width=2852
 Height=6208
 MaxLeft=-1
@@ -652,8 +720,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=0
-Top=0
+Left=-16
+Top=217
 Width=273
 Height=361
 MaxLeft=-1
@@ -757,11 +825,11 @@ State=0
 Left=0
 Top=0
 Width=2334
-Height=1125
+Height=861
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2334
-ClientHeight=1125
+ClientHeight=861
 TBDockHeight=2500
 LRDockWidth=3398
 Dockable=1
@@ -776,11 +844,11 @@ State=0
 Left=0
 Top=0
 Width=2334
-Height=1125
+Height=889
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2334
-ClientHeight=1125
+ClientHeight=889
 TBDockHeight=2319
 LRDockWidth=2822
 Dockable=1
@@ -814,11 +882,11 @@ State=0
 Left=0
 Top=0
 Width=2334
-Height=861
+Height=1125
 MaxLeft=-1
 MaxTop=-1
 ClientWidth=2334
-ClientHeight=861
+ClientHeight=1125
 TBDockHeight=1153
 LRDockWidth=3672
 Dockable=1
@@ -840,12 +908,12 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=2002
-Height=8667
+Width=1738
+Height=8125
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=2002
-ClientHeight=8667
+ClientWidth=1738
+ClientHeight=8125
 TBDockHeight=4889
 LRDockWidth=7148
 Dockable=1
@@ -857,8 +925,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=0
-Top=0
+Left=198
+Top=568
 Width=2852
 Height=3208
 MaxLeft=-1
@@ -904,12 +972,12 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=1895
-Height=9014
+Width=1738
+Height=8472
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=1895
-ClientHeight=9014
+ClientWidth=1738
+ClientHeight=8472
 TBDockHeight=3681
 LRDockWidth=1895
 Dockable=1
@@ -923,12 +991,12 @@ Docked=1
 State=0
 Left=0
 Top=0
-Width=2002
-Height=8667
+Width=1846
+Height=8125
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=2002
-ClientHeight=8667
+ClientWidth=1846
+ClientHeight=8125
 TBDockHeight=4889
 LRDockWidth=5303
 Dockable=1
@@ -988,8 +1056,8 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=8
-Top=8
+Left=0
+Top=18
 Width=3818
 Height=1417
 MaxLeft=-1
@@ -1012,14 +1080,14 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=8
-Top=8
-Width=2002
-Height=9014
+Left=3
+Top=23
+Width=2021
+Height=8569
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=2002
-ClientHeight=9014
+ClientWidth=2021
+ClientHeight=8569
 TBDockHeight=9014
 LRDockWidth=2002
 Dockable=1
@@ -1042,8 +1110,8 @@ Width=1895
 Height=9014
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=1895
-ClientHeight=9014
+ClientWidth=1738
+ClientHeight=8472
 TBDockHeight=9014
 LRDockWidth=1895
 Dockable=1
@@ -1060,14 +1128,14 @@ Create=1
 Visible=0
 Docked=1
 State=0
-Left=8
-Top=8
-Width=2002
-Height=9014
+Left=3
+Top=23
+Width=2021
+Height=8569
 MaxLeft=-1
 MaxTop=-1
-ClientWidth=2002
-ClientHeight=9014
+ClientWidth=2021
+ClientHeight=8569
 TBDockHeight=9014
 LRDockWidth=2002
 Dockable=1
