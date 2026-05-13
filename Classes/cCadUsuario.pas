@@ -17,7 +17,6 @@ type
     F_nome:string;
     F_senha:string;
     F_Foto: TBitmap;
-    F_statusId:Integer;
     function getSenha: string;
     procedure setSenha(const Value: string);
 
@@ -36,7 +35,6 @@ type
     property nome      :string  read F_nome         write F_nome;
     property senha     :string  read getSenha       write setSenha;
     property foto      :TBitmap read F_Foto;
-    property status    :Integer read F_statusId     write F_statusId;
   end;
 implementation
 
@@ -105,24 +103,19 @@ begin
       Qry.SQL.Add('UPDATE usuarios');
       Qry.SQL.Add('   SET nome     = :nome,');
       Qry.SQL.Add('       senha    = :senha,');
-      Qry.SQL.Add('       foto     = :foto,');
-      Qry.SQL.Add('       statusId = :statusId');
       Qry.SQL.Add(' WHERE usuarioId = :usuarioId');
       Qry.ParamByName('senha').AsString := Self.F_senha;
     end
     else
     begin
-      // Alterar foto/nome/status SEM tocar na senha
       Qry.SQL.Add('UPDATE usuarios');
       Qry.SQL.Add('   SET nome     = :nome,');
       Qry.SQL.Add('       foto     = :foto,');
-      Qry.SQL.Add('       statusId = :statusId');
       Qry.SQL.Add(' WHERE usuarioId = :usuarioId');
     end;
 
     Qry.ParamByName('usuarioId').AsInteger := Self.F_usuarioId;
     Qry.ParamByName('nome').AsString       := Self.F_nome;
-    Qry.ParamByName('statusId').AsInteger  := Self.F_statusId;
 
     if (Self.F_foto <> nil) and (not Self.F_foto.Empty) then
     begin
@@ -164,14 +157,12 @@ begin
   try
     Qry.Connection := FdConexao;
     // SQL parametrizada para evitar SQL Injection e facilitar o envio de BLOBs (fotos)
-    Qry.SQL.Text := 'INSERT INTO usuarios (nome, senha, foto, statusId) ' +
-                    'VALUES (:nome, :senha, :foto, :statusId)';
+    Qry.SQL.Text := 'INSERT INTO usuarios (nome, senha, foto) ' +
+                    'VALUES (:nome, :senha, :foto)';
 
     // Preenchimento dos parâmetros com os dados das propriedades da classe
     Qry.ParamByName('nome').AsString  := Self.F_nome;
     Qry.ParamByName('senha').AsString := Self.F_senha;
-
-    Qry.ParamByName('statusId').AsInteger := Self.F_statusId;
 
     // Se houver uma imagem carregada no objeto F_foto, converte para Stream e envia como Blob
     if (F_foto <> nil) and (not F_foto.Empty) then
@@ -213,7 +204,7 @@ begin
   Qry := TFDQuery.Create(nil);
   try
     Qry.Connection := FdConexao;
-    Qry.SQL.Text := 'SELECT usuarioId, nome, senha, foto, statusId FROM usuarios WHERE usuarioId = :usuarioId';
+    Qry.SQL.Text := 'SELECT usuarioId, nome, senha, foto FROM usuarios WHERE usuarioId = :usuarioId';
     Qry.ParamByName('usuarioId').AsInteger := Id;
 
     try
@@ -224,7 +215,6 @@ begin
         Self.F_usuarioId := Qry.FieldByName('usuarioId').AsInteger;
         Self.F_nome      := Qry.FieldByName('nome').AsString;
         Self.F_senha     := Qry.FieldByName('senha').AsString;
-        Self.F_statusId  := Qry.FieldByName('statusId').AsInteger;
 
         if not Qry.FieldByName('foto').IsNull then
         begin
@@ -266,7 +256,7 @@ begin
   try
     Qry := TFDQuery.Create(nil);
     Qry.Connection := FdConexao;
-    Qry.SQL.Add('SELECT usuarioId, nome, senha, foto, statusId');
+    Qry.SQL.Add('SELECT usuarioId, nome, senha, foto');
     Qry.SQL.Add('  FROM usuarios');
     Qry.SQL.Add(' WHERE nome = :nome');
     Qry.SQL.Add('   AND senha = :Senha');
@@ -280,7 +270,6 @@ begin
         F_usuarioId  := Qry.FieldByName('usuarioId').AsInteger;
         F_nome       := Qry.FieldByName('nome').AsString;
         F_senha      := Qry.FieldByName('senha').AsString;
-        F_statusId   := Qry.FieldByName('statusId').AsInteger;
 
         // Carrega a foto
         if not Qry.FieldByName('foto').IsNull then

@@ -56,8 +56,6 @@ begin
        oUsuarioLogado.senha  := oUsuario.senha;
        //puxa a foto
        oUsuarioLogado.foto.Assign(oUsuario.foto);
-       //puxa status
-       oUsuarioLogado.statusId := oUsuario.status;
 
        //fecha o login
        bFechar := True;

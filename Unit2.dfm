@@ -375,10 +375,6 @@ object frmPrincipal: TfrmPrincipal
       object N2: TMenuItem
         Caption = '-'
       end
-      object CADASTRODEFUNO1: TMenuItem
-        Caption = 'CADASTRO DE FUN'#199#195'O'
-        OnClick = CADASTRODEFUNO1Click
-      end
       object USUARIO1: TMenuItem
         Caption = 'USUARIO'
         OnClick = USUARIO1Click

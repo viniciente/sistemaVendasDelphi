@@ -60,7 +60,6 @@ type
     PieSeries2: TPieSeries;
     painel: TPanel;
     FORNECEDOR1: TMenuItem;
-    CADASTRODEFUNO1: TMenuItem;
     procedure mnuFecharClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Categorias1Click(Sender: TObject);
@@ -82,7 +81,6 @@ type
     procedure tmrAtualizacaoDashBordTimer(Sender: TObject);
     procedure LOGOUT1Click(Sender: TObject);
     procedure FORNECEDOR1Click(Sender: TObject);
-    procedure CADASTRODEFUNO1Click(Sender: TObject);
   private
     TeclaEnter: TMREnter;
     procedure AtualizacaoBancoDados(aForm: TfrmAtualizaDB);
@@ -103,7 +101,7 @@ implementation
 uses uCadCategorias, uRelVendaPorData, uCadCliente, uCadProduto, uProVendas, uRelCategoria, uRelCadCliente,
 uRelCadClienteFicha, uRelProduto, uRelCadProdutoComGrupoCategoria, uSelecionarData, uCadUsuario, uLogin, uAlterarSenha,
 cArquivoIni, uCadAcaoAcesso,
-cAcaoAcesso, uUsuarioVsAcoes, UTelaHeranca, uDtmGrafico, cCadUsuario, uCadFornecedor, uCadStatusFuncao;
+cAcaoAcesso, uUsuarioVsAcoes, UTelaHeranca, uDtmGrafico, cCadUsuario, uCadFornecedor;
 
 {$REGION'Cadastros'}
 procedure TfrmPrincipal.Categorias1Click(Sender: TObject);
@@ -149,11 +147,6 @@ end;
 procedure TfrmPrincipal.FORNECEDOR1Click(Sender: TObject);
 begin
   TFuncao.CriarForm(TfrmCadFornecedor, oUsuarioLogado, dtmConexao.FDConexao);
-end;
-
-procedure TfrmPrincipal.CADASTRODEFUNO1Click(Sender: TObject);
-begin
-  TFuncao.CriarForm(TfrmCadStatusFuncao, oUsuarioLogado, dtmConexao.FDConexao);
 end;
 
 {$ENDREGION}
@@ -239,7 +232,6 @@ begin
     TAcaoAcesso.CriarAcoes(TfrmRelCategoria,dtmConexao.FDConexao);
     TAcaoAcesso.CriarAcoes(TfrmUsuarioVsAcoes,dtmConexao.FDConexao);
     TAcaoAcesso.CriarAcoes(TfrmCadFornecedor, dtmConexao.FDConexao);
-    TAcaoAcesso.CriarAcoes(TfrmCadStatusFuncao,dtmConexao.FDConexao);
 
     TAcaoAcesso.PreencherUsuariosVsAcoes(dtmConexao.FDConexao);
 

@@ -50,9 +50,7 @@ uses
   uConProdutos in 'Consultas\uConProdutos.pas' {frmConProdutos},
   uConClientes in 'Consultas\uConClientes.pas' {frmConClientes},
   uCadFornecedor in 'Cadastros\uCadFornecedor.pas' {frmCadFornecedor},
-  cCadFornecedor in 'Classes\cCadFornecedor.pas',
-  cCadStatusFuncao in 'Classes\cCadStatusFuncao.pas',
-  uCadStatusFuncao in 'Cadastros\uCadStatusFuncao.pas' {frmCadStatusFuncao};
+  cCadFornecedor in 'Classes\cCadFornecedor.pas';
 
 {$R *.res}
 

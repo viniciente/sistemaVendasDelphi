@@ -23,18 +23,10 @@ type
     lblSenha: TLabel;
     pnlImgUsuario: TPanel;
     imgImagem: TImage;
-    lkpStatusUsuario: TDBLookupComboBox;
-    FDQryStatusUsuario: TFDQuery;
-    dsStatusUsuario: TDataSource;
-    lblStatus: TLabel;
     FDQuery1usuarioId: TFDAutoIncField;
     FDQuery1nome: TStringField;
     FDQuery1senha: TStringField;
     FDQuery1foto: TBlobField;
-    FDQuery1statusId: TIntegerField;
-    FDQuery1status: TStringField;
-    FDQryStatusUsuariostatusId: TIntegerField;
-    FDQryStatusUsuariodescricao: TStringField;
     procedure btnNovoClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -132,7 +124,6 @@ begin
     edtUsuarioId.Text   :=IntToStr(oUsuario.codigo);
     edtNome.Text        :=oUsuario.nome;
     imgImagem.Picture.Assign(oUsuario.foto);
-    lkpStatusUsuario.KeyValue :=oUsuario.status;
 
     edtSenha.Enabled := False;
     edtSenha.Visible := False;
@@ -162,7 +153,6 @@ begin
     oUsuario.codigo := 0;
 
   oUsuario.nome     := edtNome.Text;
-  oUsuario.status := lkpStatusUsuario.KeyValue;
   oUsuario.foto.Assign(imgImagem.Picture.Graphic);
 
   if edtSenha.Visible and (edtSenha.Text <> '') then
@@ -191,9 +181,6 @@ begin
   inherited;
   oUsuario:=TUsuario.Create(dtmConexao.FdConexao);
   IndiceAtual:='nome';
-
-  FDQryStatusUsuario.Close;
-  FDQryStatusUsuario.Open;
 end;
 
 end.
