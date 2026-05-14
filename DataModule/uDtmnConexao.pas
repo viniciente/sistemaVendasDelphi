@@ -17,6 +17,8 @@ type
     procedure DataModuleCreate(Sender: TObject);
   private
     procedure ConfigurarConexaoDinamicamente;
+    procedure CriarBancoSeNaoExistir;
+    procedure CriarTabelasSeNaoExistirem;
     { Private declarations }
   public
     { Public declarations }
@@ -30,6 +32,8 @@ implementation
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 
 {$R *.dfm}
+
+uses cAtualizacaoTabelaMSSQL;
 
 procedure TdtmConexao.ConfigurarConexaoDinamicamente;
 var
@@ -64,9 +68,61 @@ begin
   end;
 end;
 
+procedure TdtmConexao.CriarBancoSeNaoExistir;
+var
+  NomeBanco: String;
+begin
+
+  NomeBanco :=
+    FDConexao.Params.Values['Database'];
+
+  // conecta no MASTER primeiro
+  FDConexao.Params.Values['Database'] := 'master';
+
+  FDConexao.Connected := True;
+
+  // cria banco se não existir
+  FDConexao.ExecSQL(
+    'IF NOT EXISTS ('+
+    ' SELECT * FROM sys.databases '+
+    ' WHERE name = ' + QuotedStr(NomeBanco) +
+    ') '+
+    'BEGIN '+
+    ' CREATE DATABASE [' + NomeBanco + '] '+
+    'END'
+  );
+
+  FDConexao.Connected := False;
+
+  // reconecta no banco correto
+  FDConexao.Params.Values['Database'] :=
+    NomeBanco;
+
+  FDConexao.Connected := True;
+
+end;
+
+procedure TdtmConexao.CriarTabelasSeNaoExistirem;
+var
+  oAtualizacao: TAtualizacaoTabelaMSSQL;
+begin
+  // Garante que a conexao esta ativa no banco correto antes de criar as tabelas
+  if not FDConexao.Connected then
+    FDConexao.Connected := True;
+
+  oAtualizacao := TAtualizacaoTabelaMSSQL.Create(FDConexao);
+  try
+    oAtualizacao.Executar;
+  finally
+    FreeAndNil(oAtualizacao);
+  end;
+end;
+
 procedure TdtmConexao.DataModuleCreate(Sender: TObject);
 begin
   ConfigurarConexaoDinamicamente;
+  CriarBancoSeNaoExistir;
+  CriarTabelasSeNaoExistirem;
 end;
 
 end.

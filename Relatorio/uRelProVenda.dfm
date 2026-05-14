@@ -405,7 +405,6 @@ object frmRelProVenda: TfrmRelProVenda
     end
   end
   object QryVenda: TFDQuery
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'select  vendas.vendaId,'
@@ -469,7 +468,6 @@ object frmRelProVenda: TfrmRelProVenda
     Top = 400
   end
   object QryVendasItens: TFDQuery
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'select vendasItens.vendaId,'

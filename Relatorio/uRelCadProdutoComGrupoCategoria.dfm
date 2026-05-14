@@ -343,7 +343,7 @@ object frmRelCadProdutoComGrupoCategoria: TfrmRelCadProdutoComGrupoCategoria
           Transparent = False
         end
         object RLLabel6: TRLLabel
-          Left = 0
+          Left = -3
           Top = 0
           Width = 83
           Height = 16
@@ -360,7 +360,6 @@ object frmRelCadProdutoComGrupoCategoria: TfrmRelCadProdutoComGrupoCategoria
     end
   end
   object QryProdutos: TFDQuery
-    Active = True
     Connection = dtmConexao.fdConexao
     SQL.Strings = (
       'SELECT produtos.produtoId,'

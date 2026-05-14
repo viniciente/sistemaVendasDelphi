@@ -297,6 +297,19 @@ end;
 procedure TAtualizacaoTabelaMSSQL.InserirDadosPadrao;
 begin
 
+  // =========================================================
+  // CATEGORIAS
+  // =========================================================
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM categorias WHERE descricao = ''Serviços'') '+
+    'INSERT INTO categorias (descricao) VALUES (''Serviços'')'
+  );
+
+  // =========================================================
+  // TIPO PESSOA
+  // =========================================================
+
   FdConexao.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM tipoPessoa WHERE descricao = ''Física'') '+
     'INSERT INTO tipoPessoa (descricao) VALUES (''Física'')'
@@ -307,9 +320,56 @@ begin
     'INSERT INTO tipoPessoa (descricao) VALUES (''Jurídica'')'
   );
 
+  // =========================================================
+  // STATUS CLIENTES
+  // =========================================================
+
   FdConexao.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Ativo'') '+
     'INSERT INTO statusClientes (descricao) VALUES (''Ativo'')'
+  );
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Bloqueado'') '+
+    'INSERT INTO statusClientes (descricao) VALUES (''Bloqueado'')'
+  );
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Atenção'') '+
+    'INSERT INTO statusClientes (descricao) VALUES (''Atenção'')'
+  );
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Inativo'') '+
+    'INSERT INTO statusClientes (descricao) VALUES (''Inativo'')'
+  );
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Prospecto'') '+
+    'INSERT INTO statusClientes (descricao) VALUES (''Prospecto'')'
+  );
+
+  // =========================================================
+  // STATUS USUARIO
+  // =========================================================
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM statusUsuario WHERE descricao = ''ADMIN'') '+
+    'INSERT INTO statusUsuario (descricao) VALUES (''ADMIN'')'
+  );
+
+  // =========================================================
+  // USUARIO ADMIN
+  // =========================================================
+
+  FdConexao.ExecSQL(
+    'IF NOT EXISTS (SELECT 1 FROM usuarios WHERE nome = ''ADMIN'') '+
+    'INSERT INTO usuarios (nome, senha, statusId) '+
+    'VALUES ('+
+    ' ''ADMIN'', '+
+    ' ''987'', '+
+    ' (SELECT TOP 1 statusId FROM statusUsuario WHERE descricao = ''ADMIN'') '+
+    ')'
   );
 
 end;
