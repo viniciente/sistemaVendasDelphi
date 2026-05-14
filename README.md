@@ -7,7 +7,7 @@ Sistema de gerenciamento de vendas desenvolvido em Delphi com interface desktop.
 ## Tecnologias Utilizadas
 
 - **Linguagem:** Pascal (Delphi)
-- **IDE:** Embarcadero Delphi 12
+- **IDE:** Embarcadero Delphi 10.2
 - **Banco de Dados:** Microsoft SQL Server (MS SQL)
 - **Componentes:** FireDAC, Fortes Report Community Edition
 - **Interface:** VCL (Visual Component Library)
@@ -16,17 +16,14 @@ Sistema de gerenciamento de vendas desenvolvido em Delphi com interface desktop.
 
 ### Pré-requisitos
 
-- Embarcadero Delphi 12 instalado
 - Microsoft SQL Server configurado e acessível
-- Arquivo de configuração `Vendas.ini` com as credenciais de acesso ao banco de dados
+- Arquivo de configuração `config.ini` com as credenciais de acesso ao banco de dados
 
 ### Passos
 
-1. Abra o projeto `Vendas.dproj` no Delphi
-2. Configure a conexão com o banco de dados no arquivo `Vendas.ini`
-3. Execute a compilação do projeto (F9 ou menu Build → Compile)
-4. A aplicação será gerada como `Vendas.exe`
-5. Execute o arquivo gerado para iniciar o sistema
+1. Edite o arquivo `config.ini` com as informações do seu banco de dados (SQL)
+2. Salve e Abra o Executavel `Vendas.exe`
+3. Ao Abrir o Sistema, Terá um usuario e uma senha padrão para o primeiro acesso, Usuario: ADMIN | Senha: 123
 
 ### Autenticação
 
@@ -34,10 +31,6 @@ O sistema possui um módulo de login obrigatório:
 - Insira suas credenciais de usuário
 - O sistema validará as permissões de acesso no banco de dados
 - Opção de alterar senha disponível após o login
-
-## Como Importar/Exportar Dados
-
-### Exportação de Dados
 
 O sistema gera relatórios em formato customizado através do Fortes Report:
 
@@ -106,4 +99,3 @@ Os dados são armazenados em banco de dados MS SQL Server nas seguintes tabelas 
 
 **Versão:** 1.0  
 **Desenvolvedor:** viniciente  
-**Licença:** Aberta para uso e modificação
