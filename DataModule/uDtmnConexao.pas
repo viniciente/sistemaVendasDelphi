@@ -37,11 +37,6 @@ uses
   Vcl.Dialogs,
   cAtualizacaoTabelaMSSQL;
 
-// ============================================================
-//  GerarConfigIniPadrao
-//  Cria o arquivo config.ini com valores padrão comentados,
-//  facilitando a edição pelo cliente.
-// ============================================================
 procedure TdtmConexao.GerarConfigIniPadrao(const aCaminho: string);
 var
   LArquivo: TStringList;
@@ -81,11 +76,6 @@ begin
   end;
 end;
 
-// ============================================================
-//  ConfigurarConexao
-//  Lê o config.ini e aplica os parâmetros no FDConexao.
-//  Se o arquivo não existir, gera o padrão e avisa o cliente.
-// ============================================================
 procedure TdtmConexao.ConfigurarConexao;
 var
   LIni: TIniFile;
@@ -148,11 +138,6 @@ begin
   FDConexao.LoginPrompt := False;
 end;
 
-// ============================================================
-//  CriarBancoSeNaoExistir
-//  Conecta no master, cria o banco se necessário,
-//  depois reconecta no banco do sistema.
-// ============================================================
 procedure TdtmConexao.CriarBancoSeNaoExistir;
 var
   LNomeBanco: string;
@@ -178,10 +163,6 @@ begin
   FDConexao.Connected := True;
 end;
 
-// ============================================================
-//  CriarTabelasSeNaoExistirem
-//  Dispara a classe de atualização de estrutura.
-// ============================================================
 procedure TdtmConexao.CriarTabelasSeNaoExistirem;
 var
   oAtualizacao: TAtualizacaoTabelaMSSQL;
@@ -197,16 +178,12 @@ begin
   end;
 end;
 
-// ============================================================
-//  DataModuleCreate
-//  Ponto de entrada — executa tudo na ordem correta.
-// ============================================================
 procedure TdtmConexao.DataModuleCreate(Sender: TObject);
 begin
   try
-    ConfigurarConexao;       // 1. Lê / gera o config.ini
-    CriarBancoSeNaoExistir;  // 2. Cria o banco se não existir
-    CriarTabelasSeNaoExistirem; // 3. Cria / atualiza as tabelas
+    ConfigurarConexao;
+    CriarBancoSeNaoExistir;
+    CriarTabelasSeNaoExistirem;
   except
     on E: Exception do
     begin
