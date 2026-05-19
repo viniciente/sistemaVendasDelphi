@@ -84,6 +84,11 @@ end;
 function TCategoria.Apagar(id: Integer): Boolean;
 var TFD: TFDQuery;
 begin
+  if MessageDlg('Deseja mesmo apagar essa Categoria? '+FDescricao,mtConfirmation, [mbYes, mbNo], 0)=mrNo then begin
+    Result:=False;
+    Abort;
+  end;
+
   Result := False;
   TFD := TFDQuery.Create(nil);
   try

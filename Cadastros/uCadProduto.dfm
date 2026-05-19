@@ -29,10 +29,7 @@ inherited frmCadProduto: TfrmCadProduto
       ActivePage = tsManutencao
       ExplicitWidth = 864
       inherited tsListagem: TTabSheet
-        ExplicitLeft = 4
-        ExplicitTop = 24
         ExplicitWidth = 856
-        ExplicitHeight = 373
         object imgVisualizacao: TImage [0]
           Left = 625
           Top = 73
@@ -96,10 +93,7 @@ inherited frmCadProduto: TfrmCadProduto
         end
       end
       inherited tsManutencao: TTabSheet
-        ExplicitLeft = 4
-        ExplicitTop = 24
         ExplicitWidth = 856
-        ExplicitHeight = 373
         object lblCodigo: TLabel
           Left = 16
           Top = 29

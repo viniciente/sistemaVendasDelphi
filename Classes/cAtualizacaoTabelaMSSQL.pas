@@ -62,9 +62,6 @@ Q.Connection := FdConexao; Q.SQL.Text := 'SELECT OBJECT_ID(:NOME)'; Q.ParamByNam
 procedure TAtualizacaoTabelaMSSQL.CriarTabelas;
 begin
 
-  // =========================================================
-  // CATEGORIAS
-  // =========================================================
   if not TabelaExiste('categorias') then
   begin
     FdConexao.ExecSQL(
@@ -74,9 +71,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // TIPO PESSOA
-  // =========================================================
   if not TabelaExiste('tipoPessoa') then
   begin
     FdConexao.ExecSQL(
@@ -86,9 +80,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // STATUS CLIENTES
-  // =========================================================
   if not TabelaExiste('statusClientes') then
   begin
     FdConexao.ExecSQL(
@@ -98,9 +89,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // STATUS USUARIO
-  // =========================================================
   if not TabelaExiste('statusUsuario') then
   begin
     FdConexao.ExecSQL(
@@ -110,9 +98,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // FORNECEDOR
-  // =========================================================
   if not TabelaExiste('fornecedor') then
   begin
     FdConexao.ExecSQL(
@@ -126,9 +111,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // ACAO ACESSO
-  // =========================================================
   if not TabelaExiste('acaoAcesso') then
   begin
     FdConexao.ExecSQL(
@@ -139,9 +121,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // CLIENTES
-  // =========================================================
   if not TabelaExiste('clientes') then
   begin
     FdConexao.ExecSQL(
@@ -165,9 +144,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // PRODUTOS
-  // =========================================================
   if not TabelaExiste('produtos') then
   begin
     FdConexao.ExecSQL(
@@ -185,9 +161,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // USUARIOS
-  // =========================================================
   if not TabelaExiste('usuarios') then
   begin
     FdConexao.ExecSQL(
@@ -201,9 +174,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // STATUS ACAO ACESSO
-  // =========================================================
   if not TabelaExiste('statusAcaoAcesso') then
   begin
     FdConexao.ExecSQL(
@@ -220,9 +190,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // USUARIOS ACAO ACESSO
-  // =========================================================
   if not TabelaExiste('usuariosAcaoAcesso') then
   begin
     FdConexao.ExecSQL(
@@ -238,9 +205,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // VENDAS
-  // =========================================================
   if not TabelaExiste('vendas') then
   begin
     FdConexao.ExecSQL(
@@ -255,9 +219,6 @@ begin
     );
   end;
 
-  // =========================================================
-  // VENDAS ITENS
-  // =========================================================
   if not TabelaExiste('vendasItens') then
   begin
     FdConexao.ExecSQL(
@@ -297,18 +258,11 @@ end;
 procedure TAtualizacaoTabelaMSSQL.InserirDadosPadrao;
 begin
 
-  // =========================================================
-  // CATEGORIAS
-  // =========================================================
-
   FdConexao.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM categorias WHERE descricao = ''Serviços'') '+
     'INSERT INTO categorias (descricao) VALUES (''Serviços'')'
   );
 
-  // =========================================================
-  // TIPO PESSOA
-  // =========================================================
 
   FdConexao.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM tipoPessoa WHERE descricao = ''Física'') '+
@@ -320,9 +274,6 @@ begin
     'INSERT INTO tipoPessoa (descricao) VALUES (''Jurídica'')'
   );
 
-  // =========================================================
-  // STATUS CLIENTES
-  // =========================================================
 
   FdConexao.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM statusClientes WHERE descricao = ''Ativo'') '+
@@ -349,18 +300,11 @@ begin
     'INSERT INTO statusClientes (descricao) VALUES (''Prospecto'')'
   );
 
-  // =========================================================
-  // STATUS USUARIO
-  // =========================================================
-
   FdConexao.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM statusUsuario WHERE descricao = ''ADMIN'') '+
     'INSERT INTO statusUsuario (descricao) VALUES (''ADMIN'')'
   );
 
-  // =========================================================
-  // USUARIO ADMIN
-  // =========================================================
 
   FdConexao.ExecSQL(
     'IF NOT EXISTS (SELECT 1 FROM usuarios WHERE nome = ''ADMIN'') '+
